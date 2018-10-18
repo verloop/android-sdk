@@ -25,11 +25,7 @@ public class VerloopService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
 
-        Bundle extras = intent.getExtras();
-
-        boolean isToBind = extras != null && extras.getBoolean(Verloop.ONLY_BIND, false);
-
-        if (!isToBind || !verloopFragment.isClientAndUserInitialized()) {
+        if (!verloopFragment.isClientAndUserInitialized()) {
             Log.d(TAG, "Starting Fragment");
             SharedPreferences preferences =
                     getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);

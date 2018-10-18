@@ -53,7 +53,6 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
 
 
         Intent intent = new Intent(this, VerloopService.class);
-        intent.putExtra(Verloop.ONLY_BIND, true);
 
         startService(intent);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
