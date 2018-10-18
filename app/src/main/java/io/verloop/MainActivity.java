@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "fcm token: " + token);
 
                 VerloopConfig config = new VerloopConfig("hello.stage");
+                config.setFcmToken(token);
                 verloop = new Verloop(MainActivity.this, config);
             }
         });

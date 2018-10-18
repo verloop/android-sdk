@@ -27,13 +27,15 @@ public class Verloop {
 
     private String userId;
     private String clientId;
+    private String fcmToken;
 
 
     public Verloop(Context context, VerloopConfig config) {
         this.context = context;
 
-        this.userId = retreiveUserId(config);
+        this.userId = retrieveUserId(config);
         this.clientId = config.getClientId();
+        this.fcmToken = config.getFcmToken();
 
         config.save(getPreferences());
 
@@ -41,10 +43,21 @@ public class Verloop {
     }
 
     public void login(String userId) {
+        login(userId, null);
+    }
+
+    public void login(String userId, String fcmToken) {
         stopService();
 
         this.userId = userId;
-        getPreferences().edit().putString(CONFIG_USER_ID, userId).apply();
+        this.fcmToken = fcmToken;
+
+        SharedPreferences.Editor editor = getPreferences().edit();
+
+        editor.putString(CONFIG_USER_ID, this.userId);
+        editor.putString(CONFIG_FCM_TOKEN, this.fcmToken);
+
+        editor.apply();
 
         startService();
     }
@@ -52,7 +65,12 @@ public class Verloop {
     public void logout() {
         stopService();
 
-        getPreferences().edit().putString(CONFIG_USER_ID, null).apply();
+        SharedPreferences.Editor editor = getPreferences().edit();
+
+        editor.putString(CONFIG_USER_ID, null);
+        editor.putString(CONFIG_FCM_TOKEN, null);
+
+        editor.apply();
     }
 
     public void showChat() {
@@ -62,7 +80,7 @@ public class Verloop {
         context.startActivity(i);
     }
 
-    private String retreiveUserId(VerloopConfig config) {
+    private String retrieveUserId(VerloopConfig config) {
         if (config.getUserId() == null) {
             SharedPreferences preferences = getPreferences();
             userId = preferences.getString(CONFIG_USER_ID, null);
@@ -86,15 +104,6 @@ public class Verloop {
     private void startService() {
         Intent intent = new Intent(context, VerloopService.class);
 
-//        intent.putExtra(USER_ID, this.userId);
-//        intent.putExtra(CLIENT_ID, this.clientId);
-
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            context.startForegroundService(intent);
-//        } else {
-//            context.startService(intent);
-//        }
         context.startService(intent);
     }
 
