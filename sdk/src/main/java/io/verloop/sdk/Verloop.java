@@ -33,7 +33,7 @@ public class Verloop {
 
 
     public Verloop(Context context, VerloopConfig config) {
-        this.context = context;
+        this.context = context.getApplicationContext();
 
         this.userId = retrieveUserId(config);
         this.clientId = config.getClientId();
