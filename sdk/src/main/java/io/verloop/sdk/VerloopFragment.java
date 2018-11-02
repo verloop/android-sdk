@@ -1,7 +1,9 @@
 package io.verloop.sdk;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.net.UrlQuerySanitizer;
@@ -12,9 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 import static android.webkit.WebSettings.LOAD_DEFAULT;
@@ -30,6 +35,12 @@ public class VerloopFragment extends Fragment {
 
     private String clientId, userId;
 
+    private static final int ICE_CREAM = 12421;
+    private static final int LOLLIPOP = 12422;
+
+    private ValueCallback<Uri[]> filePathCallback;
+    private ValueCallback<Uri> uploadMsg;
+
     public static VerloopFragment newInstance(Context context) {
         VerloopFragment fragment = new VerloopFragment();
         Bundle args = new Bundle();
@@ -40,9 +51,42 @@ public class VerloopFragment extends Fragment {
 
     public void initializeWebView(Context context) {
         mWebView = new WebView(context);
+        mWebView.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                // open rest of URLS in default browser
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+                return true;
+            }
+        });
+
+        mWebView.setWebChromeClient(new WebChromeClient() {
+
+            //Handling input[type="file"] requests for android API 16+
+            public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+                Log.d(TAG, "openFileChooser");
+                VerloopFragment.this.uploadMsg = uploadMsg;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("*/*");
+                getActivity().startActivityForResult(Intent.createChooser(i, "Choose a file"), ICE_CREAM);
+            }
+
+            //Handling input[type="file"] requests for android API 21+
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                Log.d(TAG, "onShowFileChooser");
+                VerloopFragment.this.filePathCallback = filePathCallback;
+                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+                i.addCategory(Intent.CATEGORY_OPENABLE);
+                i.setType("*/*");
+                getActivity().startActivityForResult(Intent.createChooser(i, "Choose a file"), LOLLIPOP);
+                return true;
+            }
+        });
 
         WebSettings settings = mWebView.getSettings();
-        mWebView.addJavascriptInterface(new VerloopInterface(context, this), "VerloopMobile");
 
         if (context.getCacheDir() != null) {
             settings.setAppCachePath(context.getCacheDir().getAbsolutePath());
@@ -51,27 +95,34 @@ public class VerloopFragment extends Fragment {
         }
 
         settings.setJavaScriptEnabled(true);
+        mWebView.addJavascriptInterface(new VerloopInterface(context, this), "VerloopMobile");
         settings.setDomStorageEnabled(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
 
         settings.setCacheMode(LOAD_DEFAULT);
     }
 
-    public void loadChat(String clientId, String userId, String fcmToken) {
+    public void loadChat(String clientId, String userId, String fcmToken, boolean isStaging) {
         this.clientId = clientId;
         this.userId = userId;
         // Make sure the URL is built using a library.
         Uri.Builder uriBuilder = new Uri.Builder();
 
         uriBuilder.scheme("https");
-        uriBuilder.authority(this.clientId + ".verloop.io");
+        if (isStaging) {
+            uriBuilder.authority(this.clientId + ".stage.verloop.io");
+        } else {
+            uriBuilder.authority(this.clientId + ".verloop.io");
+        }
         uriBuilder.path("livechat");
         uriBuilder.appendQueryParameter("mode", "sdk");
         uriBuilder.appendQueryParameter("sdk", "android");
         uriBuilder.appendQueryParameter("user_id", this.userId);
 
         if (fcmToken != null) {
-            uriBuilder.appendQueryParameter("deviceToken", fcmToken);
-            uriBuilder.appendQueryParameter("deviceType", "android");
+            uriBuilder.appendQueryParameter("device_token", fcmToken);
+            uriBuilder.appendQueryParameter("device_type", "android");
         }
 
         Uri uri = uriBuilder.build();
@@ -161,5 +212,33 @@ public class VerloopFragment extends Fragment {
     boolean isClientAndUserSame(String clientId, String userId) {
         return isClientAndUserInitialized() &&
                 this.userId.equals(userId) && this.clientId.equals(clientId);
+    }
+
+    void fileUploadResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "Request Code: " + requestCode);
+        Log.d(TAG, "Result Code:  " + resultCode);
+        switch (requestCode) {
+            case ICE_CREAM:
+                Uri uri = null;
+                if (data != null) {
+                    uri = data.getData();
+                }
+                uploadMsg.onReceiveValue(uri);
+                uploadMsg = null;
+                break;
+            case LOLLIPOP:
+                Uri[] results = null;
+                // Check that the response is a good one
+                if (resultCode == Activity.RESULT_OK) {
+                    String dataString = data.getDataString();
+                    if (dataString != null) {
+                        results = new Uri[]{Uri.parse(dataString)};
+                    }
+                }
+
+                filePathCallback.onReceiveValue(results);
+                filePathCallback = null;
+                break;
+        }
     }
 }

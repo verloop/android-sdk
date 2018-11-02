@@ -33,6 +33,7 @@ public class VerloopService extends Service {
             String clientId = preferences.getString(Verloop.CONFIG_CLIENT_ID, null);
             String userId = preferences.getString(Verloop.CONFIG_USER_ID, null);
             String fcmToken = preferences.getString(Verloop.CONFIG_FCM_TOKEN, null);
+            boolean isStaging = preferences.getBoolean(Verloop.CONFIG_STAGING, false);
 
             if (clientId == null)
                 throw new UnsupportedOperationException("You need to have client_id");
@@ -41,7 +42,7 @@ public class VerloopService extends Service {
                 throw new UnsupportedOperationException("You need to have user_id");
 
             if (!getFragment().isClientAndUserSame(clientId, userId))
-                getFragment().loadChat(clientId, userId, fcmToken);
+                getFragment().loadChat(clientId, userId, fcmToken, isStaging);
             else
                 Log.d(TAG, "Client and User ID is same.");
         }

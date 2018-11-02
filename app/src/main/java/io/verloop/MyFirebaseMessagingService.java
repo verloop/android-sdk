@@ -27,8 +27,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.d("MyFirebaseMessagingServ", remoteMessage.getFrom());
 
         for (String i : remoteMessage.getData().keySet()) {
-            Log.d("MyFirebaseMessagingServ", i);
+            Log.d("MyFirebaseMessagingServ", "Key: " + i);
+            Log.d("MyFirebaseMessagingServ", "Val: " + remoteMessage.getData().get(i));
         }
+
+        Log.d("MyFirebaseMessagingServ", "Verloop Value: " + remoteMessage.getData().get("verloop"));
 
         Map<String, String> map = remoteMessage.getData();
 

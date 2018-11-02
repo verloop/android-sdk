@@ -55,6 +55,8 @@ public class VerloopNotification {
             notification.setContentIntent(contentIntent);
 
 
+
+
             NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -74,7 +76,7 @@ public class VerloopNotification {
     }
 
     private static boolean isActivityShowing(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, context.MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
         return preferences.getBoolean(Verloop.IS_SHOWN, false);
     }
 }

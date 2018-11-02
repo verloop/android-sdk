@@ -1,5 +1,6 @@
 package io.verloop.sdk;
 
+import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     static final String TAG = "VerloopActivity";
 
     private VerloopService verloopService;
+    private boolean isServiceConnecting = false;
     private VerloopFragment verloopFragment;
     private ServiceConnection serviceConnection = this;
     private Toolbar toolbar;
@@ -51,13 +54,6 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         getSupportActionBar().setElevation(1);
         toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
 
-
-        Intent intent = new Intent(this, VerloopService.class);
-
-        startService(intent);
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-
-
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.addAction(getPackageName() + ".REFRESH_VERLOOP_INTERFACE");
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
@@ -66,6 +62,8 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     @Override
     protected void onResume() {
         super.onResume();
+        connectWithService();
+
         setActivityActive(true);
         VerloopNotification.cancelNotification(this);
     }
@@ -123,6 +121,7 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     @Override
     public void onServiceDisconnected(ComponentName name) {
         verloopService = null;
+        isServiceConnecting = false;
     }
 
 
@@ -143,5 +142,23 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         SharedPreferences.Editor editor = getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE).edit();
         editor.putBoolean(Verloop.IS_SHOWN, isShown);
         editor.apply();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult");
+
+        verloopFragment.fileUploadResult(requestCode, resultCode, data);
+    }
+
+    private void connectWithService() {
+        if (!isServiceConnecting) {
+            Intent intent = new Intent(this, VerloopService.class);
+
+            startService(intent);
+            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+            isServiceConnecting = true;
+        }
     }
 }

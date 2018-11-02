@@ -33,6 +33,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button button = findViewById(R.id.button);
+        findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                verloop.logout();
+            }
+        });
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,22 +67,15 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "fcm token: " + token);
 
-                VerloopConfig config = new VerloopConfig("hello.stage");
+                VerloopConfig config = new VerloopConfig("hello");
                 config.setFcmToken(token);
+                config.setStaging(true);
                 verloop = new Verloop(MainActivity.this, config);
             }
         });
-
-
-//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//        ft.add(R.id.fragment, VerloopFragment.newInstance(), TAG).commit();
-    }
+        }
 
     private void addVerloop() {
-//        Intent i = new Intent(this, VerloopActivity.class);
-//        startActivity(i);
         verloop.showChat();
-//        MyApp app = (MyApp) getApplication();
-//        app.getVerloop().showChat();
     }
 }

@@ -20,6 +20,7 @@ public class Verloop {
     static final String CONFIG_CLIENT_ID = "CLIENT_ID";
     static final String CONFIG_USER_ID = "USER_ID";
     static final String CONFIG_FCM_TOKEN = "FCM_TOKEN";
+    static final String CONFIG_STAGING = "IS_STAGING";
 
     static final String SHARED_PREFERENCE_FILE_NAME = "io.verloop.sdk";
 
@@ -28,6 +29,7 @@ public class Verloop {
     private String userId;
     private String clientId;
     private String fcmToken;
+    private boolean isStaging;
 
 
     public Verloop(Context context, VerloopConfig config) {
@@ -36,6 +38,7 @@ public class Verloop {
         this.userId = retrieveUserId(config);
         this.clientId = config.getClientId();
         this.fcmToken = config.getFcmToken();
+        this.isStaging = config.getStaging();
 
         config.save(getPreferences());
 
@@ -64,6 +67,9 @@ public class Verloop {
 
     public void logout() {
         stopService();
+
+        if (fcmToken != null)
+            VerloopLogoutService.logout(context, clientId, userId, fcmToken, isStaging);
 
         SharedPreferences.Editor editor = getPreferences().edit();
 
