@@ -9,6 +9,7 @@
         <activity
             android:name=".VerloopActivity"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <service
