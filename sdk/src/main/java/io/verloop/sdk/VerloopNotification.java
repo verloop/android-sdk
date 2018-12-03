@@ -21,11 +21,22 @@ import java.util.Map;
 import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class VerloopNotification {
-
-
     private static final String TAG = "VerloopNotification";
 
-    public static void showNotification(Context context, @DrawableRes int smallIcon, Map<String, String> data) {
+    /**
+     * Call this method in your notification listener. It checks for the <code>verloop</code> key in
+     * <code>data</code> object.
+     *
+     * Only shows notification if the user is not currently on the verloop chat screen.
+     *
+     * @param context Context from service.
+     * @param smallIcon Drawable integer for showing the icon in notification.
+     * @param data Data from the remote message from FCM notification. Set this value as
+     *             <code>remoteMessage.getData()</code>.
+     *
+     * @return <code>true</code> if the notification was shown. <code>false</code> if it wasn't.
+     */
+    public static boolean showNotification(Context context, @DrawableRes int smallIcon, Map<String, String> data) {
         if (data.containsKey("verloop") && !isActivityShowing(context)) {
             JSONObject json;
             String title, text;
@@ -35,7 +46,7 @@ public class VerloopNotification {
                 text = json.getString("text");
             } catch (JSONException e) {
                 Log.e(TAG, e.toString());
-                return;
+                return false;
             }
 
 
@@ -66,7 +77,10 @@ public class VerloopNotification {
             }
 
             notificationManager.notify(Verloop.VERLOOP_ID, notification.build());
+            return true;
         }
+
+        return false;
     }
 
     static void cancelNotification(Context context) {
