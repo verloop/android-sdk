@@ -57,7 +57,6 @@ public class VerloopService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "onCreate");
         verloopFragment = VerloopFragment.newInstance(this);
     }
 
@@ -66,7 +65,6 @@ public class VerloopService extends Service {
         super.onDestroy();
         getFragment().wipeData();
         verloopFragment = null;
-        Log.d(TAG, "onDestroy");
     }
 
     @Override
