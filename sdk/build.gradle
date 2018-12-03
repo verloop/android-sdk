@@ -55,9 +55,9 @@ ext {
     libraryDescription = 'Livechat SDK for Verloop.io'
 
     siteUrl = 'https://verloop.io/'
-    gitUrl = 'https://github.com/LissF/DiagonalScrollView.git'
+    gitUrl = 'https://github.com/verloop/verloop_ios.git'
 
-    libraryVersion = '0.0.1'
+    libraryVersion = '0.0.1.1'
 
     developerId = 'verloop'
     developerName = 'Verloop'

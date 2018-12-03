@@ -22,6 +22,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Iterator;
+
 import static android.webkit.WebSettings.LOAD_DEFAULT;
 
 
@@ -33,7 +39,8 @@ public class VerloopFragment extends Fragment {
     private int textColor = Color.parseColor("#fefefe");
     private WebView mWebView;
 
-    private String clientId, userId;
+    private String clientId, userId, fcmToken, customFields;
+    private boolean isStaging;
 
     private static final int ICE_CREAM = 12421;
     private static final int LOLLIPOP = 12422;
@@ -103,14 +110,17 @@ public class VerloopFragment extends Fragment {
         settings.setCacheMode(LOAD_DEFAULT);
     }
 
-    public void loadChat(String clientId, String userId, String fcmToken, boolean isStaging) {
+    public void loadChat(String clientId, String userId, String fcmToken, String customFields, boolean isStaging) {
         this.clientId = clientId;
         this.userId = userId;
+        this.fcmToken = fcmToken;
+        this.customFields = customFields;
+        this.isStaging = isStaging;
         // Make sure the URL is built using a library.
         Uri.Builder uriBuilder = new Uri.Builder();
 
         uriBuilder.scheme("https");
-        if (isStaging) {
+        if (this.isStaging) {
             uriBuilder.authority(this.clientId + ".stage.verloop.io");
         } else {
             uriBuilder.authority(this.clientId + ".verloop.io");
@@ -119,22 +129,22 @@ public class VerloopFragment extends Fragment {
         uriBuilder.appendQueryParameter("mode", "sdk");
         uriBuilder.appendQueryParameter("sdk", "android");
         uriBuilder.appendQueryParameter("user_id", this.userId);
+        uriBuilder.appendQueryParameter("custom_fields", this.customFields);
 
-        if (fcmToken != null) {
-            uriBuilder.appendQueryParameter("device_token", fcmToken);
+        if (this.fcmToken != null) {
+            uriBuilder.appendQueryParameter("device_token", this.fcmToken);
             uriBuilder.appendQueryParameter("device_type", "android");
         }
 
         Uri uri = uriBuilder.build();
 
-        Log.d(TAG, "URI: " + uri.toString());
+        Log.d(TAG, "Verloop URI: " + uri.toString());
 
         mWebView.loadUrl(uri.toString());
     }
 
     public void startRoom() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            Log.d(TAG, "Starting Room");
             mWebView.evaluateJavascript("VerloopLivechat.start();", null);
         } else {
             mWebView.loadUrl("javascript:VerloopLivechat.start();");
@@ -209,9 +219,24 @@ public class VerloopFragment extends Fragment {
         return this.userId != null && this.clientId != null;
     }
 
-    boolean isClientAndUserSame(String clientId, String userId) {
-        return isClientAndUserInitialized() &&
-                this.userId.equals(userId) && this.clientId.equals(clientId);
+    boolean isConfigSame(String clientId, String userId, String fcmToken, String customFields, boolean isStaging) {
+        boolean ret = true;
+
+        if (this.userId != null)
+            ret = this.userId.equals(userId);
+
+        if (this.clientId != null)
+            ret = ret && this.clientId.equals(clientId);
+
+        if (this.fcmToken != null)
+            ret = ret && this.fcmToken.equals(fcmToken);
+
+        if (this.customFields != null)
+            ret = ret && this.customFields.equals(customFields);
+
+        ret = ret && (this.isStaging == isStaging);
+
+        return ret;
     }
 
     void fileUploadResult(int requestCode, int resultCode, Intent data) {

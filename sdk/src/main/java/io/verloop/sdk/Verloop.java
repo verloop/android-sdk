@@ -21,6 +21,8 @@ public class Verloop {
     static final String CONFIG_USER_ID = "USER_ID";
     static final String CONFIG_FCM_TOKEN = "FCM_TOKEN";
     static final String CONFIG_STAGING = "IS_STAGING";
+    static final String CONFIG_FIELDS = "CUSTOM_FIELDS";
+
 
     static final String SHARED_PREFERENCE_FILE_NAME = "io.verloop.sdk";
 
@@ -31,9 +33,14 @@ public class Verloop {
     private String fcmToken;
     private boolean isStaging;
 
-
+    /**
+     *
+     *
+     * @param context Context of an activity/service.
+     * @param config The <code>VerloopConfig</code> object for the current user.
+     */
     public Verloop(Context context, VerloopConfig config) {
-        this.context = context.getApplicationContext();
+        this.context = context;
 
         this.userId = retrieveUserId(config);
         this.clientId = config.getClientId();
@@ -45,10 +52,25 @@ public class Verloop {
         this.startService();
     }
 
+    /**
+     * @deprecated Use {@link #login(VerloopConfig)} instead.
+     *
+     * Login a different user than the one that this object was initialized with.
+     *
+     * @param userId User ID of the user you want to log in the app.
+     */
     public void login(String userId) {
         login(userId, null);
     }
 
+    /**
+     * @deprecated Use {@link #login(VerloopConfig)} instead.
+     *
+     * Login a different user than the one that this object was initialized with.
+     *
+     * @param userId User ID of the user you want to log in the app.
+     * @param fcmToken FCM Token of the user being logged in.
+     */
     public void login(String userId, String fcmToken) {
         stopService();
 
@@ -63,6 +85,24 @@ public class Verloop {
         editor.apply();
 
         startService();
+    }
+
+    /**
+     * Login a different user than the one that this object was initialized with.
+     *
+     * @param config The <code>VerloopConfig</code> object to initialize with a new user.
+     */
+    public void login(VerloopConfig config) {
+        this.stopService();
+
+        this.userId = retrieveUserId(config);
+        this.clientId = config.getClientId();
+        this.fcmToken = config.getFcmToken();
+        this.isStaging = config.getStaging();
+
+        config.save(getPreferences());
+
+        this.startService();
     }
 
     public void logout() {

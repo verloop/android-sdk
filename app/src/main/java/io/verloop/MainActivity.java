@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 VerloopConfig config = new VerloopConfig("hello");
                 config.setFcmToken(token);
                 config.setStaging(true);
+                config.putCustomField("N", "Shobhit");
+                config.putCustomField("A", "26");
                 verloop = new Verloop(MainActivity.this, config);
             }
         });

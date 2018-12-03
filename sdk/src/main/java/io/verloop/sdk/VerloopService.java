@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -34,6 +33,7 @@ public class VerloopService extends Service {
             String userId = preferences.getString(Verloop.CONFIG_USER_ID, null);
             String fcmToken = preferences.getString(Verloop.CONFIG_FCM_TOKEN, null);
             boolean isStaging = preferences.getBoolean(Verloop.CONFIG_STAGING, false);
+            String fields = preferences.getString(Verloop.CONFIG_FIELDS, null);
 
             if (clientId == null)
                 throw new UnsupportedOperationException("You need to have client_id");
@@ -41,8 +41,8 @@ public class VerloopService extends Service {
             if (userId == null)
                 throw new UnsupportedOperationException("You need to have user_id");
 
-            if (!getFragment().isClientAndUserSame(clientId, userId))
-                getFragment().loadChat(clientId, userId, fcmToken, isStaging);
+            if (!getFragment().isConfigSame(clientId, userId, fcmToken, fields, isStaging))
+                getFragment().loadChat(clientId, userId, fcmToken, fields, isStaging);
             else
                 Log.d(TAG, "Client and User ID is same.");
         }

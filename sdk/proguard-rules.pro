@@ -20,6 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepclassmembers class VerloopInterface {
+-keepclassmembers class io.verloop.sdk.VerloopInterface {
     public *;
 }

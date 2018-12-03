@@ -1,13 +1,26 @@
 package io.verloop.sdk;
 
-import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class VerloopConfig {
     private String userId;
     private String clientId;
     private String fcmToken;
-    private boolean isStaging;
+    private boolean isStaging = false;
+
+    private ArrayList<CustomField> fields = new ArrayList<>();
+
+    public enum Scope {
+        USER,
+        ROOM
+    }
 
     public VerloopConfig(String clientId) {
         this.clientId = clientId;
@@ -16,7 +29,6 @@ public class VerloopConfig {
     public VerloopConfig(String clientId, String userId) {
         this.clientId = clientId;
         this.userId = userId;
-        this.isStaging = false;
     }
 
     String getUserId() {
@@ -47,6 +59,14 @@ public class VerloopConfig {
         this.isStaging = staging;
     }
 
+    public void putCustomField(String key, String value, Scope scope) {
+        fields.add(new CustomField(key, value, scope));
+    }
+
+    public void putCustomField(String key, String value) {
+        fields.add(new CustomField(key, value, null));
+    }
+
 
     void save(SharedPreferences preferences) {
         SharedPreferences.Editor editor = preferences.edit();
@@ -54,7 +74,40 @@ public class VerloopConfig {
         editor.putString(Verloop.CONFIG_USER_ID, this.userId);
         editor.putString(Verloop.CONFIG_FCM_TOKEN, this.fcmToken);
         editor.putBoolean(Verloop.CONFIG_STAGING, this.isStaging);
+
+        JSONObject object = new JSONObject();
+        for (CustomField field : fields) {
+            try {
+                if (field.scope != null) {
+                    JSONObject innerObject = new JSONObject();
+                    JSONObject scopeObject = new JSONObject();
+
+                    scopeObject.put("scope", field.scope.name().toLowerCase());
+
+                    innerObject.put("value", field.value);
+                    innerObject.put("options", scopeObject);
+
+                    object.put(field.key, innerObject);
+                } else {
+                    object.put(field.key, field.value);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        editor.putString(Verloop.CONFIG_FIELDS, object.toString());
         editor.apply();
     }
 
+    class CustomField {
+        String key, value;
+        Scope scope;
+
+        public CustomField(String key, String value, Scope scope) {
+            this.key = key;
+            this.value = value;
+            this.scope = scope;
+        }
+    }
 }
