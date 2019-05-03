@@ -23,6 +23,7 @@ Then add the Verloop's dependency in your app's gradle file
   }
 ```
 
+
 ## Usage
 
 In your `MainActivity` (or any of the activity), you need to initialize an object of `Verloop` class. It accepts a `VerloopConfig` object as an argument for initializing.
@@ -38,7 +39,7 @@ config.setFcmToken("FCMTOKEN-FOR-DEVICE");
 // Optional; for testing.
 config.setStaging(true);
 
-Verloop verloop = new Verloop(getApplicationContext(), config);
+Verloop verloop = new Verloop(this, config); // `this` here refers to an activity context.
 
 ```
 
@@ -68,6 +69,16 @@ public void onMessageReceived(RemoteMessage remoteMessage) {
 
     // Do anything else with your message.
 }
+```
+
+# User Properties
+
+To set a user properties `name`, `email`, and `phone`, you can directly call the method in `VerloopConfig` object.
+
+```java
+config.setUserName("Name");
+config.setUserEmail("Email");
+config.setUserPhone("Phone");
 ```
 
 # User session management
