@@ -4,7 +4,24 @@
 
 ## How to install
 
-Copy paste the AAR file in your project and import it like any other library. You can follow this tutorial to find out how to go about it - https://medium.com/@notestomyself/how-to-include-external-aar-file-using-gradle-6604b378e808
+Add JitPack in your project's gradle file :
+
+```
+  allprojects {
+    repositories {
+      ...
+      maven { url 'https://jitpack.io' }
+    }
+  }
+```
+
+Then add the Verloop's dependency in your app's gradle file
+
+```
+  dependencies {
+          implementation 'com.gitlab.indusbit:verloop-android-app-for-sdk:v1.0.0'
+  }
+```
 
 ## Usage
 
