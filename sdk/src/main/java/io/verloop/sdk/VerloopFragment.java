@@ -39,7 +39,7 @@ public class VerloopFragment extends Fragment {
     private int textColor = Color.parseColor("#fefefe");
     private WebView mWebView;
 
-    private String clientId, userId, fcmToken, customFields;
+    private String clientId, userId, fcmToken, userName, userEmail, userPhone, customFields;
     private boolean isStaging;
 
     private static final int ICE_CREAM = 12421;
@@ -110,10 +110,13 @@ public class VerloopFragment extends Fragment {
         settings.setCacheMode(LOAD_DEFAULT);
     }
 
-    public void loadChat(String clientId, String userId, String fcmToken, String customFields, boolean isStaging) {
+    public void loadChat(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String customFields, boolean isStaging) {
         this.clientId = clientId;
         this.userId = userId;
         this.fcmToken = fcmToken;
+        this.userPhone = userPhone;
+        this.userEmail = userEmail;
+        this.userName = userName;
         this.customFields = customFields;
         this.isStaging = isStaging;
         // Make sure the URL is built using a library.
@@ -134,6 +137,18 @@ public class VerloopFragment extends Fragment {
         if (this.fcmToken != null) {
             uriBuilder.appendQueryParameter("device_token", this.fcmToken);
             uriBuilder.appendQueryParameter("device_type", "android");
+        }
+
+        if (this.userName != null) {
+            uriBuilder.appendQueryParameter("name", this.userName);
+        }
+
+        if (this.userEmail != null) {
+            uriBuilder.appendQueryParameter("email", this.userEmail);
+        }
+
+        if (this.userPhone != null) {
+            uriBuilder.appendQueryParameter("phone", this.userPhone);
         }
 
         Uri uri = uriBuilder.build();
@@ -219,22 +234,47 @@ public class VerloopFragment extends Fragment {
         return this.userId != null && this.clientId != null;
     }
 
-    boolean isConfigSame(String clientId, String userId, String fcmToken, String customFields, boolean isStaging) {
+    boolean isConfigSame(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String customFields, boolean isStaging) {
         boolean ret = true;
 
         if (this.userId != null)
             ret = this.userId.equals(userId);
 
+//        Log.d(TAG, "Ret: "+ ret + " " + this.userId + ":" + userId);
+
         if (this.clientId != null)
             ret = ret && this.clientId.equals(clientId);
+
+//        Log.d(TAG, "Ret: "+ ret + " " + this.clientId + ":" + clientId);
 
         if (this.fcmToken != null)
             ret = ret && this.fcmToken.equals(fcmToken);
 
+//        Log.d(TAG, "Ret: "+ ret + " " + this.fcmToken + ":" + fcmToken);
+
+        if (this.userName != null)
+            ret = ret && this.userName.equals(userName);
+
+//        Log.d(TAG, "Ret: "+ ret + " " + this.userName + ":" + userName);
+
+        if (this.userEmail != null)
+            ret = ret && this.userEmail.equals(userEmail);
+
+//        Log.d(TAG, "Ret: "+ ret + " " + this.userEmail + ":" + userEmail);
+
+        if (this.userPhone != null)
+            ret = ret && this.userPhone.equals(userPhone);
+
+//        Log.d(TAG, "Ret: "+ ret + " " + this.userPhone + ":" + userPhone);
+
         if (this.customFields != null)
             ret = ret && this.customFields.equals(customFields);
 
+//        Log.d(TAG, "Ret: "+ ret + " " + this.customFields + ":" + customFields);
+
         ret = ret && (this.isStaging == isStaging);
+
+//        Log.d(TAG, "Ret: "+ ret + " " + this.isStaging + ":" + isStaging);
 
         return ret;
     }

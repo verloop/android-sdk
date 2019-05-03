@@ -23,6 +23,10 @@ public class Verloop {
     static final String CONFIG_STAGING = "IS_STAGING";
     static final String CONFIG_FIELDS = "CUSTOM_FIELDS";
 
+    static final String CONFIG_USER_NAME = "USER_NAME";
+    static final String CONFIG_USER_EMAIL = "USER_EMAIL";
+    static final String CONFIG_USER_PHONE = "USER_PHONE";
+
 
     static final String SHARED_PREFERENCE_FILE_NAME = "io.verloop.sdk";
 

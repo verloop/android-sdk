@@ -13,6 +13,11 @@ public class VerloopConfig {
     private String userId;
     private String clientId;
     private String fcmToken;
+
+    private String userName;
+    private String userEmail;
+    private String userPhone;
+
     private boolean isStaging = false;
 
     private ArrayList<CustomField> fields = new ArrayList<>();
@@ -59,6 +64,18 @@ public class VerloopConfig {
         this.isStaging = staging;
     }
 
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
+    }
+
     public void putCustomField(String key, String value, Scope scope) {
         fields.add(new CustomField(key, value, scope));
     }
@@ -73,7 +90,12 @@ public class VerloopConfig {
         editor.putString(Verloop.CONFIG_CLIENT_ID, this.clientId);
         editor.putString(Verloop.CONFIG_USER_ID, this.userId);
         editor.putString(Verloop.CONFIG_FCM_TOKEN, this.fcmToken);
+        editor.putString(Verloop.CONFIG_USER_NAME, this.userName);
+        editor.putString(Verloop.CONFIG_USER_EMAIL, this.userEmail);
+        editor.putString(Verloop.CONFIG_USER_PHONE, this.userPhone);
         editor.putBoolean(Verloop.CONFIG_STAGING, this.isStaging);
+
+
 
         JSONObject object = new JSONObject();
         for (CustomField field : fields) {

@@ -5,9 +5,12 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url  "https://dl.bintray.com/verloop/Maven"
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath 'com.google.gms:google-services:4.0.1'
 
 
@@ -20,6 +23,16 @@ allprojects {
     repositories {
         google()
         jcenter()
+
+        maven {
+            url  "https://dl.bintray.com/verloop/Maven"
+        }
+
+        maven {
+            url "https://jitpack.io"
+            credentials { username authToken }
+        }
+
         flatDir {
             dirs 'libs' //this way we can find the .aar file in libs folder
         }

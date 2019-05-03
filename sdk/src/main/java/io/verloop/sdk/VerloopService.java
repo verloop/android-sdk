@@ -24,16 +24,20 @@ public class VerloopService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
 
+        SharedPreferences preferences =
+                getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
+
+        String clientId = preferences.getString(Verloop.CONFIG_CLIENT_ID, null);
+        String userId = preferences.getString(Verloop.CONFIG_USER_ID, null);
+        String fcmToken = preferences.getString(Verloop.CONFIG_FCM_TOKEN, null);
+        String userName = preferences.getString(Verloop.CONFIG_USER_NAME, null);
+        String userEmail = preferences.getString(Verloop.CONFIG_USER_EMAIL, null);
+        String userPhone = preferences.getString(Verloop.CONFIG_USER_PHONE, null);
+        boolean isStaging = preferences.getBoolean(Verloop.CONFIG_STAGING, false);
+        String fields = preferences.getString(Verloop.CONFIG_FIELDS, null);
+
         if (!verloopFragment.isClientAndUserInitialized()) {
             Log.d(TAG, "Starting Fragment");
-            SharedPreferences preferences =
-                    getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-
-            String clientId = preferences.getString(Verloop.CONFIG_CLIENT_ID, null);
-            String userId = preferences.getString(Verloop.CONFIG_USER_ID, null);
-            String fcmToken = preferences.getString(Verloop.CONFIG_FCM_TOKEN, null);
-            boolean isStaging = preferences.getBoolean(Verloop.CONFIG_STAGING, false);
-            String fields = preferences.getString(Verloop.CONFIG_FIELDS, null);
 
             if (clientId == null)
                 throw new UnsupportedOperationException("You need to have client_id");
@@ -41,9 +45,14 @@ public class VerloopService extends Service {
             if (userId == null)
                 throw new UnsupportedOperationException("You need to have user_id");
 
-            if (!getFragment().isConfigSame(clientId, userId, fcmToken, fields, isStaging))
-                getFragment().loadChat(clientId, userId, fcmToken, fields, isStaging);
-            else
+//            Log.d(TAG, "clietID: " + clientId + " userID: " + userId + " isStagin: " + isStaging);
+
+            getFragment().loadChat(clientId, userId, fcmToken, userEmail, userName, userPhone, fields, isStaging);
+        } else {
+            if (!getFragment().isConfigSame(clientId, userId, fcmToken, userEmail, userName, userPhone, fields, isStaging)) {
+                Log.d(TAG, "Loading Chat.");
+                getFragment().loadChat(clientId, userId, fcmToken, userEmail, userName, userPhone, fields, isStaging);
+            } else
                 Log.d(TAG, "Client and User ID is same.");
         }
 

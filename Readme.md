@@ -4,11 +4,7 @@
 
 ## How to install
 
-To install, add this line to your gradle dependencies.
-
-```java
-compile 'io.verloop.sdk:livechat:0.0.1'
-```
+Copy paste the AAR file in your project and import it like any other library. You can follow this tutorial to find out how to go about it - https://medium.com/@notestomyself/how-to-include-external-aar-file-using-gradle-6604b378e808
 
 ## Usage
 
