@@ -34,6 +34,7 @@ public class VerloopService extends Service {
         String userEmail = preferences.getString(Verloop.CONFIG_USER_EMAIL, null);
         String userPhone = preferences.getString(Verloop.CONFIG_USER_PHONE, null);
         boolean isStaging = preferences.getBoolean(Verloop.CONFIG_STAGING, false);
+        String recipeId = preferences.getString(Verloop.CONFIG_RECIPE_ID, null);
         String fields = preferences.getString(Verloop.CONFIG_FIELDS, null);
 
         if (!verloopFragment.isClientAndUserInitialized()) {
@@ -47,11 +48,11 @@ public class VerloopService extends Service {
 
 //            Log.d(TAG, "clietID: " + clientId + " userID: " + userId + " isStagin: " + isStaging);
 
-            getFragment().loadChat(clientId, userId, fcmToken, userEmail, userName, userPhone, fields, isStaging);
+            getFragment().loadChat(clientId, userId, fcmToken, userEmail, userName, userPhone, recipeId, fields, isStaging);
         } else {
-            if (!getFragment().isConfigSame(clientId, userId, fcmToken, userEmail, userName, userPhone, fields, isStaging)) {
+            if (!getFragment().isConfigSame(clientId, userId, fcmToken, userEmail, userName, userPhone, recipeId, fields, isStaging)) {
                 Log.d(TAG, "Loading Chat.");
-                getFragment().loadChat(clientId, userId, fcmToken, userEmail, userName, userPhone, fields, isStaging);
+                getFragment().loadChat(clientId, userId, fcmToken, userEmail, userName, userPhone, recipeId, fields, isStaging);
             } else
                 Log.d(TAG, "Client and User ID is same.");
         }

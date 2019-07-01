@@ -67,11 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "fcm token: " + token);
 
-                VerloopConfig config = new VerloopConfig("anshul", "12344556");
+                VerloopConfig config = new VerloopConfig("hello.stage");
                 config.setFcmToken(token);
 //                config.setStaging(true);
                 config.putCustomField("N", "Shobhit");
                 config.putCustomField("A", "26");
+                config.setRecipeId("RFYuaciJDKe9rErLm");
 
                 config.setUserEmail("anthony@gfam.com");
                 config.setUserName("Anthony Gonsalves");
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 //                verloop.login("");
             }
         });
-        }
+    }
 
     private void addVerloop() {
         verloop.showChat();

@@ -12,8 +12,10 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         VerloopConfig config = new VerloopConfig("hello.stage");
+        config.setRecipeId("dgXwpKfgwaH78vDw8");
 
 //        verloop = new Verloop(getApplicationContext(), config);
+//        verloop.showChat();
     }
 
 //    public Verloop getVerloop() {

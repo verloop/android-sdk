@@ -22,6 +22,8 @@ public class VerloopConfig {
 
     private ArrayList<CustomField> fields = new ArrayList<>();
 
+    private String recipeId;
+
     public enum Scope {
         USER,
         ROOM
@@ -84,6 +86,10 @@ public class VerloopConfig {
         fields.add(new CustomField(key, value, null));
     }
 
+    public void setRecipeId(String id) {
+        this.recipeId = id;
+    }
+
 
     void save(SharedPreferences preferences) {
         SharedPreferences.Editor editor = preferences.edit();
@@ -94,6 +100,7 @@ public class VerloopConfig {
         editor.putString(Verloop.CONFIG_USER_EMAIL, this.userEmail);
         editor.putString(Verloop.CONFIG_USER_PHONE, this.userPhone);
         editor.putBoolean(Verloop.CONFIG_STAGING, this.isStaging);
+        editor.putString(Verloop.CONFIG_RECIPE_ID, this.recipeId);
 
 
 

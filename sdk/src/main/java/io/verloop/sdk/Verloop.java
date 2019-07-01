@@ -22,6 +22,7 @@ public class Verloop {
     static final String CONFIG_FCM_TOKEN = "FCM_TOKEN";
     static final String CONFIG_STAGING = "IS_STAGING";
     static final String CONFIG_FIELDS = "CUSTOM_FIELDS";
+    static final String CONFIG_RECIPE_ID = "RECIPE_ID";
 
     static final String CONFIG_USER_NAME = "USER_NAME";
     static final String CONFIG_USER_EMAIL = "USER_EMAIL";

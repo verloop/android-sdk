@@ -39,7 +39,7 @@ public class VerloopFragment extends Fragment {
     private int textColor = Color.parseColor("#fefefe");
     private WebView mWebView;
 
-    private String clientId, userId, fcmToken, userName, userEmail, userPhone, customFields;
+    private String clientId, userId, fcmToken, userName, userEmail, userPhone, customFields, recipeId;
     private boolean isStaging;
 
     private static final int ICE_CREAM = 12421;
@@ -110,7 +110,7 @@ public class VerloopFragment extends Fragment {
         settings.setCacheMode(LOAD_DEFAULT);
     }
 
-    public void loadChat(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String customFields, boolean isStaging) {
+    public void loadChat(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String recipeId, String customFields, boolean isStaging) {
         this.clientId = clientId;
         this.userId = userId;
         this.fcmToken = fcmToken;
@@ -119,6 +119,7 @@ public class VerloopFragment extends Fragment {
         this.userName = userName;
         this.customFields = customFields;
         this.isStaging = isStaging;
+        this.recipeId = recipeId;
         // Make sure the URL is built using a library.
         Uri.Builder uriBuilder = new Uri.Builder();
 
@@ -149,6 +150,10 @@ public class VerloopFragment extends Fragment {
 
         if (this.userPhone != null) {
             uriBuilder.appendQueryParameter("phone", this.userPhone);
+        }
+
+        if (this.recipeId != null) {
+            uriBuilder.appendQueryParameter("recipe_id", this.recipeId);
         }
 
         Uri uri = uriBuilder.build();
@@ -234,7 +239,7 @@ public class VerloopFragment extends Fragment {
         return this.userId != null && this.clientId != null;
     }
 
-    boolean isConfigSame(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String customFields, boolean isStaging) {
+    boolean isConfigSame(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String recipeId, String customFields, boolean isStaging) {
         boolean ret = true;
 
         if (this.userId != null)
@@ -266,6 +271,9 @@ public class VerloopFragment extends Fragment {
             ret = ret && this.userPhone.equals(userPhone);
 
 //        Log.d(TAG, "Ret: "+ ret + " " + this.userPhone + ":" + userPhone);
+
+        if (this.recipeId != null)
+            ret = ret && this.recipeId.equals(recipeId);
 
         if (this.customFields != null)
             ret = ret && this.customFields.equals(customFields);
