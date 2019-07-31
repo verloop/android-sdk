@@ -8,7 +8,9 @@
     <application>
         <activity
             android:name=".VerloopActivity"
-            android:launchMode="singleInstance"
+            android:exported="true"
+            android:alwaysRetainTaskState="true"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
