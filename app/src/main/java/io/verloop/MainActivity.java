@@ -1,12 +1,14 @@
 package io.verloop;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.WebView;
 import android.webkit.WebViewFragment;
 import android.widget.Button;
 import android.widget.Toast;
@@ -49,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
+
         Log.d(TAG, "MainActivity onCreate");
 
         Log.d(TAG, "token id: " + FirebaseInstanceId.getInstance().getId());
@@ -67,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "fcm token: " + token);
 
-                VerloopConfig config = new VerloopConfig("hello.stage");
+                VerloopConfig config = new VerloopConfig("hello.dev");
                 config.setFcmToken(token);
 //                config.setStaging(true);
                 config.putCustomField("N", "Shobhit");
