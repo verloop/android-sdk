@@ -213,14 +213,14 @@ public class VerloopFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
             mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
             mWebView.getSettings().setMediaPlaybackRequiresUserGesture(true);
     }
 
