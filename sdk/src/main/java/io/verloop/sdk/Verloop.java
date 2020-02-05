@@ -40,7 +40,7 @@ public class Verloop {
     private String clientId;
     private String fcmToken;
     private boolean isStaging;
-    private VerloopConfig.LiveChatButtonClickListener buttonOnClickListener;
+    private LiveChatButtonClickListener buttonOnClickListener;
 
 
     /**
