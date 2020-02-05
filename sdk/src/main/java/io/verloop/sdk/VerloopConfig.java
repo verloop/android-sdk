@@ -148,8 +148,8 @@ public class VerloopConfig {
             this.scope = scope;
         }
     }
+}
 
-    public abstract static class LiveChatButtonClickListener {
-        abstract void buttonClicked(String title, String type, String payload);
-    }
+interface LiveChatButtonClickListener {
+    void buttonClicked(String title, String type, String payload);
 }
