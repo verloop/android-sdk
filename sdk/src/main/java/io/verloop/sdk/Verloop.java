@@ -40,7 +40,7 @@ public class Verloop {
     private String clientId;
     private String fcmToken;
     private boolean isStaging;
-    private VerloopConfig.LivechatButtonClickListener buttonOnClickListener;
+    private VerloopConfig.LiveChatButtonClickListener buttonOnClickListener;
 
 
     /**
@@ -132,21 +132,23 @@ public class Verloop {
         Intent i = new Intent(context, VerloopActivity.class);
         context.startActivity(i);
 
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        filter.addAction(context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE");
-        LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
+        if(buttonOnClickListener != null){
+            IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            filter.addAction(context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE");
+            LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
 
-                String title = intent.getStringExtra(VerloopInterface.BUTTON_TITLE);
-                String type = intent.getStringExtra(VerloopInterface.BUTTON_TYPE);
-                String payload = intent.getStringExtra(VerloopInterface.BUTTON_PAYLOAD);
+                    String title = intent.getStringExtra(VerloopInterface.BUTTON_TITLE);
+                    String type = intent.getStringExtra(VerloopInterface.BUTTON_TYPE);
+                    String payload = intent.getStringExtra(VerloopInterface.BUTTON_PAYLOAD);
 
-                Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
+                    Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
 
-                buttonOnClickListener.buttonClicked(title, type, payload);
-            }
-        }, filter);
+                    buttonOnClickListener.buttonClicked(title, type, payload);
+                }
+            }, filter);
+        }
     }
 
     private String retrieveUserId(VerloopConfig config) {

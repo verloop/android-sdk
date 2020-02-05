@@ -24,7 +24,7 @@ public class VerloopConfig {
 
     private String recipeId;
 
-    private LivechatButtonClickListener buttonOnClickListener;
+    private LiveChatButtonClickListener buttonOnClickListener;
 
     public enum Scope {
         USER,
@@ -56,7 +56,7 @@ public class VerloopConfig {
         return isStaging;
     }
 
-    LivechatButtonClickListener getButtonOnClickListener() {
+    LiveChatButtonClickListener getButtonOnClickListener() {
         return this.buttonOnClickListener;
     }
 
@@ -84,7 +84,7 @@ public class VerloopConfig {
         this.userPhone = userPhone;
     }
 
-    public void setButtonOnClickListener(LivechatButtonClickListener buttonOnClickListener) {
+    public void setButtonOnClickListener(LiveChatButtonClickListener buttonOnClickListener) {
         this.buttonOnClickListener = buttonOnClickListener;
     }
 
@@ -149,7 +149,7 @@ public class VerloopConfig {
         }
     }
 
-    interface LivechatButtonClickListener {
-        void buttonClicked(String title, String type, String payload);
+    public static class LiveChatButtonClickListener {
+        void buttonClicked(String title, String type, String payload){}
     }
 }
