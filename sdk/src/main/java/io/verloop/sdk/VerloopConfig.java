@@ -149,7 +149,7 @@ public class VerloopConfig {
         }
     }
 
-    public static class LiveChatButtonClickListener {
-        void buttonClicked(String title, String type, String payload){}
+    public abstract static class LiveChatButtonClickListener {
+        abstract void buttonClicked(String title, String type, String payload);
     }
 }
