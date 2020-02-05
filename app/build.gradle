@@ -16,6 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 }
 
 dependencies {
@@ -25,10 +29,7 @@ dependencies {
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.google.firebase:firebase-messaging:17.3.3'
 
-//    implementation project(':sdk')
-//    implementation 'com.gitlab.indusbit:verloop-android-app-for-sdk:1.0.2'
-    implementation 'com.gitlab.indusbit:verloop-android-app-for-sdk:master-SNAPSHOT'
-//    implementation 'io.verloop.sdk:livechat:0.0.1.0'
+    implementation 'com.github.verloop:android-sdk:1.0.4-rc08'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

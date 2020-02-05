@@ -24,6 +24,8 @@ public class VerloopConfig {
 
     private String recipeId;
 
+    private LiveChatButtonClickListener buttonOnClickListener;
+
     public enum Scope {
         USER,
         ROOM
@@ -54,6 +56,10 @@ public class VerloopConfig {
         return isStaging;
     }
 
+    LiveChatButtonClickListener getButtonOnClickListener() {
+        return this.buttonOnClickListener;
+    }
+
     void setUserId(String userId) {
         this.userId = userId;
     }
@@ -76,6 +82,10 @@ public class VerloopConfig {
 
     public void setUserPhone(String userPhone) {
         this.userPhone = userPhone;
+    }
+
+    public void setButtonOnClickListener(LiveChatButtonClickListener buttonOnClickListener) {
+        this.buttonOnClickListener = buttonOnClickListener;
     }
 
     public void putCustomField(String key, String value, Scope scope) {
@@ -101,7 +111,6 @@ public class VerloopConfig {
         editor.putString(Verloop.CONFIG_USER_PHONE, this.userPhone);
         editor.putBoolean(Verloop.CONFIG_STAGING, this.isStaging);
         editor.putString(Verloop.CONFIG_RECIPE_ID, this.recipeId);
-
 
 
         JSONObject object = new JSONObject();

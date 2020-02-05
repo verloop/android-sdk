@@ -11,6 +11,12 @@ import org.json.JSONObject;
 
 public class VerloopInterface {
 
+    private static final String TAG = "VerloopInterface";
+
+    static String BUTTON_TITLE = "BUTTON_TITLE";
+    static String BUTTON_TYPE = "BUTTON_TYPE";
+    static String BUTTON_PAYLOAD = "BUTTON_PAYLOAD";
+
     private VerloopFragment fragment;
     private Context context;
 
@@ -21,7 +27,7 @@ public class VerloopInterface {
 
     @JavascriptInterface
     public void clientInfo(String json) throws JSONException {
-        Log.d("VerloopInterface ", "DDD clientInfo " + json);
+        Log.d(TAG, "DDD clientInfo " + json);
         JSONObject jsonObject = new JSONObject(json);
 
         String title = jsonObject.getString("title");
@@ -36,6 +42,26 @@ public class VerloopInterface {
 
         Intent intent = new Intent();
         intent.setAction(action);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    @JavascriptInterface
+    public void onButtonClick(String json) throws JSONException {
+        Log.d(TAG, " onButtonClick " + json);
+
+        JSONObject jsonObject = new JSONObject(json);
+
+        String type = jsonObject.getString("type");
+        String title = jsonObject.getString("title");
+        String payload = jsonObject.getString("payload");
+
+        String action = context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE";
+
+        Intent intent = new Intent();
+        intent.setAction(action);
+        intent.putExtra(BUTTON_TITLE, title);
+        intent.putExtra(BUTTON_TYPE, type);
+        intent.putExtra(BUTTON_PAYLOAD, payload);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }

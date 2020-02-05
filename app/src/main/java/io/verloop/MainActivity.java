@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = findViewById(R.id.button);
+        final Button button = findViewById(R.id.button);
         findViewById(R.id.logout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
                 config.setUserEmail("anthony@gfam.com");
                 config.setUserName("Anthony Gonsalves");
                 config.setUserPhone("8890656400");
+                config.setButtonOnClickListener((title, type, payload) -> {
+                    // Add the callbacks on button clicks
+                    Log.d(TAG, "title is " + title);
+                });
                 verloop = new Verloop(MainActivity.this, config);
 
 //                verloop.login("");
