@@ -47,9 +47,9 @@ public class VerloopInterface {
     public void onButtonClick(String json) throws JSONException{
 
         JSONObject jsonObject = new JSONObject(json);
-        String title = jsonObject.getJSONObject("button").getString("title");
-        String type = jsonObject.getJSONObject("button").getString("type");
-        String payload = jsonObject.getJSONObject("button").getString("payload");
+        String title = jsonObject.getString("title");
+        String type = jsonObject.getString("type");
+        String payload = jsonObject.getString("payload");
 
         String action = context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE";
 
