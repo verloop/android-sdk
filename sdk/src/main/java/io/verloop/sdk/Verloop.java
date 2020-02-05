@@ -1,9 +1,12 @@
 package io.verloop.sdk;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Build;
+import android.net.ConnectivityManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.UUID;
@@ -37,12 +40,12 @@ public class Verloop {
     private String clientId;
     private String fcmToken;
     private boolean isStaging;
+    private VerloopConfig.LivechatButtonClickListener buttonOnClickListener;
+
 
     /**
-     *
-     *
      * @param context Context of an activity/service.
-     * @param config The <code>VerloopConfig</code> object for the current user.
+     * @param config  The <code>VerloopConfig</code> object for the current user.
      */
     public Verloop(Context context, VerloopConfig config) {
         this.context = context;
@@ -51,6 +54,7 @@ public class Verloop {
         this.clientId = config.getClientId();
         this.fcmToken = config.getFcmToken();
         this.isStaging = config.getStaging();
+        this.buttonOnClickListener = config.getButtonOnClickListener();
 
         config.save(getPreferences());
 
@@ -58,23 +62,21 @@ public class Verloop {
     }
 
     /**
-     * @deprecated Use {@link #login(VerloopConfig)} instead.
-     *
-     * Login a different user than the one that this object was initialized with.
-     *
      * @param userId User ID of the user you want to log in the app.
+     * @deprecated Use {@link #login(VerloopConfig)} instead.
+     * <p>
+     * Login a different user than the one that this object was initialized with.
      */
     public void login(String userId) {
         login(userId, null);
     }
 
     /**
-     * @deprecated Use {@link #login(VerloopConfig)} instead.
-     *
-     * Login a different user than the one that this object was initialized with.
-     *
-     * @param userId User ID of the user you want to log in the app.
+     * @param userId   User ID of the user you want to log in the app.
      * @param fcmToken FCM Token of the user being logged in.
+     * @deprecated Use {@link #login(VerloopConfig)} instead.
+     * <p>
+     * Login a different user than the one that this object was initialized with.
      */
     public void login(String userId, String fcmToken) {
         stopService();
@@ -129,6 +131,22 @@ public class Verloop {
 
         Intent i = new Intent(context, VerloopActivity.class);
         context.startActivity(i);
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        filter.addAction(context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE");
+        LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                String title = intent.getStringExtra(VerloopInterface.BUTTON_TITLE);
+                String type = intent.getStringExtra(VerloopInterface.BUTTON_TYPE);
+                String payload = intent.getStringExtra(VerloopInterface.BUTTON_PAYLOAD);
+
+                Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
+
+                buttonOnClickListener.buttonClicked(title, type, payload);
+            }
+        }, filter);
     }
 
     private String retrieveUserId(VerloopConfig config) {

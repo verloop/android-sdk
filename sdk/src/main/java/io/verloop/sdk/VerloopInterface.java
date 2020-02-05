@@ -14,6 +14,10 @@ public class VerloopInterface {
     private VerloopFragment fragment;
     private Context context;
 
+    public static String BUTTON_TITLE = "BUTTON_TITLE";
+    public static String BUTTON_TYPE = "BUTTON_TYPE";
+    public static String BUTTON_PAYLOAD = "BUTTON_PAYLOAD";
+
     VerloopInterface(Context context, VerloopFragment fragment) {
         this.fragment = fragment;
         this.context = context;
@@ -36,6 +40,24 @@ public class VerloopInterface {
 
         Intent intent = new Intent();
         intent.setAction(action);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    @JavascriptInterface
+    public void onButtonClick(String json) throws JSONException{
+
+        JSONObject jsonObject = new JSONObject(json);
+        String title = jsonObject.getJSONObject("button").getString("title");
+        String type = jsonObject.getJSONObject("button").getString("type");
+        String payload = jsonObject.getJSONObject("button").getString("payload");
+
+        String action = context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE";
+
+        Intent intent = new Intent();
+        intent.setAction(action);
+        intent.putExtra(BUTTON_TITLE, title);
+        intent.putExtra(BUTTON_TYPE, type);
+        intent.putExtra(BUTTON_PAYLOAD, payload);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }
