@@ -149,7 +149,3 @@ public class VerloopConfig {
         }
     }
 }
-
-interface LiveChatButtonClickListener {
-    void buttonClicked(String title, String type, String payload);
-}
