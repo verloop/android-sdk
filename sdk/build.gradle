@@ -18,8 +18,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            multiDexKeepFile file('multidex-config.txt')
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -41,7 +40,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'org.greenrobot:eventbus:3.2.0'
+    api 'org.greenrobot:eventbus:3.2.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
