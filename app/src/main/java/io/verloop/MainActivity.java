@@ -1,17 +1,14 @@
 package io.verloop;
 
-import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebView;
-import android.webkit.WebViewFragment;
 import android.widget.Button;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,7 +16,6 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 import io.verloop.sdk.Verloop;
-import io.verloop.sdk.VerloopActivity;
 import io.verloop.sdk.VerloopConfig;
 import io.verloop.sdk.VerloopFragment;
 
@@ -73,28 +69,33 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "fcm token: " + token);
 
-                VerloopConfig config = new VerloopConfig("hello.dev");
+                VerloopConfig config = new VerloopConfig("hello");
                 config.setFcmToken(token);
 //                config.setStaging(true);
-                config.putCustomField("N", "Shobhit");
-                config.putCustomField("A", "26");
-                config.setRecipeId("RFYuaciJDKe9rErLm");
+//                config.putCustomField("N", "Shobhit");
+//                config.putCustomField("A", "26");
+//                config.setRecipeId("RFYuaciJDKe9rErLm");
 
-                config.setUserEmail("anthony@gfam.com");
-                config.setUserName("Anthony Gonsalves");
-                config.setUserPhone("8890656400");
+//                config.setUserEmail("anthony@gfam.com");
+//                config.setUserName("Anthony Gonsalves");
+//                config.setUserPhone("8890656400");
                 config.setButtonOnClickListener((title, type, payload) -> {
                     // Add the callbacks on button clicks
                     Log.d(TAG, "title is " + title);
                 });
                 verloop = new Verloop(MainActivity.this, config);
-
-//                verloop.login("");
             }
         });
     }
 
     private void addVerloop() {
         verloop.showChat();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        verloop.onStopChat();
     }
 }

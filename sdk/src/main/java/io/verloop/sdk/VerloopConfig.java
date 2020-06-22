@@ -1,9 +1,7 @@
 package io.verloop.sdk;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -84,6 +82,10 @@ public class VerloopConfig {
         this.userPhone = userPhone;
     }
 
+    /**
+     * Call verloop.onStopChat() on destructor if button listener is added
+     * @param buttonOnClickListener
+     */
     public void setButtonOnClickListener(LiveChatButtonClickListener buttonOnClickListener) {
         this.buttonOnClickListener = buttonOnClickListener;
     }

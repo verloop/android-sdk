@@ -1,26 +1,25 @@
 package io.verloop.sdk;
 
-import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.net.ConnectivityManager;
-import android.net.Uri;
-import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 
 public class VerloopActivity extends AppCompatActivity implements ServiceConnection {
@@ -32,13 +31,11 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     private VerloopFragment verloopFragment;
     private ServiceConnection serviceConnection = this;
     private Toolbar toolbar;
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            updateUIDetails();
-        }
-    };
 
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onClientInfoEvent(ClientInfoEvent event) {
+        updateUIDetails();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +46,15 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
 
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setTitle("Chat");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setElevation(1);
-        toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setTitle("Chat");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setElevation(1);
+        }
 
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        filter.addAction(getPackageName() + ".REFRESH_VERLOOP_INTERFACE");
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
+        if(toolbar.getNavigationIcon() != null){
+            toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
+        }
     }
 
     @Override
@@ -75,10 +73,16 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService(serviceConnection);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -128,11 +132,12 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     private void updateUIDetails() {
         if (verloopFragment != null) {
             Log.d(TAG, "Update UI from Activity");
-            Log.d("verloopactivity", "DDD updateUIDetails");
             toolbar.setTitle(verloopFragment.getTitle());
             toolbar.setBackgroundColor(verloopFragment.getBgColor());
             toolbar.setTitleTextColor(verloopFragment.getTextColor());
-            toolbar.getNavigationIcon().setColorFilter(verloopFragment.getTextColor(), PorterDuff.Mode.SRC_ATOP);
+            if(toolbar.getNavigationIcon() != null){
+                toolbar.getNavigationIcon().setColorFilter(verloopFragment.getTextColor(), PorterDuff.Mode.SRC_ATOP);
+            }
 
             verloopFragment.startRoom();
         }

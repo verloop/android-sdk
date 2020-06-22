@@ -1,13 +1,13 @@
 package io.verloop.sdk;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.UUID;
 
@@ -31,7 +31,6 @@ public class Verloop {
     static final String CONFIG_USER_EMAIL = "USER_EMAIL";
     static final String CONFIG_USER_PHONE = "USER_PHONE";
 
-
     static final String SHARED_PREFERENCE_FILE_NAME = "io.verloop.sdk";
 
     private Context context;
@@ -41,7 +40,6 @@ public class Verloop {
     private String fcmToken;
     private boolean isStaging;
     private LiveChatButtonClickListener buttonOnClickListener;
-
 
     /**
      * @param context Context of an activity/service.
@@ -57,7 +55,6 @@ public class Verloop {
         this.buttonOnClickListener = config.getButtonOnClickListener();
 
         config.save(getPreferences());
-
         this.startService();
     }
 
@@ -106,12 +103,18 @@ public class Verloop {
         this.clientId = config.getClientId();
         this.fcmToken = config.getFcmToken();
         this.isStaging = config.getStaging();
+        this.buttonOnClickListener = config.getButtonOnClickListener();
 
         config.save(getPreferences());
 
         this.startService();
     }
 
+    /**
+     * This will stop all the services,
+     * set FCM token for user as null and
+     * removes the user_id from the Shared Preferences
+     */
     public void logout() {
         stopService();
 
@@ -126,28 +129,45 @@ public class Verloop {
         editor.apply();
     }
 
+    /**
+     * This will open up the activity for chat and load all the data provided in VerloopConfig
+     */
     public void showChat() {
         startService();
 
         Intent i = new Intent(context, VerloopActivity.class);
         context.startActivity(i);
 
-        if(buttonOnClickListener != null){
-            IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-            filter.addAction(context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE");
-            LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
+        if (this.buttonOnClickListener != null) {
+            EventBus.getDefault().register(this);
+        }
+    }
 
-                    String title = intent.getStringExtra(VerloopInterface.BUTTON_TITLE);
-                    String type = intent.getStringExtra(VerloopInterface.BUTTON_TYPE);
-                    String payload = intent.getStringExtra(VerloopInterface.BUTTON_PAYLOAD);
+    /**
+     * This method should be called if you are listening to button clicks
+     * Call this in onDestroy method of the activity
+     */
+    public void onStopChat() {
+        if (buttonOnClickListener != null) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
 
-                    Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
+    /**
+     * This method is for event listening, DO NOT call it explicitly.
+     *
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onChatButtonClickEvent(ChatButtonClickEvent event) {
+        if (buttonOnClickListener != null) {
+            String title = event.getTitle();
+            String type = event.getType();
+            String payload = event.getPayload();
 
-                    buttonOnClickListener.buttonClicked(title, type, payload);
-                }
-            }, filter);
+            Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
+
+            buttonOnClickListener.buttonClicked(title, type, payload);
         }
     }
 
@@ -174,7 +194,6 @@ public class Verloop {
 
     private void startService() {
         Intent intent = new Intent(context, VerloopService.class);
-
         context.startService(intent);
     }
 

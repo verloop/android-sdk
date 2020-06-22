@@ -1,1 +1,1 @@
-include ':app', ':sdk', ':verloop-livechat'
+include ':app', ':sdk'
