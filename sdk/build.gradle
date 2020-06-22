@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.kezong.fat-aar'
 
 android {
     compileSdkVersion 29
@@ -10,7 +11,7 @@ android {
         targetSdkVersion 29
         versionCode 3
         versionName "1.0.3"
-        multiDexEnabled true
+
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
 
     }
@@ -36,11 +37,10 @@ buildscript {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    api 'androidx.appcompat:appcompat:1.1.0'
-    api 'androidx.multidex:multidex:2.0.1'
-    api 'org.greenrobot:eventbus:3.2.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    embed ("org.greenrobot:eventbus:3.2.0")
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
