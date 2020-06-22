@@ -93,7 +93,7 @@ public class VerloopFragment extends Fragment {
         }
 
         settings.setJavaScriptEnabled(true);
-        mWebView.addJavascriptInterface(new VerloopInterface(context, this), "VerloopMobile");
+        mWebView.addJavascriptInterface(new VerloopInterface(this), "VerloopMobile");
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);

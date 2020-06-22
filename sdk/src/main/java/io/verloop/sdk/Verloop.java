@@ -1,11 +1,8 @@
 package io.verloop.sdk;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
@@ -58,9 +55,11 @@ public class Verloop {
         this.fcmToken = config.getFcmToken();
         this.isStaging = config.getStaging();
         this.buttonOnClickListener = config.getButtonOnClickListener();
+        if(this.buttonOnClickListener != null){
+            EventBus.getDefault().register(this);
+        }
 
         config.save(getPreferences());
-
         this.startService();
     }
 
@@ -134,35 +133,19 @@ public class Verloop {
 
         Intent i = new Intent(context, VerloopActivity.class);
         context.startActivity(i);
-
-        if(buttonOnClickListener != null){
-            EventBus.getDefault().register(this);
-
-            /*IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-            filter.addAction(context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE");
-            LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-
-                    String title = intent.getStringExtra(VerloopInterface.BUTTON_TITLE);
-                    String type = intent.getStringExtra(VerloopInterface.BUTTON_TYPE);
-                    String payload = intent.getStringExtra(VerloopInterface.BUTTON_PAYLOAD);
-
-                    Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
-
-                    buttonOnClickListener.buttonClicked(title, type, payload);
-                }
-            }, filter);*/
-        }
     }
 
+    /**
+     * This method should be called if you are listening to button clicks
+     * Call this in onDestroy method of the activity
+     */
     public void onStopChat() {
         if(buttonOnClickListener != null){
             EventBus.getDefault().unregister(this);
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void customEventReceived(ChatButtonClickEvent event){
         if(buttonOnClickListener != null){
             String title = event.getTitle();

@@ -1,24 +1,21 @@
 package io.verloop.sdk;
 
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -34,15 +31,9 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     private VerloopFragment verloopFragment;
     private ServiceConnection serviceConnection = this;
     private Toolbar toolbar;
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            updateUIDetails();
-        }
-    };
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void customEventReceived(ClientInfoEvent event){
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onMessageEvent(ClientInfoEvent event) {
         updateUIDetails();
     }
 
@@ -59,10 +50,6 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setElevation(1);
         toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
-
-//        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-//        filter.addAction(getPackageName() + ".REFRESH_VERLOOP_INTERFACE");
-//        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
     }
 
     @Override
@@ -87,16 +74,10 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     }
 
     @Override
-    public void onStop(){
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService(serviceConnection);
-//        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+        EventBus.getDefault().unregister(this);
     }
 
     @Override

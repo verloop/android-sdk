@@ -93,4 +93,11 @@ public class MainActivity extends AppCompatActivity {
     private void addVerloop() {
         verloop.showChat();
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        verloop.onStopChat();
+    }
 }

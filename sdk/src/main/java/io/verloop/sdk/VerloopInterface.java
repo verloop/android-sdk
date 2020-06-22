@@ -1,7 +1,5 @@
 package io.verloop.sdk;
 
-import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
@@ -13,16 +11,10 @@ public class VerloopInterface {
 
     private static final String TAG = "VerloopInterface";
 
-    static String BUTTON_TITLE = "BUTTON_TITLE";
-    static String BUTTON_TYPE = "BUTTON_TYPE";
-    static String BUTTON_PAYLOAD = "BUTTON_PAYLOAD";
-
     private VerloopFragment fragment;
-    private Context context;
 
-    VerloopInterface(Context context, VerloopFragment fragment) {
+    VerloopInterface(VerloopFragment fragment) {
         this.fragment = fragment;
-        this.context = context;
     }
 
     @JavascriptInterface
@@ -38,12 +30,7 @@ public class VerloopInterface {
         fragment.setBgColor(bgColor);
         fragment.setTextColor(textColor);
 
-//        String action = context.getPackageName() + ".REFRESH_VERLOOP_INTERFACE";
-
-//        Intent intent = new Intent();
-//        intent.setAction(action);
-        EventBus.getDefault().post(new ClientInfoEvent(title, bgColor, textColor));
-//        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        EventBus.getDefault().postSticky(new ClientInfoEvent(title, bgColor, textColor));
     }
 
     @JavascriptInterface
@@ -56,14 +43,6 @@ public class VerloopInterface {
         String title = jsonObject.getString("title");
         String payload = jsonObject.getString("payload");
 
-//        String action = context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE";
-
-//        Intent intent = new Intent();
-//        intent.setAction(action);
-//        intent.putExtra(BUTTON_TITLE, title);
-//        intent.putExtra(BUTTON_TYPE, type);
-//        intent.putExtra(BUTTON_PAYLOAD, payload);
-        EventBus.getDefault().post(new ChatButtonClickEvent(type, title, payload));
-//        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        EventBus.getDefault().postSticky(new ChatButtonClickEvent(type, title, payload));
     }
 }
