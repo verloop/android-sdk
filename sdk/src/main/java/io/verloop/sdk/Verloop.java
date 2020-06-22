@@ -136,7 +136,7 @@ public class Verloop {
         context.startActivity(i);
 
         if(buttonOnClickListener != null){
-            EventBus.getDefault().register(context);
+            EventBus.getDefault().register(this);
 
             /*IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
             filter.addAction(context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE");
@@ -158,7 +158,7 @@ public class Verloop {
 
     public void onStopChat() {
         if(buttonOnClickListener != null){
-            EventBus.getDefault().unregister(context);
+            EventBus.getDefault().unregister(this);
         }
     }
 

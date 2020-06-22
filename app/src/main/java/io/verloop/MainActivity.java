@@ -69,16 +69,16 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(TAG, "fcm token: " + token);
 
-                VerloopConfig config = new VerloopConfig("hello.dev");
+                VerloopConfig config = new VerloopConfig("hello");
                 config.setFcmToken(token);
 //                config.setStaging(true);
-                config.putCustomField("N", "Shobhit");
-                config.putCustomField("A", "26");
-                config.setRecipeId("RFYuaciJDKe9rErLm");
+//                config.putCustomField("N", "Shobhit");
+//                config.putCustomField("A", "26");
+//                config.setRecipeId("RFYuaciJDKe9rErLm");
 
-                config.setUserEmail("anthony@gfam.com");
-                config.setUserName("Anthony Gonsalves");
-                config.setUserPhone("8890656400");
+//                config.setUserEmail("anthony@gfam.com");
+//                config.setUserName("Anthony Gonsalves");
+//                config.setUserPhone("8890656400");
                 config.setButtonOnClickListener((title, type, payload) -> {
                     // Add the callbacks on button clicks
                     Log.d(TAG, "title is " + title);
