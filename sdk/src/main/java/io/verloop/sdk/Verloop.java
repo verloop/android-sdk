@@ -31,7 +31,6 @@ public class Verloop {
     static final String CONFIG_USER_EMAIL = "USER_EMAIL";
     static final String CONFIG_USER_PHONE = "USER_PHONE";
 
-
     static final String SHARED_PREFERENCE_FILE_NAME = "io.verloop.sdk";
 
     private Context context;
@@ -41,7 +40,6 @@ public class Verloop {
     private String fcmToken;
     private boolean isStaging;
     private LiveChatButtonClickListener buttonOnClickListener;
-
 
     /**
      * @param context Context of an activity/service.
@@ -55,9 +53,6 @@ public class Verloop {
         this.fcmToken = config.getFcmToken();
         this.isStaging = config.getStaging();
         this.buttonOnClickListener = config.getButtonOnClickListener();
-        if(this.buttonOnClickListener != null){
-            EventBus.getDefault().register(this);
-        }
 
         config.save(getPreferences());
         this.startService();
@@ -108,12 +103,18 @@ public class Verloop {
         this.clientId = config.getClientId();
         this.fcmToken = config.getFcmToken();
         this.isStaging = config.getStaging();
+        this.buttonOnClickListener = config.getButtonOnClickListener();
 
         config.save(getPreferences());
 
         this.startService();
     }
 
+    /**
+     * This will stop all the services,
+     * set FCM token for user as null and
+     * removes the user_id from the Shared Preferences
+     */
     public void logout() {
         stopService();
 
@@ -128,11 +129,18 @@ public class Verloop {
         editor.apply();
     }
 
+    /**
+     * This will open up the activity for chat and load all the data provided in VerloopConfig
+     */
     public void showChat() {
         startService();
 
         Intent i = new Intent(context, VerloopActivity.class);
         context.startActivity(i);
+
+        if (this.buttonOnClickListener != null) {
+            EventBus.getDefault().register(this);
+        }
     }
 
     /**
@@ -140,14 +148,19 @@ public class Verloop {
      * Call this in onDestroy method of the activity
      */
     public void onStopChat() {
-        if(buttonOnClickListener != null){
+        if (buttonOnClickListener != null) {
             EventBus.getDefault().unregister(this);
         }
     }
 
+    /**
+     * This method is for event listening, DO NOT call it explicitly.
+     *
+     * @param event
+     */
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void customEventReceived(ChatButtonClickEvent event){
-        if(buttonOnClickListener != null){
+    public void onChatButtonClickEvent(ChatButtonClickEvent event) {
+        if (buttonOnClickListener != null) {
             String title = event.getTitle();
             String type = event.getType();
             String payload = event.getPayload();
@@ -181,7 +194,6 @@ public class Verloop {
 
     private void startService() {
         Intent intent = new Intent(context, VerloopService.class);
-
         context.startService(intent);
     }
 

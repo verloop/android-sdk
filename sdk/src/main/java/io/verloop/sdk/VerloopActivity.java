@@ -33,7 +33,7 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     private Toolbar toolbar;
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onMessageEvent(ClientInfoEvent event) {
+    public void onClientInfoEvent(ClientInfoEvent event) {
         updateUIDetails();
     }
 
@@ -46,10 +46,15 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
 
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setTitle("Chat");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setElevation(1);
-        toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().setTitle("Chat");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setElevation(1);
+        }
+
+        if(toolbar.getNavigationIcon() != null){
+            toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
+        }
     }
 
     @Override
@@ -127,11 +132,12 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     private void updateUIDetails() {
         if (verloopFragment != null) {
             Log.d(TAG, "Update UI from Activity");
-            Log.d("verloopactivity", "DDD updateUIDetails");
             toolbar.setTitle(verloopFragment.getTitle());
             toolbar.setBackgroundColor(verloopFragment.getBgColor());
             toolbar.setTitleTextColor(verloopFragment.getTextColor());
-            toolbar.getNavigationIcon().setColorFilter(verloopFragment.getTextColor(), PorterDuff.Mode.SRC_ATOP);
+            if(toolbar.getNavigationIcon() != null){
+                toolbar.getNavigationIcon().setColorFilter(verloopFragment.getTextColor(), PorterDuff.Mode.SRC_ATOP);
+            }
 
             verloopFragment.startRoom();
         }
