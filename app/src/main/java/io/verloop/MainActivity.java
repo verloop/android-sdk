@@ -84,8 +84,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "title is " + title);
                 });
                 verloop = new Verloop(MainActivity.this, config);
-
-//                verloop.login("");
             }
         });
     }
