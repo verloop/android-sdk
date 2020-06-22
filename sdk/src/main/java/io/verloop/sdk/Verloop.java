@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.UUID;
 
@@ -133,7 +136,9 @@ public class Verloop {
         context.startActivity(i);
 
         if(buttonOnClickListener != null){
-            IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            EventBus.getDefault().register(context);
+
+            /*IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
             filter.addAction(context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE");
             LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
                 @Override
@@ -147,7 +152,26 @@ public class Verloop {
 
                     buttonOnClickListener.buttonClicked(title, type, payload);
                 }
-            }, filter);
+            }, filter);*/
+        }
+    }
+
+    public void onStopChat() {
+        if(buttonOnClickListener != null){
+            EventBus.getDefault().unregister(context);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void customEventReceived(ChatButtonClickEvent event){
+        if(buttonOnClickListener != null){
+            String title = event.getTitle();
+            String type = event.getType();
+            String payload = event.getPayload();
+
+            Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
+
+            buttonOnClickListener.buttonClicked(title, type, payload);
         }
     }
 

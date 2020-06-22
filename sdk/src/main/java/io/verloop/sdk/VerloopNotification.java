@@ -7,18 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
-import android.support.annotation.IntegerRes;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.DrawableRes;
+import androidx.core.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Map;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
 
 public class VerloopNotification {
     private static final String TAG = "VerloopNotification";

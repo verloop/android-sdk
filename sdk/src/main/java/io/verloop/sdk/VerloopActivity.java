@@ -1,6 +1,5 @@
 package io.verloop.sdk;
 
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -12,15 +11,18 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
-import android.net.Uri;
-import android.os.IBinder;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.os.IBinder;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 
 public class VerloopActivity extends AppCompatActivity implements ServiceConnection {
@@ -39,6 +41,10 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         }
     };
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void customEventReceived(ClientInfoEvent event){
+        updateUIDetails();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +60,9 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         getSupportActionBar().setElevation(1);
         toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
 
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        filter.addAction(getPackageName() + ".REFRESH_VERLOOP_INTERFACE");
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
+//        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+//        filter.addAction(getPackageName() + ".REFRESH_VERLOOP_INTERFACE");
+//        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
     }
 
     @Override
@@ -75,10 +81,22 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService(serviceConnection);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+//        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
     }
 
     @Override

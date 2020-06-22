@@ -2,10 +2,10 @@ package io.verloop.sdk;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,11 +38,12 @@ public class VerloopInterface {
         fragment.setBgColor(bgColor);
         fragment.setTextColor(textColor);
 
-        String action = context.getPackageName() + ".REFRESH_VERLOOP_INTERFACE";
+//        String action = context.getPackageName() + ".REFRESH_VERLOOP_INTERFACE";
 
-        Intent intent = new Intent();
-        intent.setAction(action);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+//        Intent intent = new Intent();
+//        intent.setAction(action);
+        EventBus.getDefault().post(new ClientInfoEvent(title, bgColor, textColor));
+//        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     @JavascriptInterface
@@ -55,13 +56,14 @@ public class VerloopInterface {
         String title = jsonObject.getString("title");
         String payload = jsonObject.getString("payload");
 
-        String action = context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE";
+//        String action = context.getPackageName() + ".BUTTON_CLICK_LISTENER_VERLOOP_INTERFACE";
 
-        Intent intent = new Intent();
-        intent.setAction(action);
-        intent.putExtra(BUTTON_TITLE, title);
-        intent.putExtra(BUTTON_TYPE, type);
-        intent.putExtra(BUTTON_PAYLOAD, payload);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+//        Intent intent = new Intent();
+//        intent.setAction(action);
+//        intent.putExtra(BUTTON_TITLE, title);
+//        intent.putExtra(BUTTON_TYPE, type);
+//        intent.putExtra(BUTTON_PAYLOAD, payload);
+        EventBus.getDefault().post(new ChatButtonClickEvent(type, title, payload));
+//        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }
