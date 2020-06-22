@@ -23,6 +23,10 @@
 -keepclassmembers class io.verloop.sdk.VerloopInterface {
     public *;
 }
+-keepclassmembers class org.greenrobot.eventbus.EventBus {
+    public *;
+}
+-keep class org.greenrobot.eventbus.EventBus {*;}
 
 -keepattributes *Annotation*
 -keepclassmembers class * {
