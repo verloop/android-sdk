@@ -23,14 +23,17 @@
 -keepclassmembers class io.verloop.sdk.VerloopInterface {
     public *;
 }
--keepclassmembers class org.greenrobot.eventbus.EventBus {
-    public *;
-}
--keep class org.greenrobot.eventbus.EventBus {*;}
+-keepclassmembers class org.greenrobot.eventbus.* {*;}
+-keep class org.greenrobot.eventbus.* {*;}
+
+-keepclassmembers class org.greenrobot.eventbus.* {*;}
+-keep class org.greenrobot.eventbus.* {*;}
 
 -keepattributes *Annotation*
 -keepclassmembers class * {
     @org.greenrobot.eventbus.Subscribe <methods>;
+    @org.greenrobot.eventbus.EventBus <methods>;
+    @org.greenrobot.eventbus.EventBus <clinit>();
 }
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }
 
