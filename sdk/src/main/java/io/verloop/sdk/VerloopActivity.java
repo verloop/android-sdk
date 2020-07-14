@@ -57,6 +57,17 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         }
     }
 
+
+    /**
+     * This method is for event listening, DO NOT call it explicitly.
+     *
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
+    public void onHideChatEvent(HideChatEvent event) {
+        onBackPressed();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -75,14 +86,20 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        if(!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(serviceConnection);
-        EventBus.getDefault().unregister(this);
+        if(isServiceConnecting){
+            unbindService(serviceConnection);
+        }
+        if(EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().unregister(this);
+        }
     }
 
     @Override
