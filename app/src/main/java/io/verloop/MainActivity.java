@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
                     // Add the callbacks on button clicks
                     Log.d(TAG, "title is " + title);
                 });
+                config.setUrlClickListener((url) -> {
+                    // Add the callbacks on button clicks
+                    Log.d(TAG, "url is " + url);
+                });
                 verloop = new Verloop(MainActivity.this, config);
             }
         });

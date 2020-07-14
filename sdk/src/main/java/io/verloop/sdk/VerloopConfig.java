@@ -24,6 +24,8 @@ public class VerloopConfig {
 
     private LiveChatButtonClickListener buttonOnClickListener;
 
+    private LiveChatUrlClickListener urlClickListener;
+
     public enum Scope {
         USER,
         ROOM
@@ -58,6 +60,10 @@ public class VerloopConfig {
         return this.buttonOnClickListener;
     }
 
+    LiveChatUrlClickListener getUrlClickListener() {
+        return this.urlClickListener;
+    }
+
     void setUserId(String userId) {
         this.userId = userId;
     }
@@ -88,6 +94,14 @@ public class VerloopConfig {
      */
     public void setButtonOnClickListener(LiveChatButtonClickListener buttonOnClickListener) {
         this.buttonOnClickListener = buttonOnClickListener;
+    }
+
+    /**
+     * Call verloop.onStopChat() on destructor if button listener is added
+     * @param urlClickListener
+     */
+    public void setUrlClickListener(LiveChatUrlClickListener urlClickListener) {
+        this.urlClickListener = urlClickListener;
     }
 
     public void putCustomField(String key, String value, Scope scope) {

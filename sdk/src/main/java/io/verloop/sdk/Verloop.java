@@ -40,6 +40,7 @@ public class Verloop {
     private String fcmToken;
     private boolean isStaging;
     private LiveChatButtonClickListener buttonOnClickListener;
+    private LiveChatUrlClickListener urlClickListener;
 
     /**
      * @param context Context of an activity/service.
@@ -53,6 +54,7 @@ public class Verloop {
         this.fcmToken = config.getFcmToken();
         this.isStaging = config.getStaging();
         this.buttonOnClickListener = config.getButtonOnClickListener();
+        this.urlClickListener = config.getUrlClickListener();
 
         config.save(getPreferences());
         this.startService();
@@ -104,6 +106,7 @@ public class Verloop {
         this.fcmToken = config.getFcmToken();
         this.isStaging = config.getStaging();
         this.buttonOnClickListener = config.getButtonOnClickListener();
+        this.urlClickListener = config.getUrlClickListener();
 
         config.save(getPreferences());
 
@@ -138,9 +141,13 @@ public class Verloop {
         Intent i = new Intent(context, VerloopActivity.class);
         context.startActivity(i);
 
-        if (this.buttonOnClickListener != null) {
+        if ((this.buttonOnClickListener != null || this.urlClickListener != null) && !EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+    }
+
+    public void hideChat() {
+        EventBus.getDefault().post(new HideChatEvent());
     }
 
     /**
@@ -148,7 +155,7 @@ public class Verloop {
      * Call this in onDestroy method of the activity
      */
     public void onStopChat() {
-        if (buttonOnClickListener != null) {
+        if ((buttonOnClickListener != null || this.urlClickListener != null) && EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
     }
@@ -168,6 +175,22 @@ public class Verloop {
             Log.d(TAG, "Button click event received Title: " + title + " Type: " + type + " Payload " + payload);
 
             buttonOnClickListener.buttonClicked(title, type, payload);
+        }
+    }
+
+    /**
+     * This method is for event listening, DO NOT call it explicitly.
+     *
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    public void onChatUrlClickEvent(ChatUrlClickEvent event) {
+        if (urlClickListener != null) {
+            String url = event.getUrl();
+
+            Log.d(TAG, "Url click event received Url: " + url);
+
+            urlClickListener.urlClicked(url);
         }
     }
 
