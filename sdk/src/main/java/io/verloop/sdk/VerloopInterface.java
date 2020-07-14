@@ -45,4 +45,15 @@ public class VerloopInterface {
 
         EventBus.getDefault().postSticky(new ChatButtonClickEvent(type, title, payload));
     }
+
+    @JavascriptInterface
+    public void onURLClick(String json) throws JSONException {
+        Log.d(TAG, " onURLClick " + json);
+
+        JSONObject jsonObject = new JSONObject(json);
+
+        String url = jsonObject.getString("url");
+
+        EventBus.getDefault().postSticky(new ChatUrlClickEvent(url));
+    }
 }
