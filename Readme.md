@@ -19,7 +19,7 @@ Then add the Verloop's dependency in your app's gradle file
 
 ```
   dependencies {
-          implementation 'com.github.verloop:android-sdk:1.0.5'
+          implementation 'com.github.verloop:android-sdk:1.0.6'
   }
 ```
 
