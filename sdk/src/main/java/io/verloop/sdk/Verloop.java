@@ -165,7 +165,7 @@ public class Verloop {
      *
      * @param event
      */
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onChatButtonClickEvent(ChatButtonClickEvent event) {
         if (buttonOnClickListener != null) {
             String title = event.getTitle();
@@ -183,7 +183,7 @@ public class Verloop {
      *
      * @param event
      */
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
     public void onChatUrlClickEvent(ChatUrlClickEvent event) {
         if (urlClickListener != null) {
             String url = event.getUrl();
