@@ -17,12 +17,10 @@ import com.google.firebase.iid.InstanceIdResult;
 
 import io.verloop.sdk.Verloop;
 import io.verloop.sdk.VerloopConfig;
-import io.verloop.sdk.VerloopFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = "MainActivity";
-    VerloopFragment v;
     Verloop verloop;
 
     @Override

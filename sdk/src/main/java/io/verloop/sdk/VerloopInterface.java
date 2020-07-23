@@ -43,7 +43,7 @@ public class VerloopInterface {
         String title = jsonObject.getString("title");
         String payload = jsonObject.getString("payload");
 
-        EventBus.getDefault().postSticky(new ChatButtonClickEvent(type, title, payload));
+        EventBus.getDefault().post(new ChatButtonClickEvent(type, title, payload));
     }
 
     @JavascriptInterface
@@ -54,6 +54,6 @@ public class VerloopInterface {
 
         String url = jsonObject.getString("url");
 
-        EventBus.getDefault().postSticky(new ChatUrlClickEvent(url));
+        EventBus.getDefault().post(new ChatUrlClickEvent(url));
     }
 }
