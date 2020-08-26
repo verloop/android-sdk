@@ -1,8 +1,11 @@
 package io.verloop.sdk;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.IBinder;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
@@ -42,6 +45,9 @@ public class Verloop {
     private LiveChatButtonClickListener buttonOnClickListener;
     private LiveChatUrlClickListener urlClickListener;
 
+    private ServiceConnection serviceConnection;
+    private boolean isServiceBound;
+
     /**
      * @param context Context of an activity/service.
      * @param config  The <code>VerloopConfig</code> object for the current user.
@@ -55,6 +61,16 @@ public class Verloop {
         this.isStaging = config.getStaging();
         this.buttonOnClickListener = config.getButtonOnClickListener();
         this.urlClickListener = config.getUrlClickListener();
+
+        this.serviceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+            }
+        };
 
         config.save(getPreferences());
         this.startService();
@@ -155,6 +171,8 @@ public class Verloop {
      * Call this in onDestroy method of the activity
      */
     public void onStopChat() {
+        stopService();
+
         if ((buttonOnClickListener != null || this.urlClickListener != null) && EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
@@ -217,11 +235,20 @@ public class Verloop {
 
     private void startService() {
         Intent intent = new Intent(context, VerloopService.class);
-        context.startService(intent);
+        if (!isServiceBound) {
+            context.startService(intent);
+            context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+            isServiceBound = true;
+        }
+
     }
 
     private void stopService() {
         Intent intent = new Intent(context, VerloopService.class);
         context.stopService(intent);
+        if(isServiceBound){
+            context.unbindService(serviceConnection);
+            isServiceBound = false;
+        }
     }
 }
