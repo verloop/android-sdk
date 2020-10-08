@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -45,7 +46,6 @@ public class Verloop {
     private LiveChatButtonClickListener buttonOnClickListener;
     private LiveChatUrlClickListener urlClickListener;
 
-    private ServiceConnection serviceConnection;
     private boolean isServiceBound;
 
     /**
@@ -62,18 +62,7 @@ public class Verloop {
         this.buttonOnClickListener = config.getButtonOnClickListener();
         this.urlClickListener = config.getUrlClickListener();
 
-        this.serviceConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-            }
-        };
-
         config.save(getPreferences());
-        this.startService();
     }
 
     /**
@@ -105,8 +94,6 @@ public class Verloop {
         editor.putString(CONFIG_FCM_TOKEN, this.fcmToken);
 
         editor.apply();
-
-        startService();
     }
 
     /**
@@ -125,8 +112,6 @@ public class Verloop {
         this.urlClickListener = config.getUrlClickListener();
 
         config.save(getPreferences());
-
-        this.startService();
     }
 
     /**
@@ -152,7 +137,7 @@ public class Verloop {
      * This will open up the activity for chat and load all the data provided in VerloopConfig
      */
     public void showChat() {
-        startService();
+        this.startService();
 
         Intent i = new Intent(context, VerloopActivity.class);
         context.startActivity(i);
@@ -236,8 +221,12 @@ public class Verloop {
     private void startService() {
         Intent intent = new Intent(context, VerloopService.class);
         if (!isServiceBound) {
-            context.startService(intent);
-            context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(intent);
+            } else {
+                context.startService(intent);
+            }
+//            context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
 
@@ -247,7 +236,7 @@ public class Verloop {
         Intent intent = new Intent(context, VerloopService.class);
         context.stopService(intent);
         if(isServiceBound){
-            context.unbindService(serviceConnection);
+//            context.unbindService(serviceConnection);
             isServiceBound = false;
         }
     }
