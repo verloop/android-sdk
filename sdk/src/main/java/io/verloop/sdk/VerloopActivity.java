@@ -171,7 +171,9 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult");
 
-        verloopFragment.fileUploadResult(requestCode, resultCode, data);
+        if(verloopFragment != null){
+            verloopFragment.fileUploadResult(requestCode, resultCode, data);
+        }
     }
 
     private void connectWithService() {
