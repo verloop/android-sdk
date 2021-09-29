@@ -69,7 +69,51 @@ verloop.showChat();
 
 and the chat activity will start.
 
-To let Verloop handle Notifications, simply add this line in your `FirebaseMessagingService` class
+
+### User Properties
+
+To set a user properties `name`, `email`, and `phone`, you can directly call the method in `VerloopConfig` object.
+
+```java
+config.setUserName("Name");
+config.setUserEmail("Email");
+config.setUserPhone("Phone");
+```
+
+### Manual recipe ID override
+
+Default recipe will run during the conversation unless we do a manual recipe override by calling the following method:
+```
+config.setRecipeId("<Recipe ID>");
+```
+
+### Custom variables
+
+You can send custom details of a customer with conversation scope or at global scope.
+
+Custom fields set on the conversation scope will have context associated with only that particular conversation. Once the conversation is over, you can set different values for a new conversation for the same customer. Use the following code to set the value:
+```
+config.putCustomField("Test Field", "Test Value");
+```
+OR
+```
+config.putCustomField("Test Field", "Test Value", Scope.ROOM);
+```
+
+Global scope variables are associated with customer and not on a conversation. Something like name, email etc. do not change on different conversation of the same user. To set the value for global scope variables:
+
+```
+config.putCustomField("Test Field", "Test Value", Scope.USER);
+```
+
+
+### Notification
+This will work only after you have added FCM token at the time of creation of the verloop config object
+```
+config.setFcmToken("FCMTOKEN-FOR-DEVICE");
+```
+
+Now, to let Verloop handle Notifications, simply add this line in your `FirebaseMessagingService` class
 
 ```java
 @Override
@@ -81,14 +125,20 @@ public void onMessageReceived(RemoteMessage remoteMessage) {
 }
 ```
 
-# User Properties
+### Button click listener
+At the time of having the conversation, bot shows button for faster replies. Button click listeners can be added using:
+```
+config.setButtonOnClickListener((title, type, payload) -> {
+  // Add the app logic for button click
+});
+```
 
-To set a user properties `name`, `email`, and `phone`, you can directly call the method in `VerloopConfig` object.
-
-```java
-config.setUserName("Name");
-config.setUserEmail("Email");
-config.setUserPhone("Phone");
+### URL click listener
+If the user clicks on any URL provided by the bot or by the agent, then you can listen to the URL and take the action in the app. Actions can be like re-routing based on the product link etc. URL click listeners can be added using:
+```
+config.setUrlClickListener((url) -> {
+  // Add the app logic for URL click
+});
 ```
 
 # User session management
