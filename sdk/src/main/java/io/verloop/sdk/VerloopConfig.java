@@ -7,7 +7,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import android.util.Log;
+
+
 public class VerloopConfig {
+
+    private static final String TAG = "VerloopConfig";
+
     private String userId;
     private String clientId;
     private String fcmToken;
@@ -69,10 +75,13 @@ public class VerloopConfig {
     }
 
     public void setFcmToken(String fcmToken) {
+        String logMessage = "FCM Token being set is " + fcmToken;
+        Log.d(TAG, logMessage);
         this.fcmToken = fcmToken;
     }
 
     public void setStaging(boolean staging) {
+
         this.isStaging = staging;
     }
 
