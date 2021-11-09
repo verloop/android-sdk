@@ -1,15 +1,11 @@
 package io.verloop.sdk;
 
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -22,41 +18,42 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 
-public class VerloopActivity extends AppCompatActivity implements ServiceConnection {
+public class VerloopActivity extends AppCompatActivity {
 
     static final String TAG = "VerloopActivity";
 
-    private VerloopService verloopService;
-    private boolean isServiceConnecting = false;
     private VerloopFragment verloopFragment;
-    private ServiceConnection serviceConnection = this;
     private Toolbar toolbar;
+    private VerloopConfig config;
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onClientInfoEvent(ClientInfoEvent event) {
         updateUIDetails();
+        verloopFragment.startRoom();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verloop);
-
+        VerloopConfig config = getIntent().getParcelableExtra("config");
+        this.config = config;
         toolbar = findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
 
-        if(getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle("Chat");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setElevation(1);
         }
 
-        if(toolbar.getNavigationIcon() != null){
+        if (toolbar.getNavigationIcon() != null) {
             toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
         }
-    }
 
+        addFragment();
+    }
 
     /**
      * This method is for event listening, DO NOT call it explicitly.
@@ -71,8 +68,6 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     @Override
     protected void onResume() {
         super.onResume();
-        connectWithService();
-
         setActivityActive(true);
         VerloopNotification.cancelNotification(this);
     }
@@ -86,7 +81,7 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     @Override
     public void onStart() {
         super.onStart();
-        if(!EventBus.getDefault().isRegistered(this)){
+        if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
     }
@@ -94,10 +89,7 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(isServiceConnecting){
-            unbindService(serviceConnection);
-        }
-        if(EventBus.getDefault().isRegistered(this)){
+        if (EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().unregister(this);
         }
     }
@@ -114,37 +106,18 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
     }
 
     private void addFragment() {
-        if (verloopService != null) {
-            Log.d(TAG, "Add Fragment from Activity");
+        Log.d(TAG, "Add Fragment from Activity");
+        verloopFragment = VerloopFragment.newInstance(config);
+        Log.d(TAG, "Frag: " + (verloopFragment != null));
 
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit();
 
-            verloopFragment = verloopService.getFragment();
+        // So that the keyboard doesn't cover the text input button.
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-            Log.d(TAG, "Frag: " + (verloopFragment != null));
-
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit();
-
-            // So that the keyboard doesn't cover the text input button.
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
-            updateUIDetails();
-        }
+        updateUIDetails();
     }
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        VerloopService.VerloopBinder binder = (VerloopService.VerloopBinder) service;
-        verloopService = binder.getService();
-        addFragment();
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        verloopService = null;
-        isServiceConnecting = false;
-    }
-
 
     private void updateUIDetails() {
         if (verloopFragment != null) {
@@ -152,18 +125,14 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
             toolbar.setTitle(verloopFragment.getTitle());
             toolbar.setBackgroundColor(verloopFragment.getBgColor());
             toolbar.setTitleTextColor(verloopFragment.getTextColor());
-            if(toolbar.getNavigationIcon() != null){
+            if (toolbar.getNavigationIcon() != null) {
                 toolbar.getNavigationIcon().setColorFilter(verloopFragment.getTextColor(), PorterDuff.Mode.SRC_ATOP);
             }
-
-            verloopFragment.startRoom();
         }
     }
 
     private void setActivityActive(boolean isShown) {
-        SharedPreferences.Editor editor = getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, MODE_PRIVATE).edit();
-        editor.putBoolean(Verloop.IS_SHOWN, isShown);
-        editor.apply();
+        // Set in app context
     }
 
     @Override
@@ -171,18 +140,8 @@ public class VerloopActivity extends AppCompatActivity implements ServiceConnect
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult");
 
-        if(verloopFragment != null){
+        if (verloopFragment != null) {
             verloopFragment.fileUploadResult(requestCode, resultCode, data);
-        }
-    }
-
-    private void connectWithService() {
-        if (!isServiceConnecting) {
-            Intent intent = new Intent(this, VerloopService.class);
-
-            startService(intent);
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-            isServiceConnecting = true;
         }
     }
 }

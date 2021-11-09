@@ -19,6 +19,8 @@ import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.Nullable;
+
 import static android.webkit.WebSettings.LOAD_DEFAULT;
 
 
@@ -30,25 +32,23 @@ public class VerloopFragment extends Fragment {
     private int textColor = Color.parseColor("#fefefe");
     private WebView mWebView;
 
-    private String clientId, userId, fcmToken, userName, userEmail, userPhone, customFields, recipeId;
-    private boolean isStaging;
-
+    private VerloopConfig config;
     private static final int ICE_CREAM = 12421;
     private static final int LOLLIPOP = 12422;
 
     private ValueCallback<Uri[]> filePathCallback;
     private ValueCallback<Uri> uploadMsg;
 
-    public static VerloopFragment newInstance(Context context) {
+    public static VerloopFragment newInstance(VerloopConfig config) {
         VerloopFragment fragment = new VerloopFragment();
         Bundle args = new Bundle();
+        args.putParcelable("config", config);
         fragment.setArguments(args);
-        fragment.initializeWebView(context);
         return fragment;
     }
 
-    public void initializeWebView(Context context) {
-        mWebView = new WebView(context);
+    public void initializeWebView() {
+        mWebView = new WebView(getActivity());
         mWebView.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -86,8 +86,8 @@ public class VerloopFragment extends Fragment {
 
         WebSettings settings = mWebView.getSettings();
 
-        if (context.getCacheDir() != null) {
-            settings.setAppCachePath(context.getCacheDir().getAbsolutePath());
+        if (getActivity().getApplicationContext().getCacheDir() != null) {
+            settings.setAppCachePath(getActivity().getApplicationContext().getCacheDir().getAbsolutePath());
             settings.setAllowFileAccess(true);
             settings.setAppCacheEnabled(true);
         }
@@ -101,50 +101,41 @@ public class VerloopFragment extends Fragment {
         settings.setCacheMode(LOAD_DEFAULT);
     }
 
-    public void loadChat(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String recipeId, String customFields, boolean isStaging) {
-        this.clientId = clientId;
-        this.userId = userId;
-        this.fcmToken = fcmToken;
-        this.userPhone = userPhone;
-        this.userEmail = userEmail;
-        this.userName = userName;
-        this.customFields = customFields;
-        this.isStaging = isStaging;
-        this.recipeId = recipeId;
+    public void loadChat() {
         // Make sure the URL is built using a library.
         Uri.Builder uriBuilder = new Uri.Builder();
 
         uriBuilder.scheme("https");
-        if (this.isStaging) {
-            uriBuilder.authority(this.clientId + ".stage.verloop.io");
+        if (config.isStaging()) {
+            uriBuilder.authority(config.getClientId() + ".stage.verloop.io");
         } else {
-            uriBuilder.authority(this.clientId + ".verloop.io");
+            uriBuilder.authority(config.getClientId() + ".verloop.io");
         }
         uriBuilder.path("livechat");
         uriBuilder.appendQueryParameter("mode", "sdk");
         uriBuilder.appendQueryParameter("sdk", "android");
-        uriBuilder.appendQueryParameter("user_id", this.userId);
-        uriBuilder.appendQueryParameter("custom_fields", this.customFields);
+        uriBuilder.appendQueryParameter("user_id", config.getUserId());
+        uriBuilder.appendQueryParameter("custom_fields", config.getFields().toString());
 
-        if (this.fcmToken != null) {
-            uriBuilder.appendQueryParameter("device_token", this.fcmToken);
+        if (config.getFcmToken() != null) {
+            uriBuilder.appendQueryParameter("device_token", config.getFcmToken());
             uriBuilder.appendQueryParameter("device_type", "android");
         }
 
-        if (this.userName != null) {
-            uriBuilder.appendQueryParameter("name", this.userName);
+        if (config.getUserName() != null) {
+            uriBuilder.appendQueryParameter("name", config.getUserName());
         }
 
-        if (this.userEmail != null) {
-            uriBuilder.appendQueryParameter("email", this.userEmail);
+        if (config.getUserEmail() != null) {
+            uriBuilder.appendQueryParameter("email", config.getUserEmail());
         }
 
-        if (this.userPhone != null) {
-            uriBuilder.appendQueryParameter("phone", this.userPhone);
+        if (config.getUserPhone() != null) {
+            uriBuilder.appendQueryParameter("phone", config.getUserPhone());
         }
 
-        if (this.recipeId != null) {
-            uriBuilder.appendQueryParameter("recipe_id", this.recipeId);
+        if (config.getRecipeId() != null) {
+            uriBuilder.appendQueryParameter("recipe_id", config.getRecipeId());
         }
 
         Uri uri = uriBuilder.build();
@@ -190,20 +181,33 @@ public class VerloopFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
+        VerloopConfig config = getArguments().getParcelable("config");
+        this.config = config;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
+        initializeWebView();
         return mWebView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        loadChat();
+        startRoom();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
         if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
             mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
     }
@@ -227,51 +231,51 @@ public class VerloopFragment extends Fragment {
     }
 
     boolean isClientAndUserInitialized() {
-        return this.userId != null && this.clientId != null;
+        return config.getUserId() != null && config.getClientId() != null;
     }
 
     boolean isConfigSame(String clientId, String userId, String fcmToken, String userEmail, String userName, String userPhone, String recipeId, String customFields, boolean isStaging) {
         boolean ret = true;
 
-        if (this.userId != null)
-            ret = this.userId.equals(userId);
+        if (config.getUserId() != null)
+            ret = config.getUserId().equals(userId);
 
 //        Log.d(TAG, "Ret: "+ ret + " " + this.userId + ":" + userId);
 
-        if (this.clientId != null)
-            ret = ret && this.clientId.equals(clientId);
+        if (config.getClientId() != null)
+            ret = ret && config.getClientId().equals(clientId);
 
-//        Log.d(TAG, "Ret: "+ ret + " " + this.clientId + ":" + clientId);
+//        Log.d(TAG, "Ret: "+ ret + " " + config.clientId + ":" + clientId);
 
-        if (this.fcmToken != null)
-            ret = ret && this.fcmToken.equals(fcmToken);
+        if (config.getFcmToken() != null)
+            ret = ret && config.getFcmToken().equals(fcmToken);
 
-//        Log.d(TAG, "Ret: "+ ret + " " + this.fcmToken + ":" + fcmToken);
+//        Log.d(TAG, "Ret: "+ ret + " " + config.fcmToken + ":" + fcmToken);
 
-        if (this.userName != null)
-            ret = ret && this.userName.equals(userName);
+        if (config.getUserName() != null)
+            ret = ret && config.getUserName().equals(userName);
 
-//        Log.d(TAG, "Ret: "+ ret + " " + this.userName + ":" + userName);
+//        Log.d(TAG, "Ret: "+ ret + " " + config.userName + ":" + userName);
 
-        if (this.userEmail != null)
-            ret = ret && this.userEmail.equals(userEmail);
+        if (config.getUserEmail() != null)
+            ret = ret && config.getUserEmail().equals(userEmail);
 
-//        Log.d(TAG, "Ret: "+ ret + " " + this.userEmail + ":" + userEmail);
+//        Log.d(TAG, "Ret: "+ ret + " " + config.userEmail + ":" + userEmail);
 
-        if (this.userPhone != null)
-            ret = ret && this.userPhone.equals(userPhone);
+        if (config.getUserPhone() != null)
+            ret = ret && config.getUserPhone().equals(userPhone);
 
-//        Log.d(TAG, "Ret: "+ ret + " " + this.userPhone + ":" + userPhone);
+//        Log.d(TAG, "Ret: "+ ret + " " + config.userPhone + ":" + userPhone);
 
-        if (this.recipeId != null)
-            ret = ret && this.recipeId.equals(recipeId);
+        if (config.getRecipeId() != null)
+            ret = ret && config.getRecipeId().equals(recipeId);
 
-        if (this.customFields != null)
-            ret = ret && this.customFields.equals(customFields);
+        if (config.getFields() != null)
+            ret = ret && config.getFields().equals(customFields);
 
-//        Log.d(TAG, "Ret: "+ ret + " " + this.customFields + ":" + customFields);
+//        Log.d(TAG, "Ret: "+ ret + " " + config.customFields + ":" + customFields);
 
-        ret = ret && (this.isStaging == isStaging);
+        ret = ret && (config.isStaging() == isStaging);
 
 //        Log.d(TAG, "Ret: "+ ret + " " + this.isStaging + ":" + isStaging);
 

@@ -15,8 +15,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-import io.verloop.sdk.Verloop;
 import io.verloop.sdk.VerloopConfig;
+import io.verloop.sdk.Verloop;
 
 public class MainActivity extends AppCompatActivity {
 

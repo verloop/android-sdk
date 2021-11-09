@@ -7,8 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+
 import androidx.annotation.DrawableRes;
 import androidx.core.app.NotificationCompat;
+
 import android.util.Log;
 
 import org.json.JSONException;
@@ -22,14 +24,13 @@ public class VerloopNotification {
     /**
      * Call this method in your notification listener. It checks for the <code>verloop</code> key in
      * <code>data</code> object.
-     *
+     * <p>
      * Only shows notification if the user is not currently on the verloop chat screen.
      *
-     * @param context Context from service.
+     * @param context   Context from service.
      * @param smallIcon Drawable integer for showing the icon in notification.
-     * @param data Data from the remote message from FCM notification. Set this value as
-     *             <code>remoteMessage.getData()</code>.
-     *
+     * @param data      Data from the remote message from FCM notification. Set this value as
+     *                  <code>remoteMessage.getData()</code>.
      * @return <code>true</code> if the notification was shown. <code>false</code> if it wasn't.
      */
     public static boolean showNotification(Context context, @DrawableRes int smallIcon, Map<String, String> data) {
@@ -62,8 +63,6 @@ public class VerloopNotification {
             notification.setContentIntent(contentIntent);
 
 
-
-
             NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -86,7 +85,7 @@ public class VerloopNotification {
     }
 
     private static boolean isActivityShowing(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(Verloop.SHARED_PREFERENCE_FILE_NAME, Context.MODE_PRIVATE);
-        return preferences.getBoolean(Verloop.IS_SHOWN, false);
+        // TODO: Maintain this state in app context
+        return true;
     }
 }
