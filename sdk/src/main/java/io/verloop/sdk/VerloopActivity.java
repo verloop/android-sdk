@@ -2,7 +2,6 @@ package io.verloop.sdk;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -12,10 +11,14 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import io.verloop.sdk.model.UIModel;
+import io.verloop.sdk.viewmodel.MainViewModel;
 
 
 public class VerloopActivity extends AppCompatActivity {
@@ -25,10 +28,12 @@ public class VerloopActivity extends AppCompatActivity {
     private VerloopFragment verloopFragment;
     private Toolbar toolbar;
     private VerloopConfig config;
+    private MainViewModel viewModel;
+
 
     @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
     public void onClientInfoEvent(ClientInfoEvent event) {
-        updateUIDetails();
+//        updateUIDetails();
         verloopFragment.startRoom();
     }
 
@@ -37,9 +42,9 @@ public class VerloopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verloop);
         VerloopConfig config = getIntent().getParcelableExtra("config");
+        viewModel = new MainViewModel();
         this.config = config;
         toolbar = findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
@@ -51,6 +56,13 @@ public class VerloopActivity extends AppCompatActivity {
         if (toolbar.getNavigationIcon() != null) {
             toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
         }
+
+        viewModel.getUIDetails().observe(this, new Observer<UIModel>() {
+            @Override
+            public void onChanged(UIModel uiModel) {
+                updateUIDetails(uiModel);
+            }
+        });
 
         addFragment();
     }
@@ -96,11 +108,11 @@ public class VerloopActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // Respond to the action bar's Up/Home button
-                finish();
-                return false;
+//      switch deleted
+        if (item.getItemId() == android.R.id.home) {
+            // Respond to the action bar's Up/Home button
+            finish();
+            return false;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -109,26 +121,22 @@ public class VerloopActivity extends AppCompatActivity {
         Log.d(TAG, "Add Fragment from Activity");
         verloopFragment = VerloopFragment.newInstance(config);
         Log.d(TAG, "Frag: " + (verloopFragment != null));
-
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit();
 
         // So that the keyboard doesn't cover the text input button.
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
-        updateUIDetails();
+//        updateUIDetails();
     }
 
-    private void updateUIDetails() {
-        if (verloopFragment != null) {
-            Log.d(TAG, "Update UI from Activity");
-            toolbar.setTitle(verloopFragment.getTitle());
-            toolbar.setBackgroundColor(verloopFragment.getBgColor());
-            toolbar.setTitleTextColor(verloopFragment.getTextColor());
-            if (toolbar.getNavigationIcon() != null) {
-                toolbar.getNavigationIcon().setColorFilter(verloopFragment.getTextColor(), PorterDuff.Mode.SRC_ATOP);
-            }
+    private void updateUIDetails(UIModel model) {
+        toolbar.setTitle(model.getTitle());
+        toolbar.setBackgroundColor(Color.parseColor(model.getBgColor()));
+        if (model.getTextColor().length() == 4) {
+            String textColor = model.getTextColor().replaceAll("#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])", "#$1$1$2$2$3$3");
+            model.setTextColor(textColor);
         }
+        toolbar.setTitleTextColor(Color.parseColor(model.getTextColor()));
     }
 
     private void setActivityActive(boolean isShown) {
