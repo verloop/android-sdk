@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 
 import androidx.annotation.DrawableRes;
@@ -85,7 +84,6 @@ public class VerloopNotification {
     }
 
     private static boolean isActivityShowing(Context context) {
-        // TODO: Maintain this state in app context
-        return true;
+        return Verloop.Companion.isActivityVisible();
     }
 }

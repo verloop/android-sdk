@@ -17,9 +17,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import io.verloop.sdk.model.UIModel;
+import io.verloop.sdk.model.ClientInfo;
 import io.verloop.sdk.viewmodel.MainViewModel;
-
 
 public class VerloopActivity extends AppCompatActivity {
 
@@ -29,13 +28,6 @@ public class VerloopActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private VerloopConfig config;
     private MainViewModel viewModel;
-
-
-    @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-    public void onClientInfoEvent(ClientInfoEvent event) {
-//        updateUIDetails();
-        verloopFragment.startRoom();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +40,7 @@ public class VerloopActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Chat");
+            getSupportActionBar().setTitle("");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setElevation(1);
         }
@@ -57,10 +49,10 @@ public class VerloopActivity extends AppCompatActivity {
             toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
         }
 
-        viewModel.getUIDetails().observe(this, new Observer<UIModel>() {
+        viewModel.getUIDetails().observe(this, new Observer<ClientInfo>() {
             @Override
-            public void onChanged(UIModel uiModel) {
-                updateUIDetails(uiModel);
+            public void onChanged(ClientInfo clientInfo) {
+                updateUIDetails(clientInfo);
             }
         });
 
@@ -126,21 +118,20 @@ public class VerloopActivity extends AppCompatActivity {
 
         // So that the keyboard doesn't cover the text input button.
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-//        updateUIDetails();
     }
 
-    private void updateUIDetails(UIModel model) {
-        toolbar.setTitle(model.getTitle());
-        toolbar.setBackgroundColor(Color.parseColor(model.getBgColor()));
-        if (model.getTextColor().length() == 4) {
-            String textColor = model.getTextColor().replaceAll("#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])", "#$1$1$2$2$3$3");
-            model.setTextColor(textColor);
+    private void updateUIDetails(ClientInfo clientInfo) {
+        toolbar.setTitle(clientInfo.getTitle());
+        toolbar.setBackgroundColor(Color.parseColor(clientInfo.getBgColor()));
+        if (clientInfo.getTextColor().length() == 4) {
+            String textColor = clientInfo.getTextColor().replaceAll("#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])", "#$1$1$2$2$3$3");
+            clientInfo.setTextColor(textColor);
         }
-        toolbar.setTitleTextColor(Color.parseColor(model.getTextColor()));
+        toolbar.setTitleTextColor(Color.parseColor(clientInfo.getTextColor()));
     }
 
     private void setActivityActive(boolean isShown) {
-        // Set in app context
+        Verloop.Companion.setActivityVisible(isShown);
     }
 
     @Override

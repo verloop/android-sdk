@@ -18,22 +18,6 @@ public class VerloopInterface {
     }
 
     @JavascriptInterface
-    public void clientInfo(String json) throws JSONException {
-        Log.d(TAG, "DDD clientInfo " + json);
-        JSONObject jsonObject = new JSONObject(json);
-
-        String title = jsonObject.getString("title");
-        String bgColor = jsonObject.getString("bgColor");
-        String textColor = jsonObject.getString("textColor");
-
-        fragment.setTitle(title);
-        fragment.setBgColor(bgColor);
-        fragment.setTextColor(textColor);
-
-        EventBus.getDefault().postSticky(new ClientInfoEvent(title, bgColor, textColor));
-    }
-
-    @JavascriptInterface
     public void onButtonClick(String json) throws JSONException {
         Log.d(TAG, " onButtonClick " + json);
 

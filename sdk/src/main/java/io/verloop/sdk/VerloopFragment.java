@@ -27,9 +27,6 @@ import static android.webkit.WebSettings.LOAD_DEFAULT;
 public class VerloopFragment extends Fragment {
 
     private static final String TAG = "VerloopFragment";
-    private String title = "Chat";
-    private int bgColor = Color.parseColor("#101010");
-    private int textColor = Color.parseColor("#fefefe");
     private WebView mWebView;
 
     private VerloopConfig config;
@@ -57,6 +54,12 @@ public class VerloopFragment extends Fragment {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
                 return true;
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                startRoom();
             }
         });
 
@@ -94,6 +97,7 @@ public class VerloopFragment extends Fragment {
 
         settings.setJavaScriptEnabled(true);
         mWebView.addJavascriptInterface(new VerloopInterface(this), "VerloopMobile");
+
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
@@ -152,31 +156,6 @@ public class VerloopFragment extends Fragment {
             mWebView.loadUrl("javascript:VerloopLivechat.start();");
         }
     }
-
-    public void setTextColor(String textColor) {
-        this.textColor = Color.parseColor(textColor);
-    }
-
-    public int getTextColor() {
-        return textColor;
-    }
-
-    public void setBgColor(String bgColor) {
-        this.bgColor = Color.parseColor(bgColor);
-    }
-
-    public int getBgColor() {
-        return bgColor;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
