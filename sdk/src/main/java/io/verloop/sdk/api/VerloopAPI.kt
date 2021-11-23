@@ -7,6 +7,6 @@ import retrofit2.http.GET
 interface VerloopAPI {
 
     @GET("livechatInit")
-    fun getUIDetails(): Call<ClientInfo>
+    fun getClientInfo(): Call<ClientInfo>
 
 }

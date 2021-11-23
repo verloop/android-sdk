@@ -1,10 +1,10 @@
 package io.verloop.sdk;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +44,7 @@ public class VerloopFragment extends Fragment {
         return fragment;
     }
 
+    @SuppressLint("JavascriptInterface")
     public void initializeWebView() {
         mWebView = new WebView(getActivity());
         mWebView.setWebViewClient(new WebViewClient() {
@@ -96,7 +97,7 @@ public class VerloopFragment extends Fragment {
         }
 
         settings.setJavaScriptEnabled(true);
-        mWebView.addJavascriptInterface(new VerloopInterface(this), "VerloopMobile");
+        mWebView.addJavascriptInterface(Verloop.Companion.getEventListeners().get(config.getClientId()), "VerloopMobile");
 
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccessFromFileURLs(true);

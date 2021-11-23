@@ -27,10 +27,6 @@ Then add the Verloop's dependency in your app's gradle file
 
 ```
 -keepattributes *Annotation*
--keepclassmembers class ** {
-    @org.greenrobot.eventbus.Subscribe <methods>;
-}
--keep enum org.greenrobot.eventbus.ThreadMode { *; }
 ```
 
 

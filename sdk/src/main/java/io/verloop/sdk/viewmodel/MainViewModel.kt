@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import io.verloop.sdk.model.ClientInfo
 import io.verloop.sdk.repository.VerloopRepository
 
-class MainViewModel : ViewModel() {
+class MainViewModel(var repository: VerloopRepository) : ViewModel() {
     var details: MutableLiveData<ClientInfo>? = null
-    fun getUIDetails(): LiveData<ClientInfo>? {
-        details = VerloopRepository.getUIDetails()
+    fun getClientInfo(): LiveData<ClientInfo>? {
+        details = repository.getClientInfo()
         return details
     }
 }

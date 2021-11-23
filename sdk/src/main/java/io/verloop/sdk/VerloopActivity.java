@@ -12,13 +12,16 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+import com.example.verloop_sdk.api.VerloopAPI;
 
+import io.verloop.sdk.api.VerloopServiceBuilder;
 import io.verloop.sdk.model.ClientInfo;
+import io.verloop.sdk.repository.VerloopRepository;
 import io.verloop.sdk.viewmodel.MainViewModel;
+import io.verloop.sdk.viewmodel.MainViewModelFactory;
+import retrofit2.Retrofit;
 
 public class VerloopActivity extends AppCompatActivity {
 
@@ -34,7 +37,13 @@ public class VerloopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verloop);
         VerloopConfig config = getIntent().getParcelableExtra("config");
-        viewModel = new MainViewModel();
+
+        Retrofit retrofit = VerloopServiceBuilder.INSTANCE.buildService(getApplicationContext(), "https://hello.verloop.io/", VerloopAPI.class);
+        VerloopRepository repository = new VerloopRepository(getApplicationContext(), retrofit);
+
+        MainViewModelFactory viewModelFactory = new MainViewModelFactory(repository);
+        viewModel = new ViewModelProvider(this, viewModelFactory).get(MainViewModel.class);
+
         this.config = config;
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -49,24 +58,20 @@ public class VerloopActivity extends AppCompatActivity {
             toolbar.getNavigationIcon().setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);
         }
 
-        viewModel.getUIDetails().observe(this, new Observer<ClientInfo>() {
+        viewModel.getClientInfo().observe(this, new Observer<ClientInfo>() {
             @Override
             public void onChanged(ClientInfo clientInfo) {
-                updateUIDetails(clientInfo);
+                updateClientInfo(clientInfo);
             }
         });
 
+        Verloop.Companion.getHideEventListeners().put(config.getClientId(), new HideEventListener() {
+            @Override
+            public void onHide() {
+                onBackPressed();
+            }
+        });
         addFragment();
-    }
-
-    /**
-     * This method is for event listening, DO NOT call it explicitly.
-     *
-     * @param event
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    public void onHideChatEvent(HideChatEvent event) {
-        onBackPressed();
     }
 
     @Override
@@ -83,19 +88,10 @@ public class VerloopActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
+        Verloop.Companion.getEventListeners().remove(config.getClientId());
+        Verloop.Companion.getHideEventListeners().remove(config.getClientId());
     }
 
     @Override
@@ -120,7 +116,7 @@ public class VerloopActivity extends AppCompatActivity {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
-    private void updateUIDetails(ClientInfo clientInfo) {
+    private void updateClientInfo(ClientInfo clientInfo) {
         toolbar.setTitle(clientInfo.getTitle());
         toolbar.setBackgroundColor(Color.parseColor(clientInfo.getBgColor()));
         if (clientInfo.getTextColor().length() == 4) {

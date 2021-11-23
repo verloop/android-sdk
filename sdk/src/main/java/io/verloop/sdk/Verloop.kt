@@ -5,25 +5,25 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.view.View
+import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
+import org.json.JSONException
+import org.json.JSONObject
 
 class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
     val TAG = "VerloopOBJECT"
 
     companion object {
-        var isActivityVisible = false
         const val VERLOOP_ID = 8375667
+        var isActivityVisible = false
+        val eventListeners = HashMap<String, VerloopEventListener>()
+        val hideEventListeners = HashMap<String, HideEventListener>()
     }
 
-    private lateinit var buttonOnClickListener: LiveChatButtonClickListener
-    private lateinit var urlClickListener: LiveChatUrlClickListener
-
     init {
+        // For Web View Performance
         val webView = WebView(context)
         webView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -57,41 +57,49 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     }
 
     fun showChat() {
+        eventListeners.put(verloopConfig.clientId, VerloopEventListener(verloopConfig))
         val i = Intent(context, VerloopActivity::class.java)
         i.putExtra("config", verloopConfig)
         context.startActivity(i)
-        if ((verloopConfig.buttonOnClickListener != null || verloopConfig.urlClickListener != null) && !EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this)
-        }
     }
 
     fun hideChat() {
-        EventBus.getDefault().post(HideChatEvent())
+        hideEventListeners[verloopConfig.clientId]?.onHide()
+        eventListeners.remove(verloopConfig.clientId)
+        hideEventListeners.remove(verloopConfig.clientId)
     }
 
     fun onStopChat() {
-        if ((verloopConfig.buttonOnClickListener != null || verloopConfig.urlClickListener != null) && EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this)
-        }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    fun onChatButtonClickEvent(event: ChatButtonClickEvent) {
-        if (verloopConfig.buttonOnClickListener != null) {
-            val title = event.title
-            val type = event.type
-            val payload = event.payload
-            Log.d(TAG, "Button click event received Title: $title Type: $type Payload $payload")
-            verloopConfig.buttonOnClickListener!!.buttonClicked(title, type, payload)
-        }
-    }
+    class VerloopEventListener internal constructor(private val config: VerloopConfig) {
 
-    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
-    fun onChatUrlClickEvent(event: ChatUrlClickEvent) {
-        if (verloopConfig.urlClickListener != null) {
-            val url = event.url
-            Log.d(TAG, "Url click event received Url: $url")
-            verloopConfig.urlClickListener!!.urlClicked(url)
+        companion object {
+            private const val TAG = "VerloopInterface"
+        }
+
+        @JavascriptInterface
+        @Throws(JSONException::class)
+        fun onButtonClick(json: String) {
+            Log.d(TAG, " onButtonClick $json")
+            val jsonObject = JSONObject(json)
+            val type = jsonObject.getString("type")
+            val title = jsonObject.getString("title")
+            val payload = jsonObject.getString("payload")
+            if(config.buttonOnClickListener != null) {
+                config.buttonOnClickListener!!.buttonClicked(title, type, payload);
+            }
+        }
+
+        @JavascriptInterface
+        @Throws(JSONException::class)
+        fun onURLClick(json: String) {
+            Log.d(TAG, " onURLClick $json")
+            val jsonObject = JSONObject(json)
+            val url = jsonObject.getString("url")
+            if(config.urlClickListener != null) {
+                config.urlClickListener!!.urlClicked(url)
+            }
         }
     }
 }
