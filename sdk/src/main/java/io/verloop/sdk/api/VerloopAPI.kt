@@ -1,4 +1,4 @@
-package com.example.verloop_sdk.api
+package io.verloop.sdk.api
 
 import io.verloop.sdk.model.ClientInfo
 import retrofit2.Call

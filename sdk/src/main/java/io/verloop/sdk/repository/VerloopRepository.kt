@@ -3,7 +3,7 @@ package io.verloop.sdk.repository
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.verloop_sdk.api.VerloopAPI
+import io.verloop.sdk.api.VerloopAPI
 import io.verloop.sdk.model.ClientInfo
 import retrofit2.Call
 import retrofit2.Callback

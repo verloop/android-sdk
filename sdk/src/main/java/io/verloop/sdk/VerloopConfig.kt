@@ -4,19 +4,29 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.util.*
 
+data class VerloopConfig(
+    var clientId: String,
+    var userId: String? = UUID.randomUUID().toString(),
+    var fcmToken: String?,
+    var userName: String?,
+    var userEmail: String?,
+    var userPhone: String?,
+    var recipeId: String?,
+    var isStaging: Boolean = false,
+    var fields: ArrayList<CustomField> = ArrayList()
+) : Parcelable {
 
-data class VerloopConfig(var clientId: String,
-                         var userId: String? = UUID.randomUUID().toString(),
-                         var fcmToken: String?,
-                         var userName: String?,
-                         var userEmail: String?,
-                         var userPhone: String?,
-                         var recipeId: String?,
-                         var isStaging: Boolean = false,
-                         var fields: ArrayList<CustomFieldV2> = ArrayList()) : Parcelable {
-
-
-    constructor(clientId: String) : this(clientId, UUID.randomUUID().toString(), null, null, null, null, null, false, ArrayList())
+    constructor(clientId: String) : this(
+        clientId,
+        UUID.randomUUID().toString(),
+        null,
+        null,
+        null,
+        null,
+        null,
+        false,
+        ArrayList()
+    )
 
     constructor(clientId: String, userId: String) : this(clientId) {
         this.userId = userId
@@ -30,18 +40,19 @@ data class VerloopConfig(var clientId: String,
         this.userPhone = source.readString()
         this.recipeId = source.readString()
         this.isStaging = source.readInt() == 1
-        this.fields = source.readArrayList(CustomFieldV2::class.java.classLoader) as ArrayList<CustomFieldV2>
+        this.fields =
+            source.readArrayList(CustomField::class.java.classLoader) as ArrayList<CustomField>
     }
 
     var buttonOnClickListener: LiveChatButtonClickListener? = null
     var urlClickListener: LiveChatUrlClickListener? = null
 
     fun putCustomField(key: String, value: String, scope: Scope) {
-        fields.add(CustomFieldV2(key, value, scope))
+        fields.add(CustomField(key, value, scope))
     }
 
     fun putCustomField(key: String, value: String) {
-        fields.add(CustomFieldV2(key, value, null))
+        fields.add(CustomField(key, value, null))
     }
 
     override fun describeContents(): Int {
@@ -72,5 +83,5 @@ data class VerloopConfig(var clientId: String,
         USER, ROOM
     }
 
-    class CustomFieldV2(val key: String, var value: String, var scope: Scope?)
+    class CustomField(val key: String, var value: String, var scope: Scope?)
 }

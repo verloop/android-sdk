@@ -8,7 +8,7 @@
 
     <application>
         <activity
-            android:name=".VerloopActivity"
+            android:name=".ui.VerloopActivity"
             android:alwaysRetainTaskState="true"
             android:exported="true"
             android:launchMode="singleTop"
@@ -16,7 +16,7 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <service
-            android:name=".VerloopLogoutService"
+            android:name=".service.VerloopLogoutService"
             android:enabled="true" />
     </application>
 

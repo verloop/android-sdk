@@ -8,6 +8,8 @@ import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
+import io.verloop.sdk.service.VerloopLogoutService
+import io.verloop.sdk.ui.VerloopActivity
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -56,6 +58,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         }
     }
 
+    // TODO Need to use same name in JS
     fun showChat() {
         eventListeners.put(verloopConfig.clientId, VerloopEventListener(verloopConfig))
         val i = Intent(context, VerloopActivity::class.java)
