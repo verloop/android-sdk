@@ -16,7 +16,7 @@ object VerloopServiceBuilder {
             .cache(myCache)
             .addInterceptor { chain ->
                 var request = chain.request()
-                request = if (NetworkUtils.isNetworkAvailable(context)!!)
+                request = if (NetworkUtils.isNetworkAvailable(context))
                     request.newBuilder().header("Cache-Control", "public, max-age=" + 30).build()
                 else
                     request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()

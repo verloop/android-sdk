@@ -43,8 +43,7 @@ class VerloopFragment : Fragment() {
     @SuppressLint("JavascriptInterface")
     fun initializeWebView() {
         mWebView = WebView(requireActivity())
-
-        mWebView!!.webViewClient = object : WebViewClient() {
+        mWebView?.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
                 // open rest of URLS in default browser
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -58,7 +57,7 @@ class VerloopFragment : Fragment() {
             }
         }
 
-        mWebView!!.webChromeClient = object : WebChromeClient() {
+        mWebView?.webChromeClient = object : WebChromeClient() {
             //Handling input[type="file"] requests for android API 16+
             fun openFileChooser(
                 uploadMsg: ValueCallback<Uri?>,
@@ -88,61 +87,63 @@ class VerloopFragment : Fragment() {
                 return true
             }
         }
-        val settings = mWebView!!.settings
+        val settings = mWebView?.settings
         if (activity?.applicationContext?.cacheDir != null) {
-            settings.setAppCachePath(activity?.applicationContext?.cacheDir?.absolutePath)
-            settings.allowFileAccess = true
-            settings.setAppCacheEnabled(true)
+            settings?.setAppCachePath(activity?.applicationContext?.cacheDir?.absolutePath)
+            settings?.allowFileAccess = true
+            settings?.setAppCacheEnabled(true)
 
         }
-        settings.javaScriptEnabled = true
-        mWebView!!.addJavascriptInterface(eventListeners[config!!.clientId]!!, "VerloopMobile")
-        settings.domStorageEnabled = true
-        settings.allowFileAccessFromFileURLs = true
-        settings.allowUniversalAccessFromFileURLs = true
-        settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        settings?.javaScriptEnabled = true
+        val listener = eventListeners[config?.clientId]
+        if (listener != null)
+            mWebView?.addJavascriptInterface(listener, "VerloopMobile")
+        settings?.domStorageEnabled = true
+        settings?.allowFileAccessFromFileURLs = true
+        settings?.allowUniversalAccessFromFileURLs = true
+        settings?.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
     }
 
     private fun loadChat() {
         // Make sure the URL is built using a library.
         val uriBuilder = Uri.Builder()
         uriBuilder.scheme("https")
-        if (config!!.isStaging) {
-            uriBuilder.authority(config!!.clientId + ".stage.verloop.io")
+        if (config?.isStaging == true) {
+            uriBuilder.authority(config?.clientId + ".stage.verloop.io")
         } else {
-            uriBuilder.authority(config!!.clientId + ".verloop.io")
+            uriBuilder.authority(config?.clientId + ".verloop.io")
         }
         uriBuilder.path("livechat")
         uriBuilder.appendQueryParameter("mode", "sdk")
         uriBuilder.appendQueryParameter("sdk", "android")
-        uriBuilder.appendQueryParameter("user_id", config!!.userId)
-        uriBuilder.appendQueryParameter("custom_fields", config!!.fields.toString())
-        if (config!!.fcmToken != null) {
-            uriBuilder.appendQueryParameter("device_token", config!!.fcmToken)
+        uriBuilder.appendQueryParameter("user_id", config?.userId)
+        uriBuilder.appendQueryParameter("custom_fields", config?.fields.toString())
+        if (config?.fcmToken != null) {
+            uriBuilder.appendQueryParameter("device_token", config?.fcmToken)
             uriBuilder.appendQueryParameter("device_type", "android")
         }
-        if (config!!.userName != null) {
-            uriBuilder.appendQueryParameter("name", config!!.userName)
+        if (config?.userName != null) {
+            uriBuilder.appendQueryParameter("name", config?.userName)
         }
-        if (config!!.userEmail != null) {
-            uriBuilder.appendQueryParameter("email", config!!.userEmail)
+        if (config?.userEmail != null) {
+            uriBuilder.appendQueryParameter("email", config?.userEmail)
         }
-        if (config!!.userPhone != null) {
-            uriBuilder.appendQueryParameter("phone", config!!.userPhone)
+        if (config?.userPhone != null) {
+            uriBuilder.appendQueryParameter("phone", config?.userPhone)
         }
-        if (config!!.recipeId != null) {
-            uriBuilder.appendQueryParameter("recipe_id", config!!.recipeId)
+        if (config?.recipeId != null) {
+            uriBuilder.appendQueryParameter("recipe_id", config?.recipeId)
         }
         val uri = uriBuilder.build()
         Log.d(TAG, "Verloop URI: $uri")
-        mWebView!!.loadUrl(uri.toString())
+        mWebView?.loadUrl(uri.toString())
     }
 
     fun startRoom() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mWebView!!.evaluateJavascript("VerloopLivechat.start();", null)
+            mWebView?.evaluateJavascript("VerloopLivechat.start();", null)
         } else {
-            mWebView!!.loadUrl("javascript:VerloopLivechat.start();")
+            mWebView?.loadUrl("javascript:VerloopLivechat.start();")
         }
     }
 
@@ -167,7 +168,7 @@ class VerloopFragment : Fragment() {
 
                     var results: Array<Uri>? = null
                     // Check that the response is a good one
-                    val dataString = data!!.dataString
+                    val dataString = data?.dataString
                     if (dataString != null) {
                         results = arrayOf(Uri.parse(dataString))
                     }
@@ -196,67 +197,19 @@ class VerloopFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView!!.settings.mediaPlaybackRequiresUserGesture =
+        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView?.settings?.mediaPlaybackRequiresUserGesture =
             false
     }
 
     override fun onDetach() {
         super.onDetach()
-        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView!!.settings.mediaPlaybackRequiresUserGesture =
+        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView?.settings?.mediaPlaybackRequiresUserGesture =
             true
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy")
-    }
-
-    fun wipeData() {
-        val storage = WebStorage.getInstance()
-        storage.deleteAllData()
-    }
-
-    val isClientAndUserInitialized: Boolean
-        get() = config!!.userId != null && config!!.clientId != null
-
-    fun isConfigSame(
-        clientId: String,
-        userId: String,
-        fcmToken: String,
-        userEmail: String,
-        userName: String,
-        userPhone: String,
-        recipeId: String,
-        customFields: String,
-        isStaging: Boolean
-    ): Boolean {
-        var ret = true
-        if (config!!.userId != null) ret = config!!.userId == userId
-
-//        Log.d(TAG, "Ret: "+ ret + " " + this.userId + ":" + userId);
-        if (config!!.clientId != null) ret = ret && config!!.clientId == clientId
-
-//        Log.d(TAG, "Ret: "+ ret + " " + config.clientId + ":" + clientId);
-        if (config!!.fcmToken != null) ret = ret && config!!.fcmToken == fcmToken
-
-//        Log.d(TAG, "Ret: "+ ret + " " + config.fcmToken + ":" + fcmToken);
-        if (config!!.userName != null) ret = ret && config!!.userName == userName
-
-//        Log.d(TAG, "Ret: "+ ret + " " + config.userName + ":" + userName);
-        if (config!!.userEmail != null) ret = ret && config!!.userEmail == userEmail
-
-//        Log.d(TAG, "Ret: "+ ret + " " + config.userEmail + ":" + userEmail);
-        if (config!!.userPhone != null) ret = ret && config!!.userPhone == userPhone
-
-//        Log.d(TAG, "Ret: "+ ret + " " + config.userPhone + ":" + userPhone);
-        if (config!!.recipeId != null) ret = ret && config!!.recipeId == recipeId
-        if (config!!.fields != null) ret = ret && config!!.fields.equals(customFields)
-
-//        Log.d(TAG, "Ret: "+ ret + " " + config.customFields + ":" + customFields);
-        ret = ret && config!!.isStaging == isStaging
-
-//        Log.d(TAG, "Ret: "+ ret + " " + this.isStaging + ":" + isStaging);
-        return ret
     }
 
     fun fileUploadResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -268,14 +221,14 @@ class VerloopFragment : Fragment() {
                 if (data != null) {
                     uri = data.data
                 }
-                uploadMsg!!.onReceiveValue(uri)
+                uploadMsg?.onReceiveValue(uri)
                 uploadMsg = null
             }
             LOLLIPOP -> {
                 var results: Array<Uri>? = null
                 // Check that the response is a good one
                 if (resultCode == Activity.RESULT_OK) {
-                    val dataString = data!!.dataString
+                    val dataString = data?.dataString
                     if (dataString != null) {
                         results = arrayOf(Uri.parse(dataString))
                     }

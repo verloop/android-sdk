@@ -43,18 +43,14 @@ class VerloopActivity : AppCompatActivity() {
 
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-        if (supportActionBar != null) {
-            supportActionBar!!.title = ""
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-            supportActionBar!!.elevation = 1f
-        }
-        if (toolbar?.navigationIcon != null) {
-            toolbar?.navigationIcon!!.colorFilter =
-                BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
-                    ContextCompat.getColor(applicationContext, R.color.white),
-                    BlendModeCompat.SRC_ATOP
-                )
-        }
+        supportActionBar?.title = ""
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.elevation = 1f
+        toolbar?.navigationIcon?.colorFilter =
+            BlendModeColorFilterCompat.createBlendModeColorFilterCompat(
+                ContextCompat.getColor(applicationContext, R.color.white),
+                BlendModeCompat.SRC_ATOP
+            )
 
         val config: VerloopConfig? = intent.getParcelableExtra("config")
         this.config = config
@@ -72,14 +68,11 @@ class VerloopActivity : AppCompatActivity() {
             val repository = VerloopRepository(applicationContext, retrofit)
             val viewModelFactory = MainViewModelFactory(repository)
             viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-
-            viewModel!!.getClientInfo()!!
+            viewModel?.getClientInfo()!!
                 .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
-            if (config.clientId != null) {
-                hideEventListeners[config.clientId!!] = object : HideEventListener {
-                    override fun onHide() {
-                        onBackPressed()
-                    }
+            hideEventListeners[config.clientId] = object : HideEventListener {
+                override fun onHide() {
+                    onBackPressed()
                 }
             }
             addFragment()
@@ -99,8 +92,8 @@ class VerloopActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        eventListeners.remove(config!!.clientId)
-        hideEventListeners.remove(config!!.clientId)
+        eventListeners.remove(config?.clientId)
+        hideEventListeners.remove(config?.clientId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -126,16 +119,16 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     private fun updateClientInfo(clientInfo: ClientInfo) {
-        toolbar!!.title = clientInfo.title
-        toolbar!!.setBackgroundColor(Color.parseColor(clientInfo.bgColor))
-        if (clientInfo.textColor!!.length == 4) {
-            val textColor = clientInfo.textColor!!.replace(
+        toolbar?.title = clientInfo.title
+        toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor))
+        if (clientInfo.textColor?.length == 4) {
+            val textColor = clientInfo.textColor?.replace(
                 "#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])".toRegex(),
                 "#$1$1$2$2$3$3"
             )
             clientInfo.textColor = textColor
         }
-        toolbar!!.setTitleTextColor(Color.parseColor(clientInfo.textColor))
+        toolbar?.setTitleTextColor(Color.parseColor(clientInfo.textColor))
     }
 
     private fun setActivityActive(isShown: Boolean) {
@@ -145,8 +138,6 @@ class VerloopActivity : AppCompatActivity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult")
-        if (verloopFragment != null) {
-            verloopFragment!!.fileUploadResult(requestCode, resultCode, data)
-        }
+        verloopFragment?.fileUploadResult(requestCode, resultCode, data)
     }
 }

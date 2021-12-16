@@ -22,8 +22,8 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     companion object {
         const val VERLOOP_ID = 8375667
         var isActivityVisible = false
-        val eventListeners = HashMap<String, VerloopEventListener>()
-        val hideEventListeners = HashMap<String, HideEventListener>()
+        val eventListeners = HashMap<String?, VerloopEventListener>()
+        val hideEventListeners = HashMap<String?, HideEventListener>()
     }
 
     init {
@@ -78,7 +78,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
     // TODO Need to use same name in JS
     fun showChat() {
-        if (verloopConfig.clientId != null) eventListeners[verloopConfig.clientId!!] =
+        if (verloopConfig.clientId != null) eventListeners[verloopConfig.clientId] =
             VerloopEventListener(verloopConfig)
         val i = Intent(context, VerloopActivity::class.java)
         i.putExtra("config", verloopConfig)
@@ -108,9 +108,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             val type = jsonObject.getString("type")
             val title = jsonObject.getString("title")
             val payload = jsonObject.getString("payload")
-            if (config.buttonOnClickListener != null) {
-                config.buttonOnClickListener!!.buttonClicked(title, type, payload);
-            }
+            config.buttonOnClickListener?.buttonClicked(title, type, payload);
         }
 
         @JavascriptInterface
@@ -119,9 +117,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             Log.d(TAG, " onURLClick $json")
             val jsonObject = JSONObject(json)
             val url = jsonObject.getString("url")
-            if (config.urlClickListener != null) {
-                config.urlClickListener!!.urlClicked(url)
-            }
+            config.urlClickListener?.urlClicked(url)
         }
     }
 }
