@@ -8,7 +8,9 @@ import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
-import io.verloop.sdk.service.VerloopLogoutService
+import androidx.work.*
+import io.verloop.sdk.model.LogoutRequestBody
+import io.verloop.sdk.service.LogoutWorker
 import io.verloop.sdk.ui.VerloopActivity
 import org.json.JSONException
 import org.json.JSONObject
@@ -36,31 +38,48 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         }
         webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-        webView.loadUrl("https://hello.stage.verloop.io/livechat?mode=popout")
+        webView.loadUrl("https://hello.verloop.io/livechat?mode=popout")
     }
 
+    @Deprecated("Not in use anymore")
     fun login(userId: String) {
-        login(userId, null)
     }
 
+    @Deprecated("Not in use anymore")
     fun login(userId: String, fcmToken: String?) {
-        verloopConfig.userId = userId
-        verloopConfig.fcmToken = fcmToken
     }
 
+    @Deprecated("Not in use anymore")
     fun login(verloopConfig: VerloopConfig) {
-        this.verloopConfig = verloopConfig
     }
 
     fun logout() {
-        if (verloopConfig.fcmToken != null) {
-            VerloopLogoutService.logout(context, verloopConfig.clientId, verloopConfig.userId, verloopConfig.fcmToken, verloopConfig.isStaging)
-        }
+        val data = Data.Builder()
+            .putString(LogoutRequestBody.CLIENT_ID, verloopConfig.clientId)
+            .putString(LogoutRequestBody.USER_ID, verloopConfig.userId)
+            .putString(LogoutRequestBody.FCM_TOKEN, verloopConfig.fcmToken)
+            .putBoolean(LogoutRequestBody.IS_STAGING, verloopConfig.isStaging)
+            .build()
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val logoutWorkRequest: WorkRequest =
+            OneTimeWorkRequestBuilder<LogoutWorker>()
+                .setInputData(data)
+                .setConstraints(constraints)
+                .build()
+
+        WorkManager
+            .getInstance(context)
+            .enqueue(logoutWorkRequest)
+
     }
 
     // TODO Need to use same name in JS
     fun showChat() {
-        eventListeners.put(verloopConfig.clientId, VerloopEventListener(verloopConfig))
+        if (verloopConfig.clientId != null) eventListeners[verloopConfig.clientId!!] =
+            VerloopEventListener(verloopConfig)
         val i = Intent(context, VerloopActivity::class.java)
         i.putExtra("config", verloopConfig)
         context.startActivity(i)
@@ -89,7 +108,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             val type = jsonObject.getString("type")
             val title = jsonObject.getString("title")
             val payload = jsonObject.getString("payload")
-            if(config.buttonOnClickListener != null) {
+            if (config.buttonOnClickListener != null) {
                 config.buttonOnClickListener!!.buttonClicked(title, type, payload);
             }
         }
@@ -100,7 +119,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             Log.d(TAG, " onURLClick $json")
             val jsonObject = JSONObject(json)
             val url = jsonObject.getString("url")
-            if(config.urlClickListener != null) {
+            if (config.urlClickListener != null) {
                 config.urlClickListener!!.urlClicked(url)
             }
         }

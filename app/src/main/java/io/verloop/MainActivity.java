@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "fcm token: " + token);
 
                 VerloopConfig config = new VerloopConfig("hello");
+                // config = new VerloopConfig.Builder().clientId("hello").build();
                 config.setFcmToken(token);
 //                config.setStaging(true);
 //                config.putCustomField("N", "Shobhit");

@@ -14,10 +14,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-
-        <service
-            android:name=".service.VerloopLogoutService"
-            android:enabled="true" />
     </application>
 
 </manifest>

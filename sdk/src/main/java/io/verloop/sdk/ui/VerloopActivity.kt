@@ -11,9 +11,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.HideEventListener
 import io.verloop.sdk.R
@@ -35,6 +32,10 @@ class VerloopActivity : AppCompatActivity() {
     private var toolbar: Toolbar? = null
     private var config: VerloopConfig? = null
     private var viewModel: MainViewModel? = null
+
+    companion object {
+        const val TAG = "VerloopActivity"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,10 +60,13 @@ class VerloopActivity : AppCompatActivity() {
         this.config = config
 
         if (config != null) {
+            val baseUrl =
+                if (config.isStaging) "https://${config.clientId}.stage.verloop.io" else "https://${config.clientId}.verloop.io"
+
             val retrofit =
                 buildService(
                     applicationContext,
-                    "https://${config.clientId}.verloop.io/",
+                    baseUrl,
                     VerloopAPI::class.java
                 )
             val repository = VerloopRepository(applicationContext, retrofit)
@@ -71,9 +75,11 @@ class VerloopActivity : AppCompatActivity() {
 
             viewModel!!.getClientInfo()!!
                 .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
-            hideEventListeners[config.clientId] = object : HideEventListener {
-                override fun onHide() {
-                    onBackPressed()
+            if (config.clientId != null) {
+                hideEventListeners[config.clientId!!] = object : HideEventListener {
+                    override fun onHide() {
+                        onBackPressed()
+                    }
                 }
             }
             addFragment()
@@ -142,9 +148,5 @@ class VerloopActivity : AppCompatActivity() {
         if (verloopFragment != null) {
             verloopFragment!!.fileUploadResult(requestCode, resultCode, data)
         }
-    }
-
-    companion object {
-        const val TAG = "VerloopActivity"
     }
 }
