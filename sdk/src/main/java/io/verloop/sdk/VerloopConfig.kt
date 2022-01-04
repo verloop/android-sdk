@@ -50,7 +50,7 @@ data class VerloopConfig private constructor(
     }
 
     var buttonOnClickListener: LiveChatButtonClickListener? = null
-    var urlClickListener: LiveChatUrlClickListener? = null
+    var chatUrlClickListener: LiveChatUrlClickListener? = null
 
     fun putCustomField(key: String, value: String, scope: Scope) {
         fields.add(CustomField(key, value, scope))
@@ -58,6 +58,14 @@ data class VerloopConfig private constructor(
 
     fun putCustomField(key: String, value: String) {
         fields.add(CustomField(key, value, null))
+    }
+
+    fun setButtonClickListener(listener: LiveChatButtonClickListener) {
+        this.buttonOnClickListener = listener
+    }
+
+    fun setUrlClickListener(listener: LiveChatUrlClickListener) {
+        this.chatUrlClickListener = listener
     }
 
     override fun describeContents(): Int {
@@ -104,7 +112,10 @@ data class VerloopConfig private constructor(
         var fields: ArrayList<CustomField> = ArrayList()
     ) {
         fun clientId(clientId: String?) = apply { this.clientId = clientId }
-        fun userId(userId: String) = apply { this.userId = userId }
+        fun userId(userId: String) = apply {
+        if(!userId.equals(""))
+            this.userId = userId
+        }
         fun fcmToken(fcmToken: String) = apply { this.fcmToken = fcmToken }
         fun userName(userName: String) = apply { this.userName = userName }
         fun userEmail(userEmail: String) = apply { this.userEmail = userEmail }

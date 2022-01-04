@@ -70,7 +70,7 @@ class VerloopActivity : AppCompatActivity() {
             viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
             viewModel?.getClientInfo()!!
                 .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
-            hideEventListeners[config.clientId] = object : HideEventListener {
+            hideEventListeners[config.recipeId] = object : HideEventListener {
                 override fun onHide() {
                     onBackPressed()
                 }
@@ -92,8 +92,8 @@ class VerloopActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        eventListeners.remove(config?.clientId)
-        hideEventListeners.remove(config?.clientId)
+        eventListeners.remove(config?.recipeId)
+        hideEventListeners.remove(config?.recipeId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

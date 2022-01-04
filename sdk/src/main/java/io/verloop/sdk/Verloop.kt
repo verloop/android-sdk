@@ -78,7 +78,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
     // TODO Need to use same name in JS
     fun showChat() {
-        if (verloopConfig.clientId != null) eventListeners[verloopConfig.clientId] =
+        if (verloopConfig.recipeId != null) eventListeners[verloopConfig.recipeId] =
             VerloopEventListener(verloopConfig)
         val i = Intent(context, VerloopActivity::class.java)
         i.putExtra("config", verloopConfig)
@@ -86,9 +86,9 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     }
 
     fun hideChat() {
-        hideEventListeners[verloopConfig.clientId]?.onHide()
-        eventListeners.remove(verloopConfig.clientId)
-        hideEventListeners.remove(verloopConfig.clientId)
+        hideEventListeners[verloopConfig.recipeId]?.onHide()
+        eventListeners.remove(verloopConfig.recipeId)
+        hideEventListeners.remove(verloopConfig.recipeId)
     }
 
     fun onStopChat() {
@@ -117,7 +117,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             Log.d(TAG, " onURLClick $json")
             val jsonObject = JSONObject(json)
             val url = jsonObject.getString("url")
-            config.urlClickListener?.urlClicked(url)
+            config.chatUrlClickListener?.urlClicked(url)
         }
     }
 }

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".TestActivity">
+
+    <EditText
+        android:id="@+id/editClientId1"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:hint="Client ID"
+        app:layout_constraintEnd_toStartOf="@+id/editClientId2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="8dp"
+        tools:ignore="MissingConstraints" />
+
+    <EditText
+        android:id="@+id/editClientId2"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:hint="Client ID"
+        app:layout_constraintStart_toEndOf="@+id/editClientId1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="8dp"
+        tools:ignore="MissingConstraints" />
+
+    <EditText
+        android:id="@+id/editUserId1"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:hint="User ID"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/editUserId2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editClientId1"
+        android:layout_marginRight="8dp"
+        tools:ignore="MissingConstraints" />
+
+    <EditText
+        android:id="@+id/editUserId2"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:hint="User ID"
+        app:layout_constraintStart_toEndOf="@+id/editUserId1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editClientId2"
+        android:layout_marginLeft="8dp"
+        tools:ignore="MissingConstraints" />
+
+    <EditText
+        android:id="@+id/editRecipeId1"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:hint="Recipe ID"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/editRecipeId2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editUserId1"
+        android:layout_marginRight="8dp"
+        tools:ignore="MissingConstraints" />
+
+    <EditText
+        android:id="@+id/editRecipeId2"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:hint="Recipe ID"
+        app:layout_constraintStart_toEndOf="@+id/editRecipeId1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editUserId2"
+        android:layout_marginLeft="8dp"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Start Chat 01"
+        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button2"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Start Chat 02"
+        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/button1"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

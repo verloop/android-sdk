@@ -95,13 +95,13 @@ class VerloopFragment : Fragment() {
 
         }
         settings?.javaScriptEnabled = true
-        val listener = eventListeners[config?.clientId]
+        val listener = eventListeners[config?.recipeId]
         if (listener != null)
             mWebView?.addJavascriptInterface(listener, "VerloopMobile")
         settings?.domStorageEnabled = true
         settings?.allowFileAccessFromFileURLs = true
         settings?.allowUniversalAccessFromFileURLs = true
-        settings?.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        settings?.cacheMode = WebSettings.LOAD_DEFAULT
     }
 
     private fun loadChat() {
