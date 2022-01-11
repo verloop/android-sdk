@@ -1,102 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp"
-    tools:context=".TestActivity">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="15dp"
+        tools:context=".TestActivity">
 
-    <EditText
-        android:id="@+id/editClientId1"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:hint="Client ID"
-        app:layout_constraintEnd_toStartOf="@+id/editClientId2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginRight="8dp"
-        tools:ignore="MissingConstraints" />
+    <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:id="@+id/input_layout_client_id_1"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/input_layout_client_id_2"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginRight="8dp"
+            tools:ignore="MissingConstraints">
 
-    <EditText
-        android:id="@+id/editClientId2"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:hint="Client ID"
-        app:layout_constraintStart_toEndOf="@+id/editClientId1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginLeft="8dp"
-        tools:ignore="MissingConstraints" />
+        <EditText
+                android:id="@+id/editClientId1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Client ID"
+                tools:ignore="MissingConstraints" />
 
-    <EditText
-        android:id="@+id/editUserId1"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:hint="User ID"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/editUserId2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editClientId1"
-        android:layout_marginRight="8dp"
-        tools:ignore="MissingConstraints" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:id="@+id/editUserId2"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:hint="User ID"
-        app:layout_constraintStart_toEndOf="@+id/editUserId1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editClientId2"
-        android:layout_marginLeft="8dp"
-        tools:ignore="MissingConstraints" />
+    <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:id="@+id/input_layout_client_id_2"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/input_layout_client_id_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginLeft="8dp"
+            tools:ignore="MissingConstraints">
 
-    <EditText
-        android:id="@+id/editRecipeId1"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:hint="Recipe ID"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toStartOf="@+id/editRecipeId2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editUserId1"
-        android:layout_marginRight="8dp"
-        tools:ignore="MissingConstraints" />
+        <EditText
+                android:id="@+id/editClientId2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Client ID"
+                tools:ignore="MissingConstraints" />
 
-    <EditText
-        android:id="@+id/editRecipeId2"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:hint="Recipe ID"
-        app:layout_constraintStart_toEndOf="@+id/editRecipeId1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editUserId2"
-        android:layout_marginLeft="8dp"
-        tools:ignore="MissingConstraints" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            tools:ignore="MissingConstraints"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:id="@+id/input_layout_user_id_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_client_id_1"
+            app:layout_constraintEnd_toStartOf="@id/input_layout_user_id_2"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="8dp">
+
+        <EditText
+                android:id="@+id/editUserId1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="User ID"
+                tools:ignore="MissingConstraints" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:id="@+id/input_layout_user_id_2"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:layout_constraintStart_toEndOf="@id/input_layout_user_id_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/input_layout_client_id_2"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="8dp"
+            tools:ignore="MissingConstraints">
+
+        <EditText
+                android:id="@+id/editUserId2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="User ID"
+                tools:ignore="MissingConstraints" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:id="@+id/input_layout_recipe_id_1"
+            android:layout_marginTop="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/input_layout_recipe_id_2"
+            app:layout_constraintTop_toBottomOf="@id/input_layout_user_id_1"
+            tools:ignore="MissingConstraints">
+
+        <EditText
+                android:id="@+id/editRecipeId1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Recipe ID"
+                tools:ignore="MissingConstraints" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:id="@+id/input_layout_recipe_id_2"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:layout_constraintStart_toEndOf="@+id/input_layout_recipe_id_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_user_id_2"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="8dp"
+            tools:ignore="MissingConstraints">
+
+        <EditText
+                android:id="@+id/editRecipeId2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Recipe ID"
+                tools:ignore="MissingConstraints" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <Button
-        android:id="@+id/button1"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:text="Start Chat 01"
-        android:layout_marginBottom="8dp"
-        android:layout_marginHorizontal="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/button2"
-        app:layout_constraintStart_toStartOf="parent" />
+            android:id="@+id/button1"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:text="Start Chat 01"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginBottom="80dp"
+            app:layout_constraintEnd_toStartOf="@+id/button2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:ignore="MissingConstraints" />
 
     <Button
-        android:id="@+id/button2"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:text="Start Chat 02"
-        android:layout_marginBottom="8dp"
-        android:layout_marginHorizontal="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button1"
-        app:layout_constraintEnd_toEndOf="parent" />
+            android:id="@+id/button2"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:text="Start Chat 02"
+            android:layout_marginBottom="80dp"
+            android:layout_marginHorizontal="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/button1"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+            android:id="@+id/close_chat_1"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:text="Close Chat 01"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/close_chat_2"
+            android:layout_marginHorizontal="4dp"
+            app:layout_constraintTop_toBottomOf="@+id/button1"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"/>
+
+    <Button
+            android:text="Close Chat 02"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:id="@+id/close_chat_2"
+            android:layout_marginHorizontal="4dp"
+            app:layout_constraintStart_toEndOf="@+id/close_chat_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button2"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

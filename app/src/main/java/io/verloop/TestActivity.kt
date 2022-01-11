@@ -19,6 +19,9 @@ class TestActivity : AppCompatActivity() {
         val button1 = findViewById<Button>(R.id.button1)
         val button2 = findViewById<Button>(R.id.button2)
 
+        val closeBtn1 = findViewById<Button>(R.id.close_chat_1)
+        val closeBtn2 = findViewById<Button>(R.id.close_chat_2)
+
         val editClientId1 = findViewById<EditText>(R.id.editClientId1)
         val editClientId2 = findViewById<EditText>(R.id.editClientId2)
 
@@ -70,5 +73,14 @@ class TestActivity : AppCompatActivity() {
             verloop2 = Verloop(this, verloopConfig2!!)
             verloop2?.showChat()
         }
+
+        closeBtn1.setOnClickListener(View.OnClickListener {
+            Log.d(TAG,"logging out")
+            verloop?.logout()
+        })
+
+        closeBtn2.setOnClickListener(View.OnClickListener {
+            verloop2?.logout()
+        })
     }
 }
