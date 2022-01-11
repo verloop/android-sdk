@@ -66,7 +66,7 @@ class VerloopActivity : AppCompatActivity() {
                     VerloopAPI::class.java
                 )
             val repository = VerloopRepository(applicationContext, retrofit)
-            val viewModelFactory = MainViewModelFactory(repository)
+            val viewModelFactory = MainViewModelFactory(config.recipeId, repository)
             viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
             viewModel?.getClientInfo()!!
                 .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
