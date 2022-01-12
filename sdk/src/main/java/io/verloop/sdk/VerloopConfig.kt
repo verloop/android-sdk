@@ -113,9 +113,10 @@ data class VerloopConfig private constructor(
     ) {
         fun clientId(clientId: String?) = apply { this.clientId = clientId }
         fun userId(userId: String) = apply {
-        if(!userId.equals(""))
-            this.userId = userId
+            if (!userId.equals(""))
+                this.userId = userId
         }
+
         fun fcmToken(fcmToken: String) = apply { this.fcmToken = fcmToken }
         fun userName(userName: String) = apply { this.userName = userName }
         fun userEmail(userEmail: String) = apply { this.userEmail = userEmail }
@@ -125,17 +126,21 @@ data class VerloopConfig private constructor(
         fun isStaging(isStaging: Boolean) = apply { this.isStaging = isStaging }
         fun fields(fields: ArrayList<CustomField>) = apply { this.fields = fields }
 
-        fun build() = VerloopConfig(
-            clientId,
-            userId,
-            fcmToken,
-            userName,
-            userEmail,
-            userPhone,
-            recipeId,
-            department,
-            isStaging,
-            fields
-        )
+        @Throws(VerloopException::class)
+        fun build(): VerloopConfig {
+            if (clientId.isNullOrEmpty()) throw VerloopException("Client id cannot be null or empty")
+            return VerloopConfig(
+                clientId,
+                userId,
+                fcmToken,
+                userName,
+                userEmail,
+                userPhone,
+                recipeId,
+                department,
+                isStaging,
+                fields
+            )
+        }
     }
 }
