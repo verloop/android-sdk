@@ -20,11 +20,15 @@ class VerloopRepository(val context: Context, private val retrofit: Retrofit) {
 
     fun getClientInfo(): MutableLiveData<ClientInfo> {
         val details = MutableLiveData<ClientInfo>()
+
+        // If available return data stored in sharedPreferences first and then hit the API in background
         var clientInfoJson = sharedPreferences.getString("clientInfo", null)
         if(clientInfoJson != null) {
             val clientInfo = Gson().fromJson(clientInfoJson, ClientInfo::class.java)
             details.value = clientInfo
         }
+
+        // API call to get new data if available
         val call = retrofit.create(VerloopAPI::class.java).getClientInfo()
         call.enqueue(object : Callback<ClientInfo> {
             override fun onResponse(call: Call<ClientInfo>, response: Response<ClientInfo>) {

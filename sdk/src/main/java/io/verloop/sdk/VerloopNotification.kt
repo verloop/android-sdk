@@ -21,7 +21,6 @@ object VerloopNotification {
      * Call this method in your notification listener. It checks for the `verloop` key in
      * `data` object.
      *
-     *
      * Only shows notification if the user is not currently on the verloop chat screen.
      *
      * @param context   Context from service.
@@ -36,6 +35,7 @@ object VerloopNotification {
         @DrawableRes smallIcon: Int,
         data: Map<String?, String?>
     ): Boolean {
+        // Show the notification only if chat activity is not running
         if (data.containsKey("verloop") && !isActivityShowing(context)) {
             val json: JSONObject
             val title: String

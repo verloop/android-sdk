@@ -21,6 +21,7 @@ import io.verloop.sdk.api.VerloopAPI
 import io.verloop.sdk.api.VerloopServiceBuilder.buildService
 import io.verloop.sdk.model.ClientInfo
 import io.verloop.sdk.repository.VerloopRepository
+import io.verloop.sdk.utils.CommonUtils
 import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 
@@ -92,7 +93,6 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//      switch deleted
         if (item.itemId == android.R.id.home) {
             // Respond to the action bar's Up/Home button
             finish()
@@ -102,10 +102,7 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     private fun addFragment() {
-        Log.d(TAG, "Add Fragment from Activity")
         verloopFragment = VerloopFragment.newInstance(configKey, config)
-        Log.d(TAG, "Frag: " + (verloopFragment != null))
-
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit()
 
@@ -116,14 +113,7 @@ class VerloopActivity : AppCompatActivity() {
     private fun updateClientInfo(clientInfo: ClientInfo) {
         toolbar?.title = clientInfo.title
         toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor))
-        if (clientInfo.textColor?.length == 4) {
-            val textColor = clientInfo.textColor?.replace(
-                "#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])".toRegex(),
-                "#$1$1$2$2$3$3"
-            )
-            clientInfo.textColor = textColor
-        }
-        toolbar?.setTitleTextColor(Color.parseColor(clientInfo.textColor))
+        toolbar?.setTitleTextColor(Color.parseColor(CommonUtils.getExpandedColorHex(clientInfo.textColor)))
     }
 
     private fun setActivityActive(isShown: Boolean) {

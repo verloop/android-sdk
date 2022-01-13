@@ -21,12 +21,18 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
     companion object {
         const val VERLOOP_ID = 8375667
+
+        // Global scoped state for chat activity. Used by notification handled to identify is app is
+        // in foreground of not
         var isActivityVisible = false
+
+        // Centralized access to the event listeners for all Verloop objects.
+        // Used for passing callback events triggered from the WebView back to the user via ViewModel
         val eventListeners = HashMap<String?, VerloopEventListener>()
     }
 
+    // Preload WebView with template URL to cache the contents and improve performance on next reload
     init {
-        // For Web View Performance
         val webView = WebView(context)
         webView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -52,6 +58,9 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     fun login(verloopConfig: VerloopConfig) {
     }
 
+    /**
+     * This will logout the user and unregister the device from notification subscription.
+     */
     fun logout() {
         val data = Data.Builder()
             .putString(LogoutRequestBody.CLIENT_ID, verloopConfig.clientId)
@@ -74,11 +83,15 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             .enqueue(logoutWorkRequest)
     }
 
-    // TODO Need to use same name in JS
+    /**
+     * This will open up the activity for chat and load all the data provided in VerloopConfig
+     */
     fun showChat() {
         eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
         val i = Intent(context, VerloopActivity::class.java)
         i.putExtra("config", verloopConfig)
+
+        // To be used as key for eventListeners map
         i.putExtra("configKey", verloopConfig.hashCode().toString())
         context.startActivity(i)
     }
@@ -91,6 +104,9 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     fun onStopChat() {
     }
 
+    /**
+     * This class is for event listening, DO NOT use it explicitly.
+     */
     class VerloopEventListener internal constructor(private val config: VerloopConfig) {
 
         companion object {

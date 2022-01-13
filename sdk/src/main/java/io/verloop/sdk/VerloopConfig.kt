@@ -60,12 +60,20 @@ data class VerloopConfig private constructor(
         fields.add(CustomField(key, value, null))
     }
 
-    fun setButtonClickListener(listener: LiveChatButtonClickListener) {
-        this.buttonOnClickListener = listener
+    /**
+     * Callback for button click event from within the chat
+     * @param buttonOnClickListener
+     */
+    fun setButtonClickListener(buttonOnClickListener: LiveChatButtonClickListener) {
+        this.buttonOnClickListener = buttonOnClickListener
     }
 
-    fun setUrlClickListener(listener: LiveChatUrlClickListener) {
-        this.chatUrlClickListener = listener
+    /**
+     * Callback for url click event from within the chat
+     * @param urlClickListener
+     */
+    fun setUrlClickListener(urlClickListener: LiveChatUrlClickListener) {
+        this.chatUrlClickListener = urlClickListener
     }
 
     override fun describeContents(): Int {
