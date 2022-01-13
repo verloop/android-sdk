@@ -23,7 +23,6 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         const val VERLOOP_ID = 8375667
         var isActivityVisible = false
         val eventListeners = HashMap<String?, VerloopEventListener>()
-        val hideEventListeners = HashMap<String?, HideEventListener>()
     }
 
     init {
@@ -84,12 +83,11 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         context.startActivity(i)
     }
 
+    @Deprecated("Not in use anymore")
     fun hideChat() {
-        hideEventListeners[verloopConfig.recipeId]?.onHide()
-        eventListeners.remove(verloopConfig.recipeId)
-        hideEventListeners.remove(verloopConfig.recipeId)
     }
 
+    @Deprecated("Not in use anymore. Use Logout instead")
     fun onStopChat() {
     }
 

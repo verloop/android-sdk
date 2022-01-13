@@ -12,10 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.lifecycle.ViewModelProvider
-import io.verloop.sdk.HideEventListener
 import io.verloop.sdk.R
 import io.verloop.sdk.Verloop.Companion.eventListeners
-import io.verloop.sdk.Verloop.Companion.hideEventListeners
 import io.verloop.sdk.Verloop.Companion.isActivityVisible
 import io.verloop.sdk.VerloopConfig
 import io.verloop.sdk.VerloopNotification
@@ -70,11 +68,6 @@ class VerloopActivity : AppCompatActivity() {
             viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
             viewModel?.getClientInfo()!!
                 .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
-            hideEventListeners[config.recipeId] = object : HideEventListener {
-                override fun onHide() {
-                    onBackPressed()
-                }
-            }
             addFragment()
         }
     }
@@ -93,7 +86,6 @@ class VerloopActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         eventListeners.remove(config?.recipeId)
-        hideEventListeners.remove(config?.recipeId)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
