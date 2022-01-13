@@ -73,7 +73,6 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         WorkManager
             .getInstance(context)
             .enqueue(logoutWorkRequest)
-
     }
 
     // TODO Need to use same name in JS
