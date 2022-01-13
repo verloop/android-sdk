@@ -80,7 +80,7 @@ class TestActivity : AppCompatActivity() {
                         .userEmail(email1.text?.toString())
                         .userPhone(phone1.text?.toString())
                         .department(department1.text?.toString())
-                        .fcmToken(fcmToken)
+                        .fcmToken(if(checkBoxRegisterFCMToken.isChecked) fcmToken else null)
                         .isStaging(checkBoxIsStaging.isChecked).build()
 
                 verloopConfig?.setUrlClickListener(object : LiveChatUrlClickListener {
