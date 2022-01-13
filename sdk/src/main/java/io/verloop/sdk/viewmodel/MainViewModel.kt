@@ -7,7 +7,7 @@ import io.verloop.sdk.Verloop
 import io.verloop.sdk.model.ClientInfo
 import io.verloop.sdk.repository.VerloopRepository
 
-class MainViewModel(var recipeId: String?, var repository: VerloopRepository) : ViewModel() {
+class MainViewModel(var configKey: String?, var repository: VerloopRepository) : ViewModel() {
     var details: MutableLiveData<ClientInfo>? = null
 
     fun getClientInfo(): LiveData<ClientInfo>? {
@@ -16,14 +16,14 @@ class MainViewModel(var recipeId: String?, var repository: VerloopRepository) : 
     }
 
     fun buttonClicked(json: String) {
-        recipeId.let {
-            Verloop.eventListeners[recipeId]?.onButtonClick(json)
+        configKey.let {
+            Verloop.eventListeners[configKey]?.onButtonClick(json)
         }
     }
 
     fun urlClicked(json: String) {
-        recipeId.let {
-            Verloop.eventListeners[recipeId]?.onURLClick(json)
+        configKey.let {
+            Verloop.eventListeners[configKey]?.onURLClick(json)
         }
     }
 }

@@ -28,6 +28,7 @@ class VerloopFragment : Fragment() {
 
     private var mWebView: WebView? = null
     private var config: VerloopConfig? = null
+    private var configKey: String? = null
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var uploadMsg: ValueCallback<Uri?>? = null
     private var resultLauncher: ActivityResultLauncher<Intent>? = null
@@ -38,10 +39,11 @@ class VerloopFragment : Fragment() {
         private const val ICE_CREAM = 12421
         private const val LOLLIPOP = 12422
 
-        fun newInstance(config: VerloopConfig?): VerloopFragment {
+        fun newInstance(configKey: String?, config: VerloopConfig?): VerloopFragment {
             val fragment = VerloopFragment()
             val args = Bundle()
             args.putParcelable("config", config)
+            args.putString("configKey", configKey)
             fragment.arguments = args
             return fragment
         }
@@ -161,11 +163,14 @@ class VerloopFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val config: VerloopConfig? = arguments?.getParcelable("config")
+        config = arguments?.getParcelable("config")
+        configKey = arguments?.getString("configKey")
+
         if (config != null) {
             this.config = config
             val baseUrl =
-                if (config.isStaging) "https://${config.clientId}.stage.verloop.io" else "https://${config.clientId}.verloop.io"
+                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
+                else "https://${config?.clientId}.verloop.io"
             val retrofit =
                 VerloopServiceBuilder.buildService(
                     requireContext().applicationContext,
@@ -173,7 +178,7 @@ class VerloopFragment : Fragment() {
                     VerloopAPI::class.java
                 )
             val repository = VerloopRepository(requireContext().applicationContext, retrofit)
-            val viewModelFactory = MainViewModelFactory(config.recipeId, repository)
+            val viewModelFactory = MainViewModelFactory(configKey, repository)
             viewModel = activity?.let {
                 ViewModelProvider(
                     it,

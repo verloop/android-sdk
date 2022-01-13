@@ -76,10 +76,10 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
     // TODO Need to use same name in JS
     fun showChat() {
-        if (verloopConfig.recipeId != null) eventListeners[verloopConfig.recipeId] =
-            VerloopEventListener(verloopConfig)
+        eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
         val i = Intent(context, VerloopActivity::class.java)
         i.putExtra("config", verloopConfig)
+        i.putExtra("configKey", verloopConfig.hashCode().toString())
         context.startActivity(i)
     }
 

@@ -30,6 +30,7 @@ class VerloopActivity : AppCompatActivity() {
     private var toolbar: Toolbar? = null
     private var config: VerloopConfig? = null
     private var viewModel: MainViewModel? = null
+    private var configKey: String? = null
 
     companion object {
         const val TAG = "VerloopActivity"
@@ -50,12 +51,14 @@ class VerloopActivity : AppCompatActivity() {
                 BlendModeCompat.SRC_ATOP
             )
 
-        val config: VerloopConfig? = intent.getParcelableExtra("config")
+        config = intent.getParcelableExtra("config")
+        configKey = intent.getStringExtra("configKey")
         this.config = config
 
         if (config != null) {
             val baseUrl =
-                if (config.isStaging) "https://${config.clientId}.stage.verloop.io" else "https://${config.clientId}.verloop.io"
+                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
+                else "https://${config?.clientId}.verloop.io"
 
             val retrofit =
                 buildService(
@@ -64,7 +67,7 @@ class VerloopActivity : AppCompatActivity() {
                     VerloopAPI::class.java
                 )
             val repository = VerloopRepository(applicationContext, retrofit)
-            val viewModelFactory = MainViewModelFactory(config.recipeId, repository)
+            val viewModelFactory = MainViewModelFactory(configKey, repository)
             viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
             viewModel?.getClientInfo()!!
                 .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
@@ -85,7 +88,7 @@ class VerloopActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        eventListeners.remove(config?.recipeId)
+        eventListeners.remove(configKey)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -100,7 +103,7 @@ class VerloopActivity : AppCompatActivity() {
 
     private fun addFragment() {
         Log.d(TAG, "Add Fragment from Activity")
-        verloopFragment = VerloopFragment.newInstance(config)
+        verloopFragment = VerloopFragment.newInstance(configKey, config)
         Log.d(TAG, "Frag: " + (verloopFragment != null))
 
         val ft = supportFragmentManager.beginTransaction()
