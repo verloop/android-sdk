@@ -35,6 +35,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Map<String, String> map = remoteMessage.getData();
 
-        VerloopNotification.showNotification(this, R.mipmap.ic_launcher_round, map);
+        VerloopNotification.showNotification(this, R.drawable.ic_launcher_foreground, map);
     }
 }

@@ -17,9 +17,14 @@ object VerloopServiceBuilder {
             .addInterceptor { chain ->
                 var request = chain.request()
                 request = if (NetworkUtils.isNetworkAvailable(context))
+                // Don't hit the API in case last call was less than 30 seconds ago
                     request.newBuilder().header("Cache-Control", "public, max-age=" + 30).build()
                 else
-                    request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build()
+                // Cache data can be used for 7 days in  case network is not available
+                    request.newBuilder().header(
+                        "Cache-Control",
+                        "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7
+                    ).build()
                 chain.proceed(request)
             }
             .build()

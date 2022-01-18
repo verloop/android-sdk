@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.repository.VerloopRepository
 
-class MainViewModelFactory(private val repository: VerloopRepository) : ViewModelProvider.Factory{
+class MainViewModelFactory(private val configKey: String?, private val repository: VerloopRepository) : ViewModelProvider.Factory{
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)){
-            return MainViewModel(repository) as T
+            return MainViewModel(configKey, repository) as T
         }
         throw IllegalArgumentException("Unknown View Model Class")
     }

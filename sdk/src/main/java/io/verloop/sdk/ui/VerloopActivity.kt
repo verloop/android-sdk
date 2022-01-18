@@ -12,10 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.lifecycle.ViewModelProvider
-import io.verloop.sdk.HideEventListener
 import io.verloop.sdk.R
 import io.verloop.sdk.Verloop.Companion.eventListeners
-import io.verloop.sdk.Verloop.Companion.hideEventListeners
 import io.verloop.sdk.Verloop.Companion.isActivityVisible
 import io.verloop.sdk.VerloopConfig
 import io.verloop.sdk.VerloopNotification
@@ -23,6 +21,7 @@ import io.verloop.sdk.api.VerloopAPI
 import io.verloop.sdk.api.VerloopServiceBuilder.buildService
 import io.verloop.sdk.model.ClientInfo
 import io.verloop.sdk.repository.VerloopRepository
+import io.verloop.sdk.utils.CommonUtils
 import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 
@@ -32,6 +31,7 @@ class VerloopActivity : AppCompatActivity() {
     private var toolbar: Toolbar? = null
     private var config: VerloopConfig? = null
     private var viewModel: MainViewModel? = null
+    private var configKey: String? = null
 
     companion object {
         const val TAG = "VerloopActivity"
@@ -52,12 +52,14 @@ class VerloopActivity : AppCompatActivity() {
                 BlendModeCompat.SRC_ATOP
             )
 
-        val config: VerloopConfig? = intent.getParcelableExtra("config")
+        config = intent.getParcelableExtra("config")
+        configKey = intent.getStringExtra("configKey")
         this.config = config
 
         if (config != null) {
             val baseUrl =
-                if (config.isStaging) "https://${config.clientId}.stage.verloop.io" else "https://${config.clientId}.verloop.io"
+                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
+                else "https://${config?.clientId}.verloop.io"
 
             val retrofit =
                 buildService(
@@ -66,15 +68,10 @@ class VerloopActivity : AppCompatActivity() {
                     VerloopAPI::class.java
                 )
             val repository = VerloopRepository(applicationContext, retrofit)
-            val viewModelFactory = MainViewModelFactory(repository)
+            val viewModelFactory = MainViewModelFactory(configKey, repository)
             viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
             viewModel?.getClientInfo()!!
                 .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
-            hideEventListeners[config.recipeId] = object : HideEventListener {
-                override fun onHide() {
-                    onBackPressed()
-                }
-            }
             addFragment()
         }
     }
@@ -92,12 +89,10 @@ class VerloopActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        eventListeners.remove(config?.recipeId)
-        hideEventListeners.remove(config?.recipeId)
+        eventListeners.remove(configKey)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//      switch deleted
         if (item.itemId == android.R.id.home) {
             // Respond to the action bar's Up/Home button
             finish()
@@ -107,10 +102,7 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     private fun addFragment() {
-        Log.d(TAG, "Add Fragment from Activity")
-        verloopFragment = VerloopFragment.newInstance(config)
-        Log.d(TAG, "Frag: " + (verloopFragment != null))
-
+        verloopFragment = VerloopFragment.newInstance(configKey, config)
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit()
 
@@ -121,14 +113,7 @@ class VerloopActivity : AppCompatActivity() {
     private fun updateClientInfo(clientInfo: ClientInfo) {
         toolbar?.title = clientInfo.title
         toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor))
-        if (clientInfo.textColor?.length == 4) {
-            val textColor = clientInfo.textColor?.replace(
-                "#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])".toRegex(),
-                "#$1$1$2$2$3$3"
-            )
-            clientInfo.textColor = textColor
-        }
-        toolbar?.setTitleTextColor(Color.parseColor(clientInfo.textColor))
+        toolbar?.setTitleTextColor(Color.parseColor(CommonUtils.getExpandedColorHex(clientInfo.textColor)))
     }
 
     private fun setActivityActive(isShown: Boolean) {

@@ -15,26 +15,35 @@ import android.webkit.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import io.verloop.sdk.Verloop.Companion.eventListeners
+import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.VerloopConfig
+import io.verloop.sdk.api.VerloopAPI
+import io.verloop.sdk.api.VerloopServiceBuilder
+import io.verloop.sdk.repository.VerloopRepository
+import io.verloop.sdk.viewmodel.MainViewModel
+import io.verloop.sdk.viewmodel.MainViewModelFactory
+import org.json.JSONException
 
 class VerloopFragment : Fragment() {
 
     private var mWebView: WebView? = null
     private var config: VerloopConfig? = null
+    private var configKey: String? = null
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var uploadMsg: ValueCallback<Uri?>? = null
     private var resultLauncher: ActivityResultLauncher<Intent>? = null
+    private var viewModel: MainViewModel? = null
 
     companion object {
         private const val TAG = "VerloopFragment"
         private const val ICE_CREAM = 12421
         private const val LOLLIPOP = 12422
 
-        fun newInstance(config: VerloopConfig?): VerloopFragment {
+        fun newInstance(configKey: String?, config: VerloopConfig?): VerloopFragment {
             val fragment = VerloopFragment()
             val args = Bundle()
             args.putParcelable("config", config)
+            args.putString("configKey", configKey)
             fragment.arguments = args
             return fragment
         }
@@ -95,9 +104,7 @@ class VerloopFragment : Fragment() {
 
         }
         settings?.javaScriptEnabled = true
-        val listener = eventListeners[config?.recipeId]
-        if (listener != null)
-            mWebView?.addJavascriptInterface(listener, "VerloopMobile")
+        mWebView?.addJavascriptInterface(this, "VerloopMobile")
         settings?.domStorageEnabled = true
         settings?.allowFileAccessFromFileURLs = true
         settings?.allowUniversalAccessFromFileURLs = true
@@ -156,9 +163,28 @@ class VerloopFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val config: VerloopConfig? = arguments?.getParcelable("config")
+        config = arguments?.getParcelable("config")
+        configKey = arguments?.getString("configKey")
+
         if (config != null) {
             this.config = config
+            val baseUrl =
+                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
+                else "https://${config?.clientId}.verloop.io"
+            val retrofit =
+                VerloopServiceBuilder.buildService(
+                    requireContext().applicationContext,
+                    baseUrl,
+                    VerloopAPI::class.java
+                )
+            val repository = VerloopRepository(requireContext().applicationContext, retrofit)
+            val viewModelFactory = MainViewModelFactory(configKey, repository)
+            viewModel = activity?.let {
+                ViewModelProvider(
+                    it,
+                    viewModelFactory
+                ).get(MainViewModel::class.java)
+            }
         }
 
         resultLauncher =
@@ -237,5 +263,19 @@ class VerloopFragment : Fragment() {
                 filePathCallback = null
             }
         }
+    }
+
+    @JavascriptInterface
+    @Throws(JSONException::class)
+    fun onButtonClick(json: String) {
+        Log.d(TAG, " onButtonClick $json")
+        viewModel?.buttonClicked(json)
+    }
+
+    @JavascriptInterface
+    @Throws(JSONException::class)
+    fun onURLClick(json: String) {
+        Log.d(TAG, " onURLClick $json")
+        viewModel?.urlClicked(json)
     }
 }

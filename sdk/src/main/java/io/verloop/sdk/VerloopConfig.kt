@@ -60,12 +60,20 @@ data class VerloopConfig private constructor(
         fields.add(CustomField(key, value, null))
     }
 
-    fun setButtonClickListener(listener: LiveChatButtonClickListener) {
-        this.buttonOnClickListener = listener
+    /**
+     * Callback for button click event from within the chat
+     * @param buttonOnClickListener
+     */
+    fun setButtonClickListener(buttonOnClickListener: LiveChatButtonClickListener) {
+        this.buttonOnClickListener = buttonOnClickListener
     }
 
-    fun setUrlClickListener(listener: LiveChatUrlClickListener) {
-        this.chatUrlClickListener = listener
+    /**
+     * Callback for url click event from within the chat
+     * @param urlClickListener
+     */
+    fun setUrlClickListener(urlClickListener: LiveChatUrlClickListener) {
+        this.chatUrlClickListener = urlClickListener
     }
 
     override fun describeContents(): Int {
@@ -112,17 +120,17 @@ data class VerloopConfig private constructor(
         var fields: ArrayList<CustomField> = ArrayList()
     ) {
         fun clientId(clientId: String?) = apply { this.clientId = clientId }
-        fun userId(userId: String) = apply {
+        fun userId(userId: String?) = apply {
             if (!userId.equals(""))
                 this.userId = userId
         }
 
-        fun fcmToken(fcmToken: String) = apply { this.fcmToken = fcmToken }
-        fun userName(userName: String) = apply { this.userName = userName }
-        fun userEmail(userEmail: String) = apply { this.userEmail = userEmail }
-        fun userPhone(userPhone: String) = apply { this.userPhone = userPhone }
-        fun recipeId(recipeId: String) = apply { this.recipeId = recipeId }
-        fun department(department: String) = apply { this.department = department }
+        fun fcmToken(fcmToken: String?) = apply { this.fcmToken = fcmToken }
+        fun userName(userName: String?) = apply { this.userName = userName }
+        fun userEmail(userEmail: String?) = apply { this.userEmail = userEmail }
+        fun userPhone(userPhone: String?) = apply { this.userPhone = userPhone }
+        fun recipeId(recipeId: String?) = apply { this.recipeId = recipeId }
+        fun department(department: String?) = apply { this.department = department }
         fun isStaging(isStaging: Boolean) = apply { this.isStaging = isStaging }
         fun fields(fields: ArrayList<CustomField>) = apply { this.fields = fields }
 
