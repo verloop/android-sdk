@@ -57,10 +57,16 @@ object VerloopNotification {
 
             // Create pending intent, mention the Activity which needs to be
             //triggered when user clicks on notification(StopScript.class in this case)
+            val notificationIntent = Intent(
+                context,
+                VerloopActivity::class.java
+            )
+            notificationIntent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP)
             val contentIntent = PendingIntent.getActivity(
                 context, 0,
-                Intent(context, VerloopActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
             )
+
             notification.setContentIntent(contentIntent)
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

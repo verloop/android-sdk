@@ -12,22 +12,41 @@ import io.verloop.sdk.LiveChatUrlClickListener
 import io.verloop.sdk.Verloop
 import io.verloop.sdk.VerloopConfig
 import io.verloop.sdk.VerloopException
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.iid.InstanceIdResult
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class TestActivity : AppCompatActivity() {
+
     private val TAG: String = "TestActivity"
+
+    var verloop: Verloop? = null
+    var verloop2: Verloop? = null
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent != null && intent.extras != null) {
+            val clientId = intent.extras?.get("clientId")
+            val userId = intent.extras?.get("userId")
+            Log.i(TAG, "clientId: $clientId, userId: $userId")
+            if (clientId != null && userId != null) {
+                verloop?.showChat()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
 
+        if (intent.extras != null) {
+            for (key in intent.extras!!.keySet()) {
+                val value = intent.extras!!.getString(key)
+                Log.d(TAG, "Key: $key Value: $value")
+            }
+        }
         var verloopConfig: VerloopConfig? = null
-        var verloop: Verloop? = null
 
         var verloopConfig2: VerloopConfig? = null
-        var verloop2: Verloop? = null
 
         var fcmToken: String? = null
 
@@ -61,12 +80,11 @@ class TestActivity : AppCompatActivity() {
         val checkBoxIsStaging = findViewById<CheckBox>(R.id.checkBoxStaging)
         val checkBoxRegisterFCMToken = findViewById<CheckBox>(R.id.checkBoxFCM)
 
-        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener(
-            this
-        ) { instanceIdResult: InstanceIdResult ->
-            val newToken = instanceIdResult.token
-            Log.i("FCM Token", newToken)
-            fcmToken = newToken
+        FirebaseMessaging.getInstance().token.addOnCompleteListener {
+            if (it.isComplete) {
+                fcmToken = it.result.toString()
+                fcmToken?.let { it1 -> Log.i("FCM Token", it1) }
+            }
         }
 
         btnStartChat1.setOnClickListener {
@@ -80,7 +98,7 @@ class TestActivity : AppCompatActivity() {
                         .userEmail(email1.text?.toString())
                         .userPhone(phone1.text?.toString())
                         .department(department1.text?.toString())
-                        .fcmToken(if(checkBoxRegisterFCMToken.isChecked) fcmToken else null)
+                        .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken else null)
                         .isStaging(checkBoxIsStaging.isChecked).build()
 
                 verloopConfig?.setUrlClickListener(object : LiveChatUrlClickListener {
@@ -91,7 +109,7 @@ class TestActivity : AppCompatActivity() {
                         i.putExtra("config", verloopConfig)
                         startActivity(i)
                     }
-                })
+                }, false)
                 verloop = Verloop(this, verloopConfig!!)
                 verloop?.showChat()
             } catch (e: VerloopException) {
@@ -109,8 +127,11 @@ class TestActivity : AppCompatActivity() {
             verloopConfig2?.setUrlClickListener(object : LiveChatUrlClickListener {
                 override fun urlClicked(url: String?) {
                     Toast.makeText(applicationContext, "Chat 2: $url", Toast.LENGTH_SHORT).show()
+                    val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
+                    i.putExtra("config", verloopConfig)
+                    startActivity(i)
                 }
-            })
+            }, true)
             verloop2 = Verloop(this, verloopConfig2!!)
             verloop2?.showChat()
         }

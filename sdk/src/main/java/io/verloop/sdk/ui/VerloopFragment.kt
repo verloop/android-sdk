@@ -54,7 +54,9 @@ class VerloopFragment : Fragment() {
         mWebView = WebView(requireActivity())
         mWebView?.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                // open rest of URLS in default browser
+                if(config?.overrideUrlClick === true) {
+                    return true
+                }
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(intent)
                 return true
