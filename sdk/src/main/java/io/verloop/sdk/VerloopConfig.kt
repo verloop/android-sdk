@@ -113,7 +113,37 @@ data class VerloopConfig private constructor(
         USER, ROOM
     }
 
-    class CustomField(val key: String, var value: String, var scope: Scope?)
+    class CustomField(var key: String?, var value: String?, var scope: Scope?) : Parcelable {
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        constructor() : this(
+            null, null, Scope.USER
+        )
+
+        constructor(source: Parcel) : this() {
+            this.key = source.readString()
+            this.value = source.readString()
+            this.scope = Scope.values()[source.readInt()]
+        }
+
+        override fun writeToParcel(dest: Parcel?, flags: Int) {
+            dest?.writeString(this.key)
+            dest?.writeString(this.value)
+            this.scope?.ordinal?.let { dest?.writeInt(it) }
+        }
+
+        companion object {
+            @JvmField
+            val CREATOR = object : Parcelable.Creator<CustomField> {
+                override fun createFromParcel(parcel: Parcel) = CustomField(parcel)
+                override fun newArray(size: Int) = arrayOfNulls<CustomField>(size)
+            }
+        }
+
+    }
 
     data class Builder(
         var clientId: String? = null,

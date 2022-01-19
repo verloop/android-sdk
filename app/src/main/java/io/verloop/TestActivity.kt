@@ -4,16 +4,16 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import io.verloop.sdk.LiveChatUrlClickListener
 import io.verloop.sdk.Verloop
 import io.verloop.sdk.VerloopConfig
 import io.verloop.sdk.VerloopException
 import com.google.firebase.messaging.FirebaseMessaging
-
+import android.widget.EditText
+import android.view.LayoutInflater
+import android.view.View
+import org.json.JSONObject
 
 class TestActivity : AppCompatActivity() {
 
@@ -22,13 +22,21 @@ class TestActivity : AppCompatActivity() {
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
 
+    var clientId: String? = null
+    var userId: String? = null
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if (intent != null && intent.extras != null) {
-            val clientId = intent.extras?.get("clientId")
-            val userId = intent.extras?.get("userId")
-            Log.i(TAG, "clientId: $clientId, userId: $userId")
-            if (clientId != null && userId != null) {
+            val verloopData = intent.extras?.get("verloop")
+            if (verloopData != null) {
+                val obj = JSONObject(verloopData.toString())
+                if (obj.has("client_id")) clientId = obj.getString("client_id")
+                if (obj.has("userId")) userId = obj.getString("userId")
+            }
+            if (clientId === null) clientId = intent.extras?.get("clientId") as String?
+            if (userId === null) userId = intent.extras?.get("userId") as String?
+            if (clientId != null) {
                 verloop?.showChat()
             }
         }
@@ -79,6 +87,33 @@ class TestActivity : AppCompatActivity() {
 
         val checkBoxIsStaging = findViewById<CheckBox>(R.id.checkBoxStaging)
         val checkBoxRegisterFCMToken = findViewById<CheckBox>(R.id.checkBoxFCM)
+        val checkOverrideUrlClick = findViewById<CheckBox>(R.id.checkOverrideUrlClick)
+
+        val btnAdd = findViewById<Button>(R.id.buttonAdd)
+        val containerCustomFields = findViewById<LinearLayout>(R.id.containerCustomFields)
+        val editCustomField = findViewById<LinearLayout>(R.id.editCustomField)
+
+        val allCustomKeys: ArrayList<EditText> = ArrayList()
+        val allCustomValues: ArrayList<EditText> = ArrayList()
+        val allCustomScopes: ArrayList<CheckBox> = ArrayList()
+        allCustomKeys.add(editCustomField.findViewById(R.id.editCustomKey))
+        allCustomValues.add(editCustomField.findViewById(R.id.editCustomValue))
+        allCustomScopes.add(editCustomField.findViewById(R.id.checkBoxRoom))
+
+        btnAdd.setOnClickListener {
+            val inflater = LayoutInflater.from(this)
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+            params.setMargins(8, 0, 8, 0)
+            val field: View = inflater.inflate(R.layout.edit_text_view, null, false)
+            field.layoutParams = params
+            containerCustomFields.addView(field)
+            allCustomKeys.add(field.findViewById(R.id.editCustomKey))
+            allCustomValues.add(field.findViewById(R.id.editCustomValue))
+            allCustomScopes.add(field.findViewById(R.id.checkBoxRoom))
+        }
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener {
             if (it.isComplete) {
@@ -89,6 +124,16 @@ class TestActivity : AppCompatActivity() {
 
         btnStartChat1.setOnClickListener {
             try {
+                var customFields: ArrayList<VerloopConfig.CustomField> = ArrayList()
+                for (i in 0 until allCustomKeys.size - 1) {
+                    val key = allCustomKeys[i].text.toString()
+                    val value = allCustomValues[i].text.toString()
+                    val scope =
+                        if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
+                    val customField = VerloopConfig.CustomField(key, value, scope)
+                    customFields.add(customField)
+                }
+
                 verloopConfig =
                     VerloopConfig.Builder()
                         .clientId(clientId1.text?.toString())
@@ -99,6 +144,7 @@ class TestActivity : AppCompatActivity() {
                         .userPhone(phone1.text?.toString())
                         .department(department1.text?.toString())
                         .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken else null)
+                        .fields(customFields)
                         .isStaging(checkBoxIsStaging.isChecked).build()
 
                 verloopConfig?.setUrlClickListener(object : LiveChatUrlClickListener {
@@ -109,31 +155,49 @@ class TestActivity : AppCompatActivity() {
                         i.putExtra("config", verloopConfig)
                         startActivity(i)
                     }
-                }, false)
+                }, checkOverrideUrlClick.isChecked)
                 verloop = Verloop(this, verloopConfig!!)
                 verloop?.showChat()
             } catch (e: VerloopException) {
                 Log.e(TAG, e.message.toString())
+                Toast.makeText(this@TestActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
             }
         }
 
         btnStartChat2.setOnClickListener {
-            verloopConfig2 =
-                VerloopConfig.Builder()
-                    .clientId(clientId2.text?.toString())
-                    .userId(userId2.text?.toString())
-                    .isStaging(false).build()
-
-            verloopConfig2?.setUrlClickListener(object : LiveChatUrlClickListener {
-                override fun urlClicked(url: String?) {
-                    Toast.makeText(applicationContext, "Chat 2: $url", Toast.LENGTH_SHORT).show()
-                    val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
-                    i.putExtra("config", verloopConfig)
-                    startActivity(i)
+            try {
+                var customFields: ArrayList<VerloopConfig.CustomField> = ArrayList()
+                for (i in 0 until allCustomKeys.size - 1) {
+                    val key = allCustomKeys[i].text.toString()
+                    val value = allCustomValues[i].text.toString()
+                    val scope =
+                        if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
+                    val customField = VerloopConfig.CustomField(key, value, scope)
+                    customFields.add(customField)
                 }
-            }, true)
-            verloop2 = Verloop(this, verloopConfig2!!)
-            verloop2?.showChat()
+
+                verloopConfig2 =
+                    VerloopConfig.Builder()
+                        .clientId(clientId2.text?.toString())
+                        .userId(userId2.text?.toString())
+                        .fields(customFields)
+                        .isStaging(false).build()
+
+                verloopConfig2?.setUrlClickListener(object : LiveChatUrlClickListener {
+                    override fun urlClicked(url: String?) {
+                        Toast.makeText(applicationContext, "Chat 2: $url", Toast.LENGTH_SHORT)
+                            .show()
+                        val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
+                        i.putExtra("config", verloopConfig)
+                        startActivity(i)
+                    }
+                }, checkOverrideUrlClick.isChecked)
+                verloop2 = Verloop(this, verloopConfig2!!)
+                verloop2?.showChat()
+            } catch (e: VerloopException) {
+                Log.e(TAG, e.message.toString())
+                Toast.makeText(this@TestActivity, e.message.toString(), Toast.LENGTH_SHORT).show()
+            }
         }
 
         btnClose1.setOnClickListener {

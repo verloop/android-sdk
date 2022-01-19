@@ -1,353 +1,399 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="12dp"
-    android:weightSum="10"
     tools:context=".TestActivity">
+
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="true"
-        android:layout_weight="0.8">
+        android:layout_height="wrap_content">
 
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <TableRow android:layout_marginBottom="8dp">
+            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
+                <TableRow android:layout_marginBottom="8dp">
 
-                    <EditText
-                        android:id="@+id/editClientId1"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editClientId1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Client ID"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editClientId2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Client ID"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserId1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="User ID"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserId2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="User ID"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editRecipeId1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Recipe ID"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editRecipeId2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Recipe ID"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserName1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Name"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserName2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Name"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserEmail1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Email"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserEmail2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Email"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserPhone1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Phone No"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editUserPhone2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Phone No"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </TableRow>
+
+                <TableRow android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editDepartment1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Department"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        tools:ignore="MissingConstraints">
+
+                        <EditText
+                            android:id="@+id/editDepartment2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Department"
+                            tools:ignore="MissingConstraints" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:id="@+id/containerCustomFields"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Client ID"
-                        tools:ignore="MissingConstraints" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                </com.google.android.material.textfield.TextInputLayout>
+                        <include
+                            android:id="@+id/editCustomField"
+                            layout="@layout/edit_text_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="4dp" />
+                    </LinearLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                </TableRow>
+
+                <Button
+                    android:id="@+id/buttonAdd"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Add"
+                    android:textAlignment="center"
+                    android:textColor="#FFF"
+                    android:textSize="14sp"
+                    tools:ignore="RtlCompat" />
 
-                    <EditText
-                        android:id="@+id/editClientId2"
-                        android:layout_width="match_parent"
+                <TableRow android:layout_marginTop="8dp">
+
+                    <CheckBox
+                        android:id="@+id/checkBoxStaging"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:hint="Client ID"
-                        tools:ignore="MissingConstraints" />
+                        android:layout_weight="3"
+                        android:text="Staging Env" />
 
-                </com.google.android.material.textfield.TextInputLayout>
-            </TableRow>
-
-            <TableRow android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserId1"
-                        android:layout_width="match_parent"
+                    <CheckBox
+                        android:id="@+id/checkBoxFCM"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:hint="User ID"
-                        tools:ignore="MissingConstraints" />
+                        android:layout_weight="3"
+                        android:text="FCM Token" />
 
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserId2"
-                        android:layout_width="match_parent"
+                    <CheckBox
+                        android:id="@+id/checkOverrideUrlClick"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:hint="User ID"
+                        android:layout_weight="4"
+                        android:text="Override Url Click" />
+                </TableRow>
+
+                <TableRow android:layout_marginTop="8dp"></TableRow>
+            </TableLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginVertical="16dp"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/button1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        android:text="Start Chat 01"
                         tools:ignore="MissingConstraints" />
 
-                </com.google.android.material.textfield.TextInputLayout>
-            </TableRow>
+                    <Button
+                        android:id="@+id/button2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        android:text="Start Chat 02" />
+                </LinearLayout>
 
-            <TableRow android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
+                    android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/editRecipeId1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Recipe ID"
-                        tools:ignore="MissingConstraints" />
+                    <Button
+                        android:id="@+id/close_chat_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        android:text="Logout Chat 01" />
 
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editRecipeId2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Recipe ID"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </TableRow>
-
-            <TableRow android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserName1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Name"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserName2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Name"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </TableRow>
-
-            <TableRow android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserEmail1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Email"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserEmail2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Email"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </TableRow>
-
-            <TableRow android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserPhone1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Phone No"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editUserPhone2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Phone No"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </TableRow>
-
-            <TableRow android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editDepartment1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Department"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    tools:ignore="MissingConstraints">
-
-                    <EditText
-                        android:id="@+id/editDepartment2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Department"
-                        tools:ignore="MissingConstraints" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-            </TableRow>
-
-            <TableRow android:layout_marginTop="8dp">
-                <CheckBox
-                    android:id="@+id/checkBoxStaging"
-                    android:layout_weight="1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Staging Env" />
-
-                <CheckBox
-                    android:id="@+id/checkBoxFCM"
-                    android:layout_weight="1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FCM Token" />
-            </TableRow>
-
-        </TableLayout>
-
+                    <Button
+                        android:id="@+id/close_chat_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="60dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        android:text="Logout Chat 02" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="16dp"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/button1"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:text="Start Chat 01"
-                tools:ignore="MissingConstraints" />
-
-            <Button
-                android:id="@+id/button2"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:text="Start Chat 02" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/close_chat_1"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:text="Logout Chat 01" />
-
-            <Button
-                android:id="@+id/close_chat_2"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginHorizontal="4dp"
-                android:layout_weight="1"
-                android:text="Logout Chat 02" />
-        </LinearLayout>
-    </LinearLayout>
 
 </LinearLayout>
