@@ -23,6 +23,8 @@ import io.verloop.sdk.repository.VerloopRepository
 import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
+import org.json.JSONObject
+import java.util.*
 
 class VerloopFragment : Fragment() {
 
@@ -54,7 +56,9 @@ class VerloopFragment : Fragment() {
         mWebView = WebView(requireActivity())
         mWebView?.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                // open rest of URLS in default browser
+                if(config?.overrideUrlClick === true) {
+                    return true
+                }
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(intent)
                 return true
@@ -124,7 +128,26 @@ class VerloopFragment : Fragment() {
         uriBuilder.appendQueryParameter("mode", "sdk")
         uriBuilder.appendQueryParameter("sdk", "android")
         uriBuilder.appendQueryParameter("user_id", config?.userId)
-        uriBuilder.appendQueryParameter("custom_fields", config?.fields.toString())
+        if(config?.fields != null && config?.fields!!.size > 0) {
+            val obj = JSONObject()
+            for (field in config?.fields!!) {
+                try {
+                    if (field.scope != null) {
+                        val innerObject = JSONObject()
+                        val scopeObject = JSONObject()
+                        scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
+                        innerObject.put("value", field.value)
+                        innerObject.put("options", scopeObject)
+                        obj.put(field.key, innerObject)
+                    } else {
+                        obj.put(field.key, field.value)
+                    }
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+            uriBuilder.appendQueryParameter("custom_fields", obj.toString())
+        }
         if (config?.fcmToken != null) {
             uriBuilder.appendQueryParameter("device_token", config?.fcmToken)
             uriBuilder.appendQueryParameter("device_type", "android")

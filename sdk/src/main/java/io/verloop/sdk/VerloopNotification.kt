@@ -10,9 +10,10 @@ import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import io.verloop.sdk.Verloop.Companion.isActivityVisible
-import io.verloop.sdk.ui.VerloopActivity
 import org.json.JSONException
 import org.json.JSONObject
+import android.content.pm.PackageManager
+
 
 object VerloopNotification {
     private const val TAG = "VerloopNotification"
@@ -40,10 +41,16 @@ object VerloopNotification {
             val json: JSONObject
             val title: String
             val text: String
+            var clientId: String? = null
+            var userId: String? = null
             try {
                 json = JSONObject(data["verloop"])
                 title = json.getString("title")
                 text = json.getString("text")
+                if (json.has("client_id"))
+                    clientId = json.getString("client_id")
+                if (json.has("userId"))
+                    userId = json.getString("userId")
             } catch (e: JSONException) {
                 Log.e(TAG, e.toString())
                 return false
@@ -57,10 +64,18 @@ object VerloopNotification {
 
             // Create pending intent, mention the Activity which needs to be
             //triggered when user clicks on notification(StopScript.class in this case)
+            val pm: PackageManager = context.packageManager
+            val notificationIntent = pm.getLaunchIntentForPackage(context.packageName)
+
+            clientId.let { notificationIntent?.putExtra("clientId", it) }
+            userId.let { notificationIntent?.putExtra("userId", it) }
+
+            notificationIntent?.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP)
             val contentIntent = PendingIntent.getActivity(
                 context, 0,
-                Intent(context, VerloopActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
             )
+
             notification.setContentIntent(contentIntent)
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
