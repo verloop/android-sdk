@@ -5,14 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
-import io.verloop.sdk.LiveChatUrlClickListener
-import io.verloop.sdk.Verloop
-import io.verloop.sdk.VerloopConfig
-import io.verloop.sdk.VerloopException
 import com.google.firebase.messaging.FirebaseMessaging
 import android.widget.EditText
 import android.view.LayoutInflater
 import android.view.View
+import io.verloop.sdk.*
 import org.json.JSONObject
 
 class TestActivity : AppCompatActivity() {
@@ -32,12 +29,32 @@ class TestActivity : AppCompatActivity() {
             if (verloopData != null) {
                 val obj = JSONObject(verloopData.toString())
                 if (obj.has("client_id")) clientId = obj.getString("client_id")
-                if (obj.has("userId")) userId = obj.getString("userId")
-            }
-            if (clientId === null) clientId = intent.extras?.get("clientId") as String?
-            if (userId === null) userId = intent.extras?.get("userId") as String?
-            if (clientId != null) {
-                verloop?.showChat()
+                if (obj.has("user_id")) userId = obj.getString("user_id")
+                if (clientId != null) {
+                    // Use the existing verloop object associated with the clientId and userId if exists
+                    if (verloop != null) {
+                        verloop?.showChat()
+                    } else {
+                        // Create new Verloop object if don't have existing one
+                        var config = VerloopConfig.Builder().clientId(clientId).build()
+                        // Set the userId if received in notification payload
+                        if (userId != null) config.userId = userId
+                        config?.setUrlClickListener(object : LiveChatUrlClickListener {
+                            override fun urlClicked(url: String?) {
+                                Toast.makeText(
+                                    applicationContext,
+                                    "Chat 1: $url",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                val i =
+                                    Intent(this@TestActivity, ProductDetailsActivity::class.java)
+                                i.putExtra("config", config)
+                                startActivity(i)
+                            }
+                        }, true)
+                        Verloop(this, config).showChat()
+                    }
+                }
             }
         }
     }
@@ -45,13 +62,8 @@ class TestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
+        if (intent != null) onNewIntent(intent)
 
-        if (intent.extras != null) {
-            for (key in intent.extras!!.keySet()) {
-                val value = intent.extras!!.getString(key)
-                Log.d(TAG, "Key: $key Value: $value")
-            }
-        }
         var verloopConfig: VerloopConfig? = null
 
         var verloopConfig2: VerloopConfig? = null
@@ -192,6 +204,13 @@ class TestActivity : AppCompatActivity() {
                         startActivity(i)
                     }
                 }, checkOverrideUrlClick.isChecked)
+
+                verloopConfig?.setButtonClickListener(object : LiveChatButtonClickListener {
+                    override fun buttonClicked(title: String?, type: String?, payload: String?) {
+                        TODO("Not yet implemented")
+                    }
+                })
+
                 verloop2 = Verloop(this, verloopConfig2!!)
                 verloop2?.showChat()
             } catch (e: VerloopException) {

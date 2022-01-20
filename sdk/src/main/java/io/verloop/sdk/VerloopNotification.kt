@@ -38,19 +38,13 @@ object VerloopNotification {
     ): Boolean {
         // Show the notification only if chat activity is not running
         if (data.containsKey("verloop") && !isActivityShowing(context)) {
-            val json: JSONObject
+            val dataPayload: JSONObject
             val title: String
             val text: String
-            var clientId: String? = null
-            var userId: String? = null
             try {
-                json = JSONObject(data["verloop"])
-                title = json.getString("title")
-                text = json.getString("text")
-                if (json.has("client_id"))
-                    clientId = json.getString("client_id")
-                if (json.has("userId"))
-                    userId = json.getString("userId")
+                dataPayload = JSONObject(data["verloop"])
+                title = dataPayload.getString("title")
+                text = dataPayload.getString("text")
             } catch (e: JSONException) {
                 Log.e(TAG, e.toString())
                 return false
@@ -67,8 +61,7 @@ object VerloopNotification {
             val pm: PackageManager = context.packageManager
             val notificationIntent = pm.getLaunchIntentForPackage(context.packageName)
 
-            clientId.let { notificationIntent?.putExtra("clientId", it) }
-            userId.let { notificationIntent?.putExtra("userId", it) }
+            dataPayload.let { notificationIntent?.putExtra("verloop", it.toString()) }
 
             notificationIntent?.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP)
             val contentIntent = PendingIntent.getActivity(
