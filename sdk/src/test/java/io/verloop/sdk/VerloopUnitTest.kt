@@ -12,18 +12,5 @@ class VerloopUnitTest {
         Assert.assertEquals("#44FFDD", color)
     }
 
-    @Test(expected = VerloopException::class)
-    fun invalidVerloopConfig() {
-        VerloopConfig.Builder().userId("Verloop").build()
-    }
 
-    @Test
-    fun validVerloopConfig() {
-        try {
-            VerloopConfig.Builder().clientId("Verloop").build()
-            assert(true)
-        } catch (e: VerloopException) {
-            assert(false)
-        }
-    }
 }
