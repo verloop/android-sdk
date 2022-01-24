@@ -1,7 +1,9 @@
 package io.verloop.sdk
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import android.view.View
@@ -14,10 +16,15 @@ import io.verloop.sdk.service.LogoutWorker
 import io.verloop.sdk.ui.VerloopActivity
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.*
+import kotlin.collections.HashMap
 
 class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
     val TAG = "VerloopOBJECT"
+    val PREF_USER_ID = "user_id"
+    private val prefName = "VerloopPreference"
+    private var preference: SharedPreferences = context.getSharedPreferences(prefName, MODE_PRIVATE)
 
     companion object {
         const val VERLOOP_ID = 8375667
@@ -87,6 +94,10 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
      * This will open up the activity for chat and load all the data provided in VerloopConfig
      */
     fun showChat() {
+        verloopConfig.userId =
+            verloopConfig.userId ?: preference.getString(PREF_USER_ID, UUID.randomUUID().toString())
+        preference.edit().putString(PREF_USER_ID, verloopConfig.userId).commit()
+
         eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
         val i = Intent(context, VerloopActivity::class.java)
         i.putExtra("config", verloopConfig)

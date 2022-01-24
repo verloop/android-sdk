@@ -6,7 +6,7 @@ import java.util.*
 
 data class VerloopConfig private constructor(
     var clientId: String?,
-    var userId: String? = UUID.randomUUID().toString(),
+    var userId: String?,
     var fcmToken: String?,
     var userName: String?,
     var userEmail: String?,
@@ -21,7 +21,7 @@ data class VerloopConfig private constructor(
     @Deprecated("Use builder instead")
     constructor(clientId: String) : this(
         clientId,
-        UUID.randomUUID().toString(),
+        null,
         null,
         null,
         null,
@@ -147,7 +147,7 @@ data class VerloopConfig private constructor(
 
     data class Builder(
         var clientId: String? = null,
-        var userId: String? = UUID.randomUUID().toString(),
+        var userId: String? = null,
         var fcmToken: String? = null,
         var userName: String? = null,
         var userEmail: String? = null,
