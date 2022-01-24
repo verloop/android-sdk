@@ -137,7 +137,7 @@ class TestActivity : AppCompatActivity() {
         btnStartChat1.setOnClickListener {
             try {
                 var customFields: ArrayList<VerloopConfig.CustomField> = ArrayList()
-                for (i in 0 until allCustomKeys.size - 1) {
+                for (i in 0 until allCustomKeys.size) {
                     val key = allCustomKeys[i].text.toString()
                     val value = allCustomValues[i].text.toString()
                     val scope =
@@ -179,7 +179,7 @@ class TestActivity : AppCompatActivity() {
         btnStartChat2.setOnClickListener {
             try {
                 var customFields: ArrayList<VerloopConfig.CustomField> = ArrayList()
-                for (i in 0 until allCustomKeys.size - 1) {
+                for (i in 0 until allCustomKeys.size) {
                     val key = allCustomKeys[i].text.toString()
                     val value = allCustomValues[i].text.toString()
                     val scope =
