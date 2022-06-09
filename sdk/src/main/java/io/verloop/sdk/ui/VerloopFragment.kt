@@ -1,6 +1,7 @@
 package io.verloop.sdk.ui
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,7 @@ import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+
 
 class VerloopFragment : Fragment() {
 
@@ -56,10 +58,23 @@ class VerloopFragment : Fragment() {
         mWebView = WebView(requireActivity())
         mWebView?.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if(config?.overrideUrlClick === true) {
+                if (config?.overrideUrlClick == true) {
                     return true
                 }
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(intent)
+                return true
+            }
+
+            @TargetApi(Build.VERSION_CODES.N)
+            override fun shouldOverrideUrlLoading(
+                view: WebView?, request: WebResourceRequest
+            ): Boolean {
+                val uri = request.url
+                if (config?.overrideUrlClick == true) {
+                    return true
+                }
+                val intent = Intent(Intent.ACTION_VIEW, uri)
                 startActivity(intent)
                 return true
             }
@@ -102,10 +117,8 @@ class VerloopFragment : Fragment() {
         }
         val settings = mWebView?.settings
         if (activity?.applicationContext?.cacheDir != null) {
-            settings?.setAppCachePath(activity?.applicationContext?.cacheDir?.absolutePath)
+            settings?.setCacheMode(WebSettings.LOAD_DEFAULT)
             settings?.allowFileAccess = true
-            settings?.setAppCacheEnabled(true)
-
         }
         settings?.javaScriptEnabled = true
         mWebView?.addJavascriptInterface(this, "VerloopMobile")
@@ -128,7 +141,7 @@ class VerloopFragment : Fragment() {
         uriBuilder.appendQueryParameter("mode", "sdk")
         uriBuilder.appendQueryParameter("sdk", "android")
         uriBuilder.appendQueryParameter("user_id", config?.userId)
-        if(config?.fields != null && config?.fields!!.size > 0) {
+        if (config?.fields != null && config?.fields!!.size > 0) {
             val obj = JSONObject()
             for (field in config?.fields!!) {
                 try {
@@ -138,9 +151,9 @@ class VerloopFragment : Fragment() {
                         scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
                         innerObject.put("value", field.value)
                         innerObject.put("options", scopeObject)
-                        obj.put(field.key, innerObject)
+                        field.key?.let { obj.put(it, innerObject) }
                     } else {
-                        obj.put(field.key, field.value)
+                        field.key?.let { obj.put(it, field.value) }
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()

@@ -22,7 +22,7 @@ class VerloopRepository(val context: Context, private val retrofit: Retrofit) {
         val details = MutableLiveData<ClientInfo>()
 
         // If available return data stored in sharedPreferences first and then hit the API in background
-        var clientInfoJson = sharedPreferences.getString("clientInfo", null)
+        val clientInfoJson = sharedPreferences.getString("clientInfo", null)
         if(clientInfoJson != null) {
             val clientInfo = Gson().fromJson(clientInfoJson, ClientInfo::class.java)
             details.value = clientInfo
@@ -39,7 +39,7 @@ class VerloopRepository(val context: Context, private val retrofit: Retrofit) {
 
                     val myEdit = sharedPreferences.edit()
                     myEdit.putString("clientInfo", Gson().toJson(clientInfo))
-                    myEdit.commit()
+                    myEdit.apply()
                 }
             }
 

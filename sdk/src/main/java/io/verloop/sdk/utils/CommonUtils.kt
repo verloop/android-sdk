@@ -8,7 +8,7 @@ class CommonUtils {
         fun getExpandedColorHex(color: String?): String {
             if(color === null) return "#FFFFFF"
             if (color.length == 4) {
-                return color?.replace(
+                return color.replace(
                     "#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])".toRegex(), "#$1$1$2$2$3$3"
                 )
             }

@@ -52,14 +52,14 @@ class VerloopActivity : AppCompatActivity() {
                 BlendModeCompat.SRC_ATOP
             )
 
-        config = intent.getParcelableExtra("config")
+        val config: VerloopConfig? = intent.getParcelableExtra("config")
         configKey = intent.getStringExtra("configKey")
         this.config = config
 
         if (config != null) {
             val baseUrl =
-                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
-                else "https://${config?.clientId}.verloop.io"
+                if (config.isStaging) "https://${config.clientId}.stage.verloop.io"
+                else "https://${config.clientId}.verloop.io"
 
             val retrofit =
                 buildService(
@@ -123,6 +123,6 @@ class VerloopActivity : AppCompatActivity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult")
-        verloopFragment?.fileUploadResult(requestCode, resultCode, data)
+        verloopFragment.fileUploadResult(requestCode, resultCode, data)
     }
 }
