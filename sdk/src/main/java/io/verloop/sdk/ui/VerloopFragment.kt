@@ -25,6 +25,7 @@ import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
 import org.json.JSONObject
+import java.net.URLEncoder
 import java.util.*
 
 
@@ -149,7 +150,7 @@ class VerloopFragment : Fragment() {
                         val innerObject = JSONObject()
                         val scopeObject = JSONObject()
                         scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
-                        innerObject.put("value", field.value)
+                        innerObject.put("value", URLEncoder.encode(field.value, "utf-8"))
                         innerObject.put("options", scopeObject)
                         field.key?.let { obj.put(it, innerObject) }
                     } else {
