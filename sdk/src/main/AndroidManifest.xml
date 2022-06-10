@@ -11,6 +11,8 @@
             android:name=".ui.VerloopActivity"
             android:alwaysRetainTaskState="true"
             android:exported="true"
+            android:fitsSystemWindows="true"
+            android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />

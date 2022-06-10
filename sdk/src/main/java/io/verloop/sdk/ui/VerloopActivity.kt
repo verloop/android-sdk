@@ -2,9 +2,11 @@ package io.verloop.sdk.ui
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -69,9 +71,8 @@ class VerloopActivity : AppCompatActivity() {
                 )
             val repository = VerloopRepository(applicationContext, retrofit)
             val viewModelFactory = MainViewModelFactory(configKey, repository)
-            viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-            viewModel?.getClientInfo()!!
-                .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
+            viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+            viewModel?.getClientInfo()?.observe(this) { clientInfo -> updateClientInfo(clientInfo) }
             addFragment()
         }
     }
@@ -105,14 +106,11 @@ class VerloopActivity : AppCompatActivity() {
         verloopFragment = VerloopFragment.newInstance(configKey, config)
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit()
-
-        // So that the keyboard doesn't cover the text input button.
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     private fun updateClientInfo(clientInfo: ClientInfo) {
         toolbar?.title = clientInfo.title
-        toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor))
+        toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor ?: "#FFFFFF"))
         toolbar?.setTitleTextColor(Color.parseColor(CommonUtils.getExpandedColorHex(clientInfo.textColor)))
     }
 
