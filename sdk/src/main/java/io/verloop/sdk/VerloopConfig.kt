@@ -87,18 +87,18 @@ data class VerloopConfig private constructor(
         return 0
     }
 
-    override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.writeString(this.clientId)
-        dest?.writeString(this.userId)
-        dest?.writeString(this.fcmToken)
-        dest?.writeString(this.userName)
-        dest?.writeString(this.userEmail)
-        dest?.writeString(this.userPhone)
-        dest?.writeString(this.recipeId)
-        dest?.writeString(this.department)
-        dest?.writeByte((if (this.isStaging) 1 else 0).toByte())
-        dest?.writeByte((if (this.overrideUrlClick) 1 else 0).toByte())
-        dest?.writeList(this.fields)
+    override fun writeToParcel(dest: Parcel, flags: Int) {
+        dest.writeString(this.clientId)
+        dest.writeString(this.userId)
+        dest.writeString(this.fcmToken)
+        dest.writeString(this.userName)
+        dest.writeString(this.userEmail)
+        dest.writeString(this.userPhone)
+        dest.writeString(this.recipeId)
+        dest.writeString(this.department)
+        dest.writeByte((if (this.isStaging) 1 else 0).toByte())
+        dest.writeByte((if (this.overrideUrlClick) 1 else 0).toByte())
+        dest.writeList(this.fields)
     }
 
     companion object {
@@ -129,10 +129,10 @@ data class VerloopConfig private constructor(
             this.scope = Scope.values()[source.readInt()]
         }
 
-        override fun writeToParcel(dest: Parcel?, flags: Int) {
-            dest?.writeString(this.key)
-            dest?.writeString(this.value)
-            this.scope?.ordinal?.let { dest?.writeInt(it) }
+        override fun writeToParcel(dest: Parcel, flags: Int) {
+            dest.writeString(this.key)
+            dest.writeString(this.value)
+            this.scope?.ordinal?.let { dest.writeInt(it) }
         }
 
         companion object {

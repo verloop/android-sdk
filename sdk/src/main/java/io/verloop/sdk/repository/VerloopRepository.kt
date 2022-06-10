@@ -16,16 +16,19 @@ import com.google.gson.Gson
 
 class VerloopRepository(val context: Context, private val retrofit: Retrofit) {
 
-    var sharedPreferences: SharedPreferences = context.getSharedPreferences("MySharedPref", MODE_PRIVATE)
+    var sharedPreferences: SharedPreferences =
+        context.getSharedPreferences("MySharedPref", MODE_PRIVATE)
 
     fun getClientInfo(): MutableLiveData<ClientInfo> {
         val details = MutableLiveData<ClientInfo>()
 
         // If available return data stored in sharedPreferences first and then hit the API in background
-        var clientInfoJson = sharedPreferences.getString("clientInfo", null)
-        if(clientInfoJson != null) {
+        val clientInfoJson = sharedPreferences.getString("clientInfo", null)
+        if (clientInfoJson != null) {
             val clientInfo = Gson().fromJson(clientInfoJson, ClientInfo::class.java)
-            details.value = clientInfo
+            if (clientInfo != null) {
+                details.value = clientInfo
+            }
         }
 
         // API call to get new data if available
@@ -33,13 +36,13 @@ class VerloopRepository(val context: Context, private val retrofit: Retrofit) {
         call.enqueue(object : Callback<ClientInfo> {
             override fun onResponse(call: Call<ClientInfo>, response: Response<ClientInfo>) {
                 val data = response.body()
-                if(data != null) {
+                if (data?.title != null && data.bgColor != null && data.textColor != null && data.bgColor != "") {
                     val clientInfo = ClientInfo(data.title, data.textColor, data.bgColor);
                     details.value = clientInfo
 
                     val myEdit = sharedPreferences.edit()
                     myEdit.putString("clientInfo", Gson().toJson(clientInfo))
-                    myEdit.commit()
+                    myEdit.apply()
                 }
             }
 

@@ -2,9 +2,11 @@ package io.verloop.sdk.ui
 
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -52,14 +54,14 @@ class VerloopActivity : AppCompatActivity() {
                 BlendModeCompat.SRC_ATOP
             )
 
-        config = intent.getParcelableExtra("config")
+        val config: VerloopConfig? = intent.getParcelableExtra("config")
         configKey = intent.getStringExtra("configKey")
         this.config = config
 
         if (config != null) {
             val baseUrl =
-                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
-                else "https://${config?.clientId}.verloop.io"
+                if (config.isStaging) "https://${config.clientId}.stage.verloop.io"
+                else "https://${config.clientId}.verloop.io"
 
             val retrofit =
                 buildService(
@@ -69,9 +71,8 @@ class VerloopActivity : AppCompatActivity() {
                 )
             val repository = VerloopRepository(applicationContext, retrofit)
             val viewModelFactory = MainViewModelFactory(configKey, repository)
-            viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
-            viewModel?.getClientInfo()!!
-                .observe(this, { clientInfo -> updateClientInfo(clientInfo) })
+            viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+            viewModel?.getClientInfo()?.observe(this) { clientInfo -> updateClientInfo(clientInfo) }
             addFragment()
         }
     }
@@ -105,14 +106,11 @@ class VerloopActivity : AppCompatActivity() {
         verloopFragment = VerloopFragment.newInstance(configKey, config)
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit()
-
-        // So that the keyboard doesn't cover the text input button.
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
     }
 
     private fun updateClientInfo(clientInfo: ClientInfo) {
         toolbar?.title = clientInfo.title
-        toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor))
+        toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor ?: "#FFFFFF"))
         toolbar?.setTitleTextColor(Color.parseColor(CommonUtils.getExpandedColorHex(clientInfo.textColor)))
     }
 
@@ -123,6 +121,6 @@ class VerloopActivity : AppCompatActivity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult")
-        verloopFragment?.fileUploadResult(requestCode, resultCode, data)
+        verloopFragment.fileUploadResult(requestCode, resultCode, data)
     }
 }

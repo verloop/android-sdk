@@ -96,7 +96,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     fun showChat() {
         verloopConfig.userId =
             verloopConfig.userId ?: preference.getString(PREF_USER_ID, UUID.randomUUID().toString())
-        preference.edit().putString(PREF_USER_ID, verloopConfig.userId).commit()
+        preference.edit().putString(PREF_USER_ID, verloopConfig.userId).apply()
 
         eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
         val i = Intent(context, VerloopActivity::class.java)
