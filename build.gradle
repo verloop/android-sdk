@@ -1,18 +1,21 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+    ext.kotlin_version = '1.6.21'
+    ext.mockito_version = '3.6.28'
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven {
-            url  "https://dl.bintray.com/verloop/Maven"
+            url "https://dl.bintray.com/verloop/Maven"
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
-        classpath 'com.google.gms:google-services:4.3.3'
-        classpath 'com.kezong:fat-aar:1.2.15'
+        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.google.gms:google-services:4.3.10'
+//        classpath 'com.kezong:fat-aar:1.2.15'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -23,15 +26,13 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
-
+        mavenCentral()
         maven {
-            url  "https://dl.bintray.com/verloop/Maven"
+            url "https://dl.bintray.com/verloop/Maven"
         }
 
         maven {
             url "https://jitpack.io"
-            credentials { username authToken }
         }
 
         maven { url 'https://jitpack.io' }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:background="@android:color/white"
+    android:orientation="horizontal">
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
+        android:layout_weight="1"
+        tools:ignore="MissingConstraints">
+
+        <EditText
+            android:id="@+id/editCustomKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Custom Key"
+            android:inputType="text"
+            tools:ignore="MissingConstraints,SpeakableTextPresentCheck" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_weight="1"
+        tools:ignore="MissingConstraints">
+
+        <EditText
+            android:id="@+id/editCustomValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Custom Value"
+            android:inputType="text"
+            tools:ignore="MissingConstraints,SpeakableTextPresentCheck" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <CheckBox
+        android:id="@+id/checkBoxRoom"
+        android:layout_marginLeft="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ROOM" />
+</LinearLayout>
