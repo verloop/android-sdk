@@ -81,7 +81,7 @@ class VerloopFragment : Fragment() {
             }
 
             override fun onPageCommitVisible(view: WebView, url: String) {
-                super.onPageFinished(view, url)
+                super.onPageCommitVisible(view, url)
                 startRoom()
             }
         }
