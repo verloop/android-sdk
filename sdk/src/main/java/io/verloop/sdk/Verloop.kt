@@ -88,6 +88,8 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         WorkManager
             .getInstance(context)
             .enqueue(logoutWorkRequest)
+
+        preference.edit().remove(PREF_USER_ID).apply()
     }
 
     /**
