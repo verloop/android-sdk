@@ -20,7 +20,7 @@ class LogoutWorker(appContext: Context, params: WorkerParameters) :
     override fun doWork(): Result {
         val clientId = inputData.getString(LogoutRequestBody.CLIENT_ID)
         val userId = inputData.getString(LogoutRequestBody.USER_ID)
-        val fcmToken = inputData.getString(LogoutRequestBody.USER_ID)
+        val fcmToken = inputData.getString(LogoutRequestBody.FCM_TOKEN)
         val isStaging = inputData.getBoolean(LogoutRequestBody.IS_STAGING, false)
 
         if (clientId != null) {
