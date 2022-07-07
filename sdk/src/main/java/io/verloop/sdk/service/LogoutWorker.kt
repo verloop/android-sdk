@@ -2,7 +2,6 @@ package io.verloop.sdk.service
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.JsonObject
@@ -42,12 +41,10 @@ class LogoutWorker(appContext: Context, params: WorkerParameters) :
             call.enqueue(object : Callback<JsonObject> {
                 override fun onResponse(call: Call<JsonObject>, response: Response<JsonObject>) {
                     Log.d(TAG, response.body().toString())
-                    Toast.makeText(applicationContext, "Logout Successful", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onFailure(call: Call<JsonObject>, t: Throwable) {
                     Log.e(TAG, t.message.toString())
-                    Toast.makeText(applicationContext, "Logout Failed", Toast.LENGTH_SHORT).show()
                 }
 
             })
