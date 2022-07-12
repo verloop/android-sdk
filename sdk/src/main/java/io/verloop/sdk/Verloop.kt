@@ -17,6 +17,7 @@ import io.verloop.sdk.ui.VerloopActivity
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
@@ -88,6 +89,12 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         WorkManager
             .getInstance(context)
             .enqueue(logoutWorkRequest)
+
+        verloopConfig.userId = null
+        verloopConfig.userName = null
+        verloopConfig.userPhone = null
+        verloopConfig.userEmail = null
+        verloopConfig.fields = ArrayList()
 
         preference.edit().remove(PREF_USER_ID).apply()
     }
