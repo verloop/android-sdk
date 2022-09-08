@@ -42,12 +42,12 @@ class TestActivity : AppCompatActivity() {
                         config?.setUrlClickListener(object : LiveChatUrlClickListener {
                             override fun urlClicked(url: String?) {
                                 Toast.makeText(
-                                    applicationContext,
-                                    "Chat 1: $url",
-                                    Toast.LENGTH_SHORT
+                                        applicationContext,
+                                        "Chat 1: $url",
+                                        Toast.LENGTH_SHORT
                                 ).show()
                                 val i =
-                                    Intent(this@TestActivity, ProductDetailsActivity::class.java)
+                                        Intent(this@TestActivity, ProductDetailsActivity::class.java)
                                 i.putExtra("config", config)
                                 startActivity(i)
                             }
@@ -115,8 +115,8 @@ class TestActivity : AppCompatActivity() {
         btnAdd.setOnClickListener {
             val inflater = LayoutInflater.from(this)
             val params = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
             )
             params.setMargins(8, 0, 8, 0)
             val field: View = inflater.inflate(R.layout.edit_text_view, null, false)
@@ -140,29 +140,27 @@ class TestActivity : AppCompatActivity() {
                 for (i in 0 until allCustomKeys.size) {
                     val key = allCustomKeys[i].text.toString()
                     val value = allCustomValues[i].text.toString()
-                    val scope =
-                        if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
-                    val customField = VerloopConfig.CustomField(key, value, scope)
-                    customFields.add(customField)
+                    val scope = if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
+                    if (!key.isNullOrEmpty()) customFields.add(VerloopConfig.CustomField(key, value, scope))
                 }
 
                 verloopConfig =
-                    VerloopConfig.Builder()
-                        .clientId(clientId1.text?.toString())
-                        .userId(userId1.text?.toString())
-                        .recipeId(recipeId1.text?.toString())
-                        .userName(name1.text?.toString())
-                        .userEmail(email1.text?.toString())
-                        .userPhone(phone1.text?.toString())
-                        .department(department1.text?.toString())
-                        .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken else null)
-                        .fields(customFields)
-                        .isStaging(checkBoxIsStaging.isChecked).build()
+                        VerloopConfig.Builder()
+                                .clientId(clientId1.text?.toString())
+                                .userId(userId1.text?.toString())
+                                .recipeId(recipeId1.text?.toString())
+                                .userName(name1.text?.toString())
+                                .userEmail(email1.text?.toString())
+                                .userPhone(phone1.text?.toString())
+                                .department(department1.text?.toString())
+                                .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken else null)
+                                .fields(customFields)
+                                .isStaging(checkBoxIsStaging.isChecked).build()
 
                 verloopConfig?.setUrlClickListener(object : LiveChatUrlClickListener {
                     override fun urlClicked(url: String?) {
                         Toast.makeText(applicationContext, "Chat 1: $url", Toast.LENGTH_SHORT)
-                            .show()
+                                .show()
                         val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
                         i.putExtra("config", verloopConfig)
                         startActivity(i)
@@ -183,22 +181,22 @@ class TestActivity : AppCompatActivity() {
                     val key = allCustomKeys[i].text.toString()
                     val value = allCustomValues[i].text.toString()
                     val scope =
-                        if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
+                            if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
                     val customField = VerloopConfig.CustomField(key, value, scope)
                     customFields.add(customField)
                 }
 
                 verloopConfig2 =
-                    VerloopConfig.Builder()
-                        .clientId(clientId2.text?.toString())
-                        .userId(userId2.text?.toString())
-                        .fields(customFields)
-                        .isStaging(false).build()
+                        VerloopConfig.Builder()
+                                .clientId(clientId2.text?.toString())
+                                .userId(userId2.text?.toString())
+                                .fields(customFields)
+                                .isStaging(false).build()
 
                 verloopConfig2?.setUrlClickListener(object : LiveChatUrlClickListener {
                     override fun urlClicked(url: String?) {
                         Toast.makeText(applicationContext, "Chat 2: $url", Toast.LENGTH_SHORT)
-                            .show()
+                                .show()
                         val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
                         i.putExtra("config", verloopConfig)
                         startActivity(i)

@@ -69,7 +69,7 @@ class VerloopFragment : Fragment() {
 
             @TargetApi(Build.VERSION_CODES.N)
             override fun shouldOverrideUrlLoading(
-                view: WebView?, request: WebResourceRequest
+                    view: WebView?, request: WebResourceRequest
             ): Boolean {
                 val uri = request.url
                 if (config?.overrideUrlClick == true) {
@@ -89,9 +89,9 @@ class VerloopFragment : Fragment() {
         mWebView?.webChromeClient = object : WebChromeClient() {
             //Handling input[type="file"] requests for android API 16+
             fun openFileChooser(
-                uploadMsg: ValueCallback<Uri?>,
-                acceptType: String?,
-                capture: String?
+                    uploadMsg: ValueCallback<Uri?>,
+                    acceptType: String?,
+                    capture: String?
             ) {
                 Log.d(TAG, "openFileChooser")
                 this@VerloopFragment.uploadMsg = uploadMsg
@@ -99,16 +99,16 @@ class VerloopFragment : Fragment() {
                 i.addCategory(Intent.CATEGORY_OPENABLE)
                 i.type = "*/*"
                 activity?.startActivityForResult(
-                    Intent.createChooser(i, "Choose a file"),
-                    ICE_CREAM
+                        Intent.createChooser(i, "Choose a file"),
+                        ICE_CREAM
                 )
             }
 
             //Handling input[type="file"] requests for android API 21+
             override fun onShowFileChooser(
-                webView: WebView,
-                filePathCallback: ValueCallback<Array<Uri>>,
-                fileChooserParams: FileChooserParams
+                    webView: WebView,
+                    filePathCallback: ValueCallback<Array<Uri>>,
+                    fileChooserParams: FileChooserParams
             ): Boolean {
                 Log.d(TAG, "onShowFileChooser")
                 this@VerloopFragment.filePathCallback = filePathCallback
@@ -141,53 +141,62 @@ class VerloopFragment : Fragment() {
         uriBuilder.path("livechat")
         uriBuilder.appendQueryParameter("mode", "sdk")
         uriBuilder.appendQueryParameter("sdk", "android")
-        uriBuilder.appendQueryParameter("user_id", config?.userId)
-        if (config?.fields != null && config?.fields!!.size > 0) {
-            val obj = JSONObject()
-            for (field in config?.fields!!) {
-                try {
-                    if (field.scope != null) {
-                        val innerObject = JSONObject()
-                        val scopeObject = JSONObject()
-                        scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
-                        innerObject.put("value", URLEncoder.encode(field.value, "utf-8"))
-                        innerObject.put("options", scopeObject)
-                        field.key?.let { obj.put(it, innerObject) }
-                    } else {
-                        field.key?.let { obj.put(it, field.value) }
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                }
-            }
-            uriBuilder.appendQueryParameter("custom_fields", obj.toString())
-        }
         if (config?.fcmToken != null) {
             uriBuilder.appendQueryParameter("device_token", config?.fcmToken)
             uriBuilder.appendQueryParameter("device_type", "android")
         }
-        if (config?.userName != null) {
-            uriBuilder.appendQueryParameter("name", config?.userName)
-        }
-        if (config?.userEmail != null) {
-            uriBuilder.appendQueryParameter("email", config?.userEmail)
-        }
-        if (config?.userPhone != null) {
-            uriBuilder.appendQueryParameter("phone", config?.userPhone)
-        }
-        if (config?.recipeId != null) {
-            uriBuilder.appendQueryParameter("recipe_id", config?.recipeId)
-        }
         val uri = uriBuilder.build()
-        Log.d(TAG, "Verloop URI: $uri")
         mWebView?.loadUrl(uri.toString())
     }
 
     fun startRoom() {
+        setParams()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mWebView?.evaluateJavascript("VerloopLivechat.start();", null)
         } else {
             mWebView?.loadUrl("javascript:VerloopLivechat.start();")
+        }
+    }
+
+    private fun setParams() {
+        val scripts: MutableList<String> = mutableListOf()
+        config?.let { it ->
+            // User Params
+            val userParamsObject = JSONObject()
+            if (!it.userEmail.isNullOrEmpty()) userParamsObject.put("email", it.userEmail)
+            if (!it.userName.isNullOrEmpty()) userParamsObject.put("name", it.userName)
+            if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
+            if (userParamsObject.length() > 0) {
+                scripts.add("VerloopLivechat.setUserParams(${userParamsObject});")
+            }
+
+            if(!it.userId.isNullOrEmpty()) { scripts.add("VerloopLivechat.setUserId(\"${it.userId}\");") }
+            if(!it.department.isNullOrEmpty()) { scripts.add("VerloopLivechat.setDepartment(\"${it.department}\");") }
+            if(!it.recipeId.isNullOrEmpty())  { scripts.add("VerloopLivechat.setRecipe(\"${it.recipeId}\");") }
+
+            // Custom Fields
+            it.fields?.let {
+                for (field in it) {
+                    val scopeObject = JSONObject()
+                    if (field.scope !== null) {
+                        scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
+                    }
+                    scripts.add("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
+                }
+            }
+        }
+        callJavaScript(scripts)
+    }
+
+    private fun callJavaScript(scripts: List<String>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            for (script in scripts) {
+                mWebView?.evaluateJavascript(script, null)
+            }
+        } else {
+            for (script in scripts) {
+                mWebView?.loadUrl("javascript:$script")
+            }
         }
     }
 
@@ -206,45 +215,45 @@ class VerloopFragment : Fragment() {
         if (config != null) {
             this.config = config
             val baseUrl =
-                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
-                else "https://${config?.clientId}.verloop.io"
+                    if (config?.isStaging == true) "https://${config?.clientId}.stage.verloop.io"
+                    else "https://${config?.clientId}.verloop.io"
             val retrofit =
-                VerloopServiceBuilder.buildService(
-                    requireContext().applicationContext,
-                    baseUrl,
-                    VerloopAPI::class.java
-                )
+                    VerloopServiceBuilder.buildService(
+                            requireContext().applicationContext,
+                            baseUrl,
+                            VerloopAPI::class.java
+                    )
             val repository = VerloopRepository(requireContext().applicationContext, retrofit)
             val viewModelFactory = MainViewModelFactory(configKey, repository)
             viewModel = activity?.let {
                 ViewModelProvider(
-                    it,
-                    viewModelFactory
+                        it,
+                        viewModelFactory
                 ).get(MainViewModel::class.java)
             }
         }
 
         resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val data: Intent? = result.data
+                registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                    if (result.resultCode == Activity.RESULT_OK) {
+                        val data: Intent? = result.data
 
-                    var results: Array<Uri>? = null
-                    // Check that the response is a good one
-                    val dataString = data?.dataString
-                    if (dataString != null) {
-                        results = arrayOf(Uri.parse(dataString))
+                        var results: Array<Uri>? = null
+                        // Check that the response is a good one
+                        val dataString = data?.dataString
+                        if (dataString != null) {
+                            results = arrayOf(Uri.parse(dataString))
+                        }
+                        filePathCallback?.onReceiveValue(results)
+                        filePathCallback = null
                     }
-                    filePathCallback?.onReceiveValue(results)
-                    filePathCallback = null
                 }
-            }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         Log.d(TAG, "onCreateView")
@@ -255,19 +264,18 @@ class VerloopFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadChat()
-        startRoom()
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView?.settings?.mediaPlaybackRequiresUserGesture =
-            false
+                false
     }
 
     override fun onDetach() {
         super.onDetach()
         if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView?.settings?.mediaPlaybackRequiresUserGesture =
-            true
+                true
     }
 
     override fun onDestroy() {
