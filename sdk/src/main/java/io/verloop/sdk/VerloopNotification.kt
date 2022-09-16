@@ -65,8 +65,10 @@ object VerloopNotification {
 
             notificationIntent?.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP)
             val contentIntent = PendingIntent.getActivity(
-                context, 0,
-                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                context,
+                0,
+                notificationIntent,
+                (PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
             )
 
             notification.setContentIntent(contentIntent)
