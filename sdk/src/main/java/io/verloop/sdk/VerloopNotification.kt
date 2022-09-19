@@ -5,14 +5,15 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import io.verloop.sdk.Verloop.Companion.isActivityVisible
 import org.json.JSONException
 import org.json.JSONObject
-import android.content.pm.PackageManager
 
 
 object VerloopNotification {
@@ -78,7 +79,7 @@ object VerloopNotification {
                 val channel = NotificationChannel(
                     channelId,
                     "Verloop Chat Message",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
                 )
                 notificationManager.createNotificationChannel(channel)
             }
