@@ -15,7 +15,6 @@ import io.verloop.sdk.Verloop.Companion.isActivityVisible
 import org.json.JSONException
 import org.json.JSONObject
 
-
 object VerloopNotification {
     private const val TAG = "VerloopNotification"
 
@@ -50,7 +49,7 @@ object VerloopNotification {
                 Log.e(TAG, e.toString())
                 return false
             }
-            val channelId = context.packageName + ":verloop"
+            val channelId = "verloop_chat"
             val notification = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(smallIcon)
                 .setContentTitle(title)

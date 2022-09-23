@@ -3,10 +3,10 @@ package io.verloop.sdk.ui
 import android.Manifest
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -75,7 +75,9 @@ class VerloopActivity : AppCompatActivity() {
             viewModel?.getClientInfo()?.observe(this) { clientInfo -> updateClientInfo(clientInfo) }
             addFragment()
         }
-        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     override fun onResume() {
@@ -131,7 +133,7 @@ class VerloopActivity : AppCompatActivity() {
         if (isGranted) {
             // Permission is granted. Continue the action or workflow in your app.
         } else {
-            Toast.makeText(this, "Notifications Disabled", Toast.LENGTH_SHORT).show()
+            // Permission not granted. Notifications will be disabled.
         }
     }
 }
