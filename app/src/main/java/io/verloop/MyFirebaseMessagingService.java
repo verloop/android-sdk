@@ -1,17 +1,10 @@
 package io.verloop;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import io.verloop.sdk.VerloopNotification;
@@ -35,6 +28,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Map<String, String> map = remoteMessage.getData();
 
-        VerloopNotification.showNotification(this, R.drawable.ic_launcher_foreground, map);
+        VerloopNotification.showNotification(this, R.drawable.ic_launcher_foreground, map, "Demo Chat Support");
     }
 }
