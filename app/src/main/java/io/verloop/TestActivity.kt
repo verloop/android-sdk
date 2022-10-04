@@ -51,7 +51,7 @@ class TestActivity : AppCompatActivity() {
                                 i.putExtra("config", config)
                                 startActivity(i)
                             }
-                        }, true)
+                        }, false)
                         Verloop(this, config).showChat()
                     }
                 }
