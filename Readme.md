@@ -115,8 +115,11 @@ Now, to let Verloop handle Notifications, simply add this line in your `Firebase
 ```kotlin
 @Override
 public void onMessageReceived(RemoteMessage remoteMessage) {
-    int icon = R.drawable.notification_image; // set a drawable to use as icon for notifications
-    VerloopNotification.showNotification(this, icon, remoteMessage.getData()); // This will be auto-ignored if notification is not from Verloop.
+    // set a drawable to use as icon for notifications
+    int icon = R.drawable.notification_image;
+    
+    // Notifications will be auto-ignored if it's not from Verloop. Default notification channel name will be "Verloop Chat Message"
+    VerloopNotification.showNotification(this, icon, remoteMessage.getData(), "Your Notification Channel Name"); 
 
     // Do anything else with your message.
 }

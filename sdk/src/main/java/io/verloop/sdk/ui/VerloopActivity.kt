@@ -1,13 +1,13 @@
 package io.verloop.sdk.ui
 
+import android.Manifest
 import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.WindowInsets
-import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -75,6 +75,9 @@ class VerloopActivity : AppCompatActivity() {
             viewModel?.getClientInfo()?.observe(this) { clientInfo -> updateClientInfo(clientInfo) }
             addFragment()
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     override fun onResume() {
@@ -122,5 +125,15 @@ class VerloopActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult")
         verloopFragment.fileUploadResult(requestCode, resultCode, data)
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permission is granted. Continue the action or workflow in your app.
+        } else {
+            // Permission not granted. Notifications will be disabled.
+        }
     }
 }

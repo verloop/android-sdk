@@ -8,6 +8,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +27,6 @@ import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
 import org.json.JSONObject
-import java.net.URLEncoder
 import java.util.*
 
 
@@ -58,26 +59,30 @@ class VerloopFragment : Fragment() {
     fun initializeWebView() {
         mWebView = WebView(requireActivity())
         mWebView?.webViewClient = object : WebViewClient() {
+
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (config?.overrideUrlClick == true) {
+                if (url.startsWith("http://")) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        if (isAdded) mWebView?.loadUrl(url)
+                    }, 500)
                     return true
                 }
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                startActivity(intent)
-                return true
+                return false
             }
 
             @TargetApi(Build.VERSION_CODES.N)
             override fun shouldOverrideUrlLoading(
                 view: WebView?, request: WebResourceRequest
             ): Boolean {
-                val uri = request.url
-                if (config?.overrideUrlClick == true) {
+                var url: String = request.url.toString()
+                if (url.startsWith("http://")) {
+                    url = url.replace("http://", "https://")
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        if (isAdded) mWebView?.loadUrl(url)
+                    }, 500)
                     return true
                 }
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(intent)
-                return true
+                return false
             }
 
             override fun onPageFinished(view: WebView, url: String) {
@@ -139,55 +144,82 @@ class VerloopFragment : Fragment() {
             uriBuilder.authority(config?.clientId + ".verloop.io")
         }
         uriBuilder.path("livechat")
-        uriBuilder.appendQueryParameter("mode", "sdk")
-        uriBuilder.appendQueryParameter("sdk", "android")
-        uriBuilder.appendQueryParameter("user_id", config?.userId)
-        if (config?.fields != null && config?.fields!!.size > 0) {
-            val obj = JSONObject()
-            for (field in config?.fields!!) {
-                try {
-                    if (field.scope != null) {
-                        val innerObject = JSONObject()
-                        val scopeObject = JSONObject()
-                        scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
-                        innerObject.put("value", URLEncoder.encode(field.value, "utf-8"))
-                        innerObject.put("options", scopeObject)
-                        field.key?.let { obj.put(it, innerObject) }
-                    } else {
-                        field.key?.let { obj.put(it, field.value) }
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                }
-            }
-            uriBuilder.appendQueryParameter("custom_fields", obj.toString())
-        }
         if (config?.fcmToken != null) {
             uriBuilder.appendQueryParameter("device_token", config?.fcmToken)
             uriBuilder.appendQueryParameter("device_type", "android")
         }
-        if (config?.userName != null) {
-            uriBuilder.appendQueryParameter("name", config?.userName)
+        if (config?.overrideUrlClick === true) {
+            uriBuilder.appendQueryParameter("mode", "popout")
+        } else {
+            uriBuilder.appendQueryParameter("mode", "sdk")
+            uriBuilder.appendQueryParameter("sdk", "android")
         }
-        if (config?.userEmail != null) {
-            uriBuilder.appendQueryParameter("email", config?.userEmail)
-        }
-        if (config?.userPhone != null) {
-            uriBuilder.appendQueryParameter("phone", config?.userPhone)
-        }
-        if (config?.recipeId != null) {
-            uriBuilder.appendQueryParameter("recipe_id", config?.recipeId)
-        }
+
         val uri = uriBuilder.build()
-        Log.d(TAG, "Verloop URI: $uri")
+        if (config?.overrideUrlClick === true) {
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+            startActivity(intent)
+            if (isAdded) activity?.finish()
+            return
+        }
+        Log.d(TAG, uri.toString())
         mWebView?.loadUrl(uri.toString())
     }
 
     fun startRoom() {
+        setParams()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mWebView?.evaluateJavascript("VerloopLivechat.start();", null)
         } else {
             mWebView?.loadUrl("javascript:VerloopLivechat.start();")
+        }
+    }
+
+    private fun setParams() {
+        val scripts: MutableList<String> = mutableListOf()
+        config?.let { it ->
+            // User Params
+            val userParamsObject = JSONObject()
+            if (!it.userEmail.isNullOrEmpty()) userParamsObject.put("email", it.userEmail)
+            if (!it.userName.isNullOrEmpty()) userParamsObject.put("name", it.userName)
+            if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
+            if (userParamsObject.length() > 0) {
+                scripts.add("VerloopLivechat.setUserParams(${userParamsObject});")
+            }
+
+            if (!it.userId.isNullOrEmpty()) {
+                scripts.add("VerloopLivechat.setUserId(\"${it.userId}\");")
+            }
+            if (!it.department.isNullOrEmpty()) {
+                scripts.add("VerloopLivechat.setDepartment(\"${it.department}\");")
+            }
+            if (!it.recipeId.isNullOrEmpty()) {
+                scripts.add("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
+            }
+
+            // Custom Fields
+            it.fields?.let {
+                for (field in it) {
+                    val scopeObject = JSONObject()
+                    if (field.scope !== null) {
+                        scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
+                    }
+                    scripts.add("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
+                }
+            }
+        }
+        callJavaScript(scripts)
+    }
+
+    private fun callJavaScript(scripts: List<String>) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            for (script in scripts) {
+                mWebView?.evaluateJavascript(script, null)
+            }
+        } else {
+            for (script in scripts) {
+                mWebView?.loadUrl("javascript:$script")
+            }
         }
     }
 
@@ -206,7 +238,7 @@ class VerloopFragment : Fragment() {
         if (config != null) {
             this.config = config
             val baseUrl =
-                if (config?.isStaging === true) "https://${config?.clientId}.stage.verloop.io"
+                if (config?.isStaging == true) "https://${config?.clientId}.stage.verloop.io"
                 else "https://${config?.clientId}.verloop.io"
             val retrofit =
                 VerloopServiceBuilder.buildService(
@@ -255,7 +287,6 @@ class VerloopFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadChat()
-        startRoom()
     }
 
     override fun onAttach(context: Context) {
