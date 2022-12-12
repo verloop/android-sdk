@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.webkit.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.VerloopConfig
@@ -28,7 +29,6 @@ import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
-
 
 class VerloopFragment : Fragment() {
 
@@ -55,8 +55,77 @@ class VerloopFragment : Fragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        config = arguments?.getParcelable("config")
+        configKey = arguments?.getString("configKey")
+
+        if (config != null) {
+            this.config = config
+            val baseUrl =
+                if (config?.isStaging == true) "https://${config?.clientId}.stage.verloop.io"
+                else "https://${config?.clientId}.verloop.io"
+            val retrofit = VerloopServiceBuilder.buildService(
+                requireContext().applicationContext, baseUrl, VerloopAPI::class.java
+            )
+            val repository = VerloopRepository(requireContext().applicationContext, retrofit)
+            val viewModelFactory = MainViewModelFactory(configKey, repository)
+            viewModel = activity?.let {
+                ViewModelProvider(
+                    it, viewModelFactory
+                )[MainViewModel::class.java]
+            }
+        }
+
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val data: Intent? = result.data
+
+                    var results: Array<Uri>? = null
+                    // Check that the response is a good one
+                    val dataString = data?.dataString
+                    if (dataString != null) {
+                        results = arrayOf(Uri.parse(dataString))
+                    }
+                    filePathCallback?.onReceiveValue(results)
+                    filePathCallback = null
+                }
+            }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
+        initializeWebView()
+        return mWebView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadChat()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mWebView?.settings?.mediaPlaybackRequiresUserGesture = false
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            mWebView?.settings?.mediaPlaybackRequiresUserGesture = true
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     @SuppressLint("JavascriptInterface")
     fun initializeWebView() {
+        WebView.setWebContentsDebuggingEnabled(true)
         mWebView = WebView(requireActivity())
         mWebView?.webViewClient = object : WebViewClient() {
 
@@ -84,19 +153,12 @@ class VerloopFragment : Fragment() {
                 }
                 return false
             }
-
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
-                startRoom()
-            }
         }
 
         mWebView?.webChromeClient = object : WebChromeClient() {
             //Handling input[type="file"] requests for android API 16+
             fun openFileChooser(
-                uploadMsg: ValueCallback<Uri?>,
-                acceptType: String?,
-                capture: String?
+                uploadMsg: ValueCallback<Uri?>, acceptType: String?, capture: String?
             ) {
                 Log.d(TAG, "openFileChooser")
                 this@VerloopFragment.uploadMsg = uploadMsg
@@ -104,8 +166,7 @@ class VerloopFragment : Fragment() {
                 i.addCategory(Intent.CATEGORY_OPENABLE)
                 i.type = "*/*"
                 activity?.startActivityForResult(
-                    Intent.createChooser(i, "Choose a file"),
-                    ICE_CREAM
+                    Intent.createChooser(i, "Choose a file"), ICE_CREAM
                 )
             }
 
@@ -123,11 +184,12 @@ class VerloopFragment : Fragment() {
         }
         val settings = mWebView?.settings
         if (activity?.applicationContext?.cacheDir != null) {
-            settings?.setCacheMode(WebSettings.LOAD_DEFAULT)
+            settings?.cacheMode = WebSettings.LOAD_DEFAULT
             settings?.allowFileAccess = true
         }
         settings?.javaScriptEnabled = true
         mWebView?.addJavascriptInterface(this, "VerloopMobile")
+        mWebView?.addJavascriptInterface(this, "VerloopMobileV2")
         settings?.domStorageEnabled = true
         settings?.allowFileAccessFromFileURLs = true
         settings?.allowUniversalAccessFromFileURLs = true
@@ -148,7 +210,7 @@ class VerloopFragment : Fragment() {
             uriBuilder.appendQueryParameter("device_token", config?.fcmToken)
             uriBuilder.appendQueryParameter("device_type", "android")
         }
-        if (config?.overrideUrlClick === true) {
+        if (config?.overrideUrlClick == true) {
             uriBuilder.appendQueryParameter("mode", "popout")
         } else {
             uriBuilder.appendQueryParameter("mode", "sdk")
@@ -156,7 +218,7 @@ class VerloopFragment : Fragment() {
         }
 
         val uri = uriBuilder.build()
-        if (config?.overrideUrlClick === true) {
+        if (config?.overrideUrlClick == true) {
             val intent = Intent(Intent.ACTION_VIEW, uri)
             startActivity(intent)
             if (isAdded) activity?.finish()
@@ -166,60 +228,45 @@ class VerloopFragment : Fragment() {
         mWebView?.loadUrl(uri.toString())
     }
 
-    fun startRoom() {
-        setParams()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mWebView?.evaluateJavascript("VerloopLivechat.start();", null)
-        } else {
-            mWebView?.loadUrl("javascript:VerloopLivechat.start();")
-        }
-    }
-
-    private fun setParams() {
-        val scripts: MutableList<String> = mutableListOf()
+    private fun startRoom() {
         config?.let { it ->
-            // User Params
             val userParamsObject = JSONObject()
             if (!it.userEmail.isNullOrEmpty()) userParamsObject.put("email", it.userEmail)
             if (!it.userName.isNullOrEmpty()) userParamsObject.put("name", it.userName)
             if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
-            if (userParamsObject.length() > 0) {
-                scripts.add("VerloopLivechat.setUserParams(${userParamsObject});")
-            }
 
+            if (userParamsObject.length() > 0) {
+                callJavaScript("VerloopLivechat.setUserParams(${userParamsObject});")
+            }
             if (!it.userId.isNullOrEmpty()) {
-                scripts.add("VerloopLivechat.setUserId(\"${it.userId}\");")
+                callJavaScript("VerloopLivechat.setUserId(\"${it.userId}\");")
             }
             if (!it.department.isNullOrEmpty()) {
-                scripts.add("VerloopLivechat.setDepartment(\"${it.department}\");")
+                callJavaScript("VerloopLivechat.setDepartment(\"${it.department}\");")
             }
             if (!it.recipeId.isNullOrEmpty()) {
-                scripts.add("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
+                callJavaScript("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
             }
 
             // Custom Fields
-            it.fields?.let {
+            it.fields.let {
                 for (field in it) {
                     val scopeObject = JSONObject()
                     if (field.scope !== null) {
                         scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
                     }
-                    scripts.add("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
+                    callJavaScript("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
                 }
             }
         }
-        callJavaScript(scripts)
+        callJavaScript("VerloopLivechat.widgetOpened();")
     }
 
-    private fun callJavaScript(scripts: List<String>) {
+    private fun callJavaScript(script: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            for (script in scripts) {
-                mWebView?.evaluateJavascript(script, null)
-            }
+            mWebView?.evaluateJavascript(script, null)
         } else {
-            for (script in scripts) {
-                mWebView?.loadUrl("javascript:$script")
-            }
+            mWebView?.loadUrl("javascript:$script")
         }
     }
 
@@ -228,82 +275,6 @@ class VerloopFragment : Fragment() {
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "*/*"
         resultLauncher?.launch(intent)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        config = arguments?.getParcelable("config")
-        configKey = arguments?.getString("configKey")
-
-        if (config != null) {
-            this.config = config
-            val baseUrl =
-                if (config?.isStaging == true) "https://${config?.clientId}.stage.verloop.io"
-                else "https://${config?.clientId}.verloop.io"
-            val retrofit =
-                VerloopServiceBuilder.buildService(
-                    requireContext().applicationContext,
-                    baseUrl,
-                    VerloopAPI::class.java
-                )
-            val repository = VerloopRepository(requireContext().applicationContext, retrofit)
-            val viewModelFactory = MainViewModelFactory(configKey, repository)
-            viewModel = activity?.let {
-                ViewModelProvider(
-                    it,
-                    viewModelFactory
-                ).get(MainViewModel::class.java)
-            }
-        }
-
-        resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val data: Intent? = result.data
-
-                    var results: Array<Uri>? = null
-                    // Check that the response is a good one
-                    val dataString = data?.dataString
-                    if (dataString != null) {
-                        results = arrayOf(Uri.parse(dataString))
-                    }
-                    filePathCallback?.onReceiveValue(results)
-                    filePathCallback = null
-                }
-            }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        super.onCreateView(inflater, container, savedInstanceState)
-        Log.d(TAG, "onCreateView")
-        initializeWebView()
-        return mWebView
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        loadChat()
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView?.settings?.mediaPlaybackRequiresUserGesture =
-            false
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) mWebView?.settings?.mediaPlaybackRequiresUserGesture =
-            true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy")
     }
 
     fun fileUploadResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -343,7 +314,31 @@ class VerloopFragment : Fragment() {
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onURLClick(json: String) {
-        Log.d(TAG, " onURLClick $json")
         viewModel?.urlClicked(json)
+    }
+
+    @JavascriptInterface
+    @Throws(JSONException::class)
+    fun livechatEvent(json: String) {
+        var params = JSONObject(json)
+        if (params.getString("fn").equals("ready")) {
+            ready()
+        } else if (params.getString("fn").equals("roomReady")) {
+            roomReady()
+        }
+    }
+
+    private fun ready() {
+        Handler(Looper.getMainLooper()).post {
+            startRoom()
+        }
+    }
+
+    private fun roomReady() {
+        Handler(Looper.getMainLooper()).post {
+            if (config?.closeExistingChat == true) {
+                callJavaScript("VerloopLivechat.close();")
+            }
+        }
     }
 }

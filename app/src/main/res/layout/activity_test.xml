@@ -329,12 +329,23 @@
                         android:layout_weight="3"
                         android:text="FCM Token" />
 
+                </TableRow>
+
+                <TableRow android:layout_marginTop="8dp">
+
                     <CheckBox
                         android:id="@+id/checkOverrideUrlClick"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
                         android:text="Override Url Click" />
+
+                    <CheckBox
+                        android:id="@+id/checkCloseExistingChat"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
+                        android:text="Close Existing Chat" />
                 </TableRow>
 
                 <TableRow android:layout_marginTop="8dp"></TableRow>

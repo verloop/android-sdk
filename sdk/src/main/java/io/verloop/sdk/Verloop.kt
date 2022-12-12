@@ -67,6 +67,23 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     }
 
     /**
+     * This will open up the activity for chat and load all the data provided in VerloopConfig
+     */
+    fun showChat() {
+        verloopConfig.userId =
+            verloopConfig.userId ?: preference.getString(PREF_USER_ID, UUID.randomUUID().toString())
+        preference.edit().putString(PREF_USER_ID, verloopConfig.userId).apply()
+
+        eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
+        val i = Intent(context, VerloopActivity::class.java)
+        i.putExtra("config", verloopConfig)
+
+        // To be used as key for eventListeners map
+        i.putExtra("configKey", verloopConfig.hashCode().toString())
+        context.startActivity(i)
+    }
+
+    /**
      * This will logout the user and unregister the device from notification subscription.
      */
     fun logout() {
@@ -97,23 +114,6 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         verloopConfig.fields = ArrayList()
 
         preference.edit().remove(PREF_USER_ID).apply()
-    }
-
-    /**
-     * This will open up the activity for chat and load all the data provided in VerloopConfig
-     */
-    fun showChat() {
-        verloopConfig.userId =
-            verloopConfig.userId ?: preference.getString(PREF_USER_ID, UUID.randomUUID().toString())
-        preference.edit().putString(PREF_USER_ID, verloopConfig.userId).apply()
-
-        eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
-        val i = Intent(context, VerloopActivity::class.java)
-        i.putExtra("config", verloopConfig)
-
-        // To be used as key for eventListeners map
-        i.putExtra("configKey", verloopConfig.hashCode().toString())
-        context.startActivity(i)
     }
 
     @Deprecated("Not in use anymore")
