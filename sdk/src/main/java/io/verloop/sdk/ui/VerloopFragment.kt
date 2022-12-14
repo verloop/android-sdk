@@ -85,8 +85,8 @@ class VerloopFragment : Fragment() {
                 return false
             }
 
-            override fun onPageFinished(view: WebView, url: String) {
-                super.onPageFinished(view, url)
+            override fun onPageCommitVisible(view: WebView, url: String) {
+                super.onPageCommitVisible(view, url)
                 startRoom()
             }
         }
