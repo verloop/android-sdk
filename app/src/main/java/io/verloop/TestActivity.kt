@@ -1,6 +1,7 @@
 package io.verloop
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.widget.EditText
 import android.view.LayoutInflater
 import android.view.View
 import io.verloop.sdk.*
+import org.json.JSONException
 import org.json.JSONObject
 
 class TestActivity : AppCompatActivity() {
@@ -18,46 +20,6 @@ class TestActivity : AppCompatActivity() {
 
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
-
-    var clientId: String? = null
-    var userId: String? = null
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        if (intent != null && intent.extras != null) {
-            val verloopData = intent.extras?.get("verloop")
-            if (verloopData != null) {
-                val obj = JSONObject(verloopData.toString())
-                if (obj.has("client_id")) clientId = obj.getString("client_id")
-                if (obj.has("user_id")) userId = obj.getString("user_id")
-                if (clientId != null) {
-                    // Use the existing verloop object associated with the clientId and userId if exists
-                    if (verloop != null) {
-                        verloop?.showChat()
-                    } else {
-                        // Create new Verloop object if don't have existing one
-                        var config = VerloopConfig.Builder().clientId(clientId).build()
-                        // Set the userId if received in notification payload
-                        if (userId != null) config.userId = userId
-                        config?.setUrlClickListener(object : LiveChatUrlClickListener {
-                            override fun urlClicked(url: String?) {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Chat 1: $url",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                val i =
-                                    Intent(this@TestActivity, ProductDetailsActivity::class.java)
-                                i.putExtra("config", config)
-                                startActivity(i)
-                            }
-                        }, false)
-                        Verloop(this, config).showChat()
-                    }
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -232,6 +194,25 @@ class TestActivity : AppCompatActivity() {
 
         btnClose2.setOnClickListener {
             verloop2?.logout()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent != null && intent.extras != null && intent.extras?.containsKey("verloop") == true) {
+            val json = intent.extras?.getString("verloop")
+            try {
+                val jsonObject = JSONObject(json)
+                if (jsonObject.has("client_id")) {
+                    var clientId = jsonObject.getString("client_id")
+                    if (clientId != null) {
+                        var config = VerloopConfig.Builder().clientId(clientId).build()
+                        Verloop(this, config).showChat()
+                    }
+                }
+            } catch (e: JSONException) {
+                Log.e(TAG, e.message.toString())
+            }
         }
     }
 }

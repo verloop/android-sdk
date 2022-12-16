@@ -17,7 +17,6 @@ import android.view.ViewGroup
 import android.webkit.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.VerloopConfig
@@ -94,7 +93,6 @@ class VerloopFragment : Fragment() {
             }
     }
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -116,13 +114,10 @@ class VerloopFragment : Fragment() {
     }
 
     override fun onDetach() {
+        mWebView?.settings?.mediaPlaybackRequiresUserGesture = true
         super.onDetach()
-        if (mWebView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            mWebView?.settings?.mediaPlaybackRequiresUserGesture = true
-        }
     }
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
     @SuppressLint("JavascriptInterface")
     fun initializeWebView() {
         WebView.setWebContentsDebuggingEnabled(true)
@@ -263,11 +258,7 @@ class VerloopFragment : Fragment() {
     }
 
     private fun callJavaScript(script: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mWebView?.evaluateJavascript(script, null)
-        } else {
-            mWebView?.loadUrl("javascript:$script")
-        }
+        mWebView?.evaluateJavascript(script, null)
     }
 
     fun openFileSelector() {

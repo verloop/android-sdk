@@ -43,13 +43,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     init {
         val webView = WebView(context)
         webView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // chromium, enable hardware acceleration
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-        } else {
-            // older android version, disable hardware acceleration
-            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        }
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
         webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         webView.loadUrl("https://hello.verloop.io/livechat?mode=popout")
     }
