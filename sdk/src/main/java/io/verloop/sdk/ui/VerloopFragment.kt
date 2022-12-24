@@ -56,7 +56,13 @@ class VerloopFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        config = arguments?.getParcelable("config")
+        config = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable("config", VerloopConfig::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getParcelable("config")
+        }
+
         configKey = arguments?.getString("configKey")
 
         if (config != null) {
@@ -159,7 +165,7 @@ class VerloopFragment : Fragment() {
                 this@VerloopFragment.uploadMsg = uploadMsg
                 val i = Intent(Intent.ACTION_GET_CONTENT)
                 i.addCategory(Intent.CATEGORY_OPENABLE)
-                i.type = "*/*"
+                i.type = "video/*"
                 activity?.startActivityForResult(
                     Intent.createChooser(i, "Choose a file"), ICE_CREAM
                 )

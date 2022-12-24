@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Build.VERSION_CODES.S
 import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
@@ -80,11 +81,15 @@ object VerloopNotification {
             dataPayload.let { notificationIntent?.putExtra("verloop", it.toString()) }
 
             notificationIntent?.flags = (Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            val flag = if (Build.VERSION.SDK_INT >= S)
+                (PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+            else
+                PendingIntent.FLAG_UPDATE_CURRENT
             val contentIntent = PendingIntent.getActivity(
                 context,
                 0,
                 notificationIntent,
-                (PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+                flag
             )
 
             notification.setContentIntent(contentIntent)
