@@ -260,7 +260,6 @@ class VerloopFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
                     val data: Intent? = result.data
-
                     var results: Array<Uri>? = null
                     // Check that the response is a good one
                     val dataString = data?.dataString
@@ -268,8 +267,10 @@ class VerloopFragment : Fragment() {
                         results = arrayOf(Uri.parse(dataString))
                     }
                     filePathCallback?.onReceiveValue(results)
-                    filePathCallback = null
+                } else {
+                    filePathCallback?.onReceiveValue(null)
                 }
+                filePathCallback = null
             }
     }
 
