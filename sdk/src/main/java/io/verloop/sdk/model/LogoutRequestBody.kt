@@ -1,5 +1,8 @@
 package io.verloop.sdk.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class LogoutRequestBody(var userId: String?, var deviceType: String?, var deviceToken: String?) {
 
     companion object {

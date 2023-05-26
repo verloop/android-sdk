@@ -1,6 +1,7 @@
 package io.verloop
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.widget.EditText
 import android.view.LayoutInflater
 import android.view.View
 import io.verloop.sdk.*
+import org.json.JSONException
 import org.json.JSONObject
 
 class TestActivity : AppCompatActivity() {
@@ -18,46 +20,6 @@ class TestActivity : AppCompatActivity() {
 
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
-
-    var clientId: String? = null
-    var userId: String? = null
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        if (intent != null && intent.extras != null) {
-            val verloopData = intent.extras?.get("verloop")
-            if (verloopData != null) {
-                val obj = JSONObject(verloopData.toString())
-                if (obj.has("client_id")) clientId = obj.getString("client_id")
-                if (obj.has("user_id")) userId = obj.getString("user_id")
-                if (clientId != null) {
-                    // Use the existing verloop object associated with the clientId and userId if exists
-                    if (verloop != null) {
-                        verloop?.showChat()
-                    } else {
-                        // Create new Verloop object if don't have existing one
-                        var config = VerloopConfig.Builder().clientId(clientId).build()
-                        // Set the userId if received in notification payload
-                        if (userId != null) config.userId = userId
-                        config?.setUrlClickListener(object : LiveChatUrlClickListener {
-                            override fun urlClicked(url: String?) {
-                                Toast.makeText(
-                                        applicationContext,
-                                        "Chat 1: $url",
-                                        Toast.LENGTH_SHORT
-                                ).show()
-                                val i =
-                                        Intent(this@TestActivity, ProductDetailsActivity::class.java)
-                                i.putExtra("config", config)
-                                startActivity(i)
-                            }
-                        }, false)
-                        Verloop(this, config).showChat()
-                    }
-                }
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +62,7 @@ class TestActivity : AppCompatActivity() {
         val checkBoxIsStaging = findViewById<CheckBox>(R.id.checkBoxStaging)
         val checkBoxRegisterFCMToken = findViewById<CheckBox>(R.id.checkBoxFCM)
         val checkOverrideUrlClick = findViewById<CheckBox>(R.id.checkOverrideUrlClick)
+        val checkCloseExistingChat = findViewById<CheckBox>(R.id.checkCloseExistingChat)
 
         val btnAdd = findViewById<Button>(R.id.buttonAdd)
         val containerCustomFields = findViewById<LinearLayout>(R.id.containerCustomFields)
@@ -115,8 +78,8 @@ class TestActivity : AppCompatActivity() {
         btnAdd.setOnClickListener {
             val inflater = LayoutInflater.from(this)
             val params = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
             )
             params.setMargins(8, 0, 8, 0)
             val field: View = inflater.inflate(R.layout.edit_text_view, null, false)
@@ -140,27 +103,35 @@ class TestActivity : AppCompatActivity() {
                 for (i in 0 until allCustomKeys.size) {
                     val key = allCustomKeys[i].text.toString()
                     val value = allCustomValues[i].text.toString()
-                    val scope = if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
-                    if (!key.isNullOrEmpty()) customFields.add(VerloopConfig.CustomField(key, value, scope))
+                    val scope =
+                        if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
+                    if (!key.isNullOrEmpty()) customFields.add(
+                        VerloopConfig.CustomField(
+                            key,
+                            value,
+                            scope
+                        )
+                    )
                 }
 
                 verloopConfig =
-                        VerloopConfig.Builder()
-                                .clientId(clientId1.text?.toString())
-                                .userId(userId1.text?.toString())
-                                .recipeId(recipeId1.text?.toString())
-                                .userName(name1.text?.toString())
-                                .userEmail(email1.text?.toString())
-                                .userPhone(phone1.text?.toString())
-                                .department(department1.text?.toString())
-                                .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken else null)
-                                .fields(customFields)
-                                .isStaging(checkBoxIsStaging.isChecked).build()
+                    VerloopConfig.Builder()
+                        .clientId(clientId1.text?.toString())
+                        .userId(userId1.text?.toString())
+                        .recipeId(recipeId1.text?.toString())
+                        .userName(name1.text?.toString())
+                        .userEmail(email1.text?.toString())
+                        .userPhone(phone1.text?.toString())
+                        .department(department1.text?.toString())
+                        .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken else null)
+                        .closeExistingChat(checkCloseExistingChat.isChecked)
+                        .fields(customFields)
+                        .isStaging(checkBoxIsStaging.isChecked).build()
 
                 verloopConfig?.setUrlClickListener(object : LiveChatUrlClickListener {
                     override fun urlClicked(url: String?) {
                         Toast.makeText(applicationContext, "Chat 1: $url", Toast.LENGTH_SHORT)
-                                .show()
+                            .show()
                         val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
                         i.putExtra("config", verloopConfig)
                         startActivity(i)
@@ -181,22 +152,22 @@ class TestActivity : AppCompatActivity() {
                     val key = allCustomKeys[i].text.toString()
                     val value = allCustomValues[i].text.toString()
                     val scope =
-                            if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
+                        if (allCustomScopes[i].isChecked) VerloopConfig.Scope.ROOM else VerloopConfig.Scope.USER
                     val customField = VerloopConfig.CustomField(key, value, scope)
                     customFields.add(customField)
                 }
 
                 verloopConfig2 =
-                        VerloopConfig.Builder()
-                                .clientId(clientId2.text?.toString())
-                                .userId(userId2.text?.toString())
-                                .fields(customFields)
-                                .isStaging(false).build()
+                    VerloopConfig.Builder()
+                        .clientId(clientId2.text?.toString())
+                        .userId(userId2.text?.toString())
+                        .fields(customFields)
+                        .isStaging(false).build()
 
                 verloopConfig2?.setUrlClickListener(object : LiveChatUrlClickListener {
                     override fun urlClicked(url: String?) {
                         Toast.makeText(applicationContext, "Chat 2: $url", Toast.LENGTH_SHORT)
-                                .show()
+                            .show()
                         val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
                         i.putExtra("config", verloopConfig)
                         startActivity(i)
@@ -223,6 +194,25 @@ class TestActivity : AppCompatActivity() {
 
         btnClose2.setOnClickListener {
             verloop2?.logout()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent != null && intent.extras != null && intent.extras?.containsKey("verloop") == true) {
+            val json = intent.extras?.getString("verloop")
+            try {
+                val jsonObject = JSONObject(json)
+                if (jsonObject.has("client_id")) {
+                    var clientId = jsonObject.getString("client_id")
+                    if (clientId != null) {
+                        var config = VerloopConfig.Builder().clientId(clientId).build()
+                        Verloop(this, config).showChat()
+                    }
+                }
+            } catch (e: JSONException) {
+                Log.e(TAG, e.message.toString())
+            }
         }
     }
 }

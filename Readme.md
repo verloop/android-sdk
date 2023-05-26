@@ -46,6 +46,7 @@ var config = VerloopConfig.Builder()
     .userEmail("USER_EMAIL")            // If email variable is a part of the recipe, or the value is not required, skip this
     .userPhone("USER_PHONE")            // If phone variable is a part of the recipe, or the value is not required, skip this
     .isStaging(false)                   // Keep this as true if you want to access <client_id>.stage.verloop.io account. If the account doesn't exist, keep it as false or skip it
+    .closeExistingChat(false)           // Close the existing chat if exist and start a new conversation
     .fields(customFields)               // These are predefined variables added on room level or user level
     .build()                            // this would build the final config object which is later used by Verloop object to star the chat
 
@@ -127,25 +128,40 @@ public void onMessageReceived(RemoteMessage remoteMessage) {
 
 ### Handle Notification click
 
-In your Launcher activity override onNewIntent as given below.
+In your Launcher activity override onCreate and onNewIntent as given below.
 
 ```kotlin
+
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_test)
+    // ...
+    if (intent != null) {
+        onNewIntent(intent)
+    }
+    // ...
+}        
+
 override fun onNewIntent(intent: Intent?) {
     super.onNewIntent(intent)
-    if (intent != null && intent.extras != null) {
-        val verloopData = intent.extras?.get("verloop")
-        if (verloopData != null) {
-            val obj = JSONObject(verloopData.toString())
-            if (obj.has("client_id")) clientId = obj.getString("client_id")
-            if (obj.has("userId")) userId = obj.getString("userId")
-        }
-        if (clientId === null) clientId = intent.extras?.get("clientId") as String?
-        if (userId === null) userId = intent.extras?.get("userId") as String?
-        if (clientId != null) {
-            verloop?.showChat()	
+    if (intent != null && intent.extras != null && intent.extras?.containsKey("verloop") == true) {
+        val json = intent.extras?.getString("verloop")
+        try {
+            val jsonObject = JSONObject(json)
+            if (jsonObject.has("client_id")) {
+                var clientId = jsonObject.getString("client_id")
+                if (clientId != null) {
+                    var config = VerloopConfig.Builder().clientId(clientId).build()
+                    Verloop(this, config).showChat()
+                }
+            }
+        } catch (e: JSONException) {
+            Log.e(TAG, e.message.toString())
         }
     }
 }
+
+
 ```
 
 

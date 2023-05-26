@@ -43,13 +43,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
     init {
         val webView = WebView(context)
         webView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // chromium, enable hardware acceleration
-            webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-        } else {
-            // older android version, disable hardware acceleration
-            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        }
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
         webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         webView.loadUrl("https://hello.verloop.io/livechat?mode=popout")
     }
@@ -64,6 +58,23 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
     @Deprecated("Not in use anymore")
     fun login(verloopConfig: VerloopConfig) {
+    }
+
+    /**
+     * This will open up the activity for chat and load all the data provided in VerloopConfig
+     */
+    fun showChat() {
+        verloopConfig.userId =
+            verloopConfig.userId ?: preference.getString(PREF_USER_ID, UUID.randomUUID().toString())
+        preference.edit().putString(PREF_USER_ID, verloopConfig.userId).apply()
+
+        eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
+        val i = Intent(context, VerloopActivity::class.java)
+        i.putExtra("config", verloopConfig)
+
+        // To be used as key for eventListeners map
+        i.putExtra("configKey", verloopConfig.hashCode().toString())
+        context.startActivity(i)
     }
 
     /**
@@ -97,23 +108,6 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         verloopConfig.fields = ArrayList()
 
         preference.edit().remove(PREF_USER_ID).apply()
-    }
-
-    /**
-     * This will open up the activity for chat and load all the data provided in VerloopConfig
-     */
-    fun showChat() {
-        verloopConfig.userId =
-            verloopConfig.userId ?: preference.getString(PREF_USER_ID, UUID.randomUUID().toString())
-        preference.edit().putString(PREF_USER_ID, verloopConfig.userId).apply()
-
-        eventListeners[verloopConfig.hashCode().toString()] = VerloopEventListener(verloopConfig)
-        val i = Intent(context, VerloopActivity::class.java)
-        i.putExtra("config", verloopConfig)
-
-        // To be used as key for eventListeners map
-        i.putExtra("configKey", verloopConfig.hashCode().toString())
-        context.startActivity(i)
     }
 
     @Deprecated("Not in use anymore")
