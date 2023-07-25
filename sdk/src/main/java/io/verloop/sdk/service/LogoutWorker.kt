@@ -20,11 +20,9 @@ class LogoutWorker(appContext: Context, params: WorkerParameters) :
         val clientId = inputData.getString(LogoutRequestBody.CLIENT_ID)
         val userId = inputData.getString(LogoutRequestBody.USER_ID)
         val fcmToken = inputData.getString(LogoutRequestBody.FCM_TOKEN)
-        val isStaging = inputData.getBoolean(LogoutRequestBody.IS_STAGING, false)
 
         if (clientId != null) {
-            val baseUrl =
-                if (isStaging) "https://${clientId}.stage.verloop.io" else "https://${clientId}.verloop.io"
+            val baseUrl = "https://${clientId}.verloop.io"
 
             val retrofit =
                 VerloopServiceBuilder.buildService(

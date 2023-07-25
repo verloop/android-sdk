@@ -316,22 +316,11 @@
                 <TableRow android:layout_marginTop="8dp">
 
                     <CheckBox
-                        android:id="@+id/checkBoxStaging"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3"
-                        android:text="Staging Env" />
-
-                    <CheckBox
                         android:id="@+id/checkBoxFCM"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
                         android:text="FCM Token" />
-
-                </TableRow>
-
-                <TableRow android:layout_marginTop="8dp">
 
                     <CheckBox
                         android:id="@+id/checkOverrideUrlClick"
@@ -339,6 +328,10 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
                         android:text="Override Url Click" />
+
+                </TableRow>
+
+                <TableRow android:layout_marginTop="8dp">
 
                     <CheckBox
                         android:id="@+id/checkCloseExistingChat"

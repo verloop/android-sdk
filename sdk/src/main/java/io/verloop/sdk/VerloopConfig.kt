@@ -13,7 +13,6 @@ data class VerloopConfig private constructor(
     var userPhone: String?,
     var recipeId: String?,
     var department: String?,
-    var isStaging: Boolean = false,
     var closeExistingChat: Boolean = false,
     var overrideUrlClick: Boolean = false,
     var fields: ArrayList<CustomField> = ArrayList()
@@ -29,7 +28,6 @@ data class VerloopConfig private constructor(
         null,
         null,
         null,
-        false,
         false,
         false,
         ArrayList()
@@ -48,7 +46,6 @@ data class VerloopConfig private constructor(
         this.userPhone = source.readString()
         this.recipeId = source.readString()
         this.department = source.readString()
-        this.isStaging = source.readInt() == 1
         this.closeExistingChat = source.readInt() == 1
         this.overrideUrlClick = source.readInt() == 1
         this.fields =
@@ -99,7 +96,6 @@ data class VerloopConfig private constructor(
         dest.writeString(this.userPhone)
         dest.writeString(this.recipeId)
         dest.writeString(this.department)
-        dest.writeByte((if (this.isStaging) 1 else 0).toByte())
         dest.writeByte((if (this.closeExistingChat) 1 else 0).toByte())
         dest.writeByte((if (this.overrideUrlClick) 1 else 0).toByte())
         dest.writeList(this.fields)
@@ -158,7 +154,6 @@ data class VerloopConfig private constructor(
         var userPhone: String? = null,
         var recipeId: String? = null,
         var department: String? = null,
-        var isStaging: Boolean = false,
         var closeExistingChat: Boolean = false,
         var overrideUrlClick: Boolean = false,
         var fields: ArrayList<CustomField> = ArrayList()
@@ -175,7 +170,6 @@ data class VerloopConfig private constructor(
         fun userPhone(userPhone: String?) = apply { this.userPhone = userPhone }
         fun recipeId(recipeId: String?) = apply { this.recipeId = recipeId }
         fun department(department: String?) = apply { this.department = department }
-        fun isStaging(isStaging: Boolean) = apply { this.isStaging = isStaging }
         fun closeExistingChat(closeExistingChat: Boolean) = apply { this.closeExistingChat = closeExistingChat }
         fun overrideUrlClick(overrideUrlClick: Boolean) =
             apply { this.overrideUrlClick = overrideUrlClick }
@@ -194,7 +188,6 @@ data class VerloopConfig private constructor(
                 userPhone,
                 recipeId,
                 department,
-                isStaging,
                 closeExistingChat,
                 overrideUrlClick,
                 fields
