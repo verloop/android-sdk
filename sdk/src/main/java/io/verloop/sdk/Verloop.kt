@@ -76,6 +76,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             .putString(LogoutRequestBody.CLIENT_ID, verloopConfig.clientId)
             .putString(LogoutRequestBody.USER_ID, verloopConfig.userId)
             .putString(LogoutRequestBody.FCM_TOKEN, verloopConfig.fcmToken)
+            .putBoolean(LogoutRequestBody.IS_STAGING, verloopConfig.isStaging)
             .build()
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

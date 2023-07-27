@@ -22,7 +22,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import io.verloop.sdk.BuildConfig
 import io.verloop.sdk.R
 import io.verloop.sdk.VerloopConfig
 import io.verloop.sdk.api.VerloopAPI
@@ -71,7 +70,9 @@ class VerloopFragment : Fragment() {
         configKey = arguments?.getString("configKey")
 
         if (config != null) {
-            val baseUrl = "https://${config?.clientId}.verloop.io"
+            val baseUrl =
+                if (config?.isStaging == true) "https://${config?.clientId}.stage.verloop.io"
+                else "https://${config?.clientId}.verloop.io"
             val retrofit = VerloopServiceBuilder.buildService(
                 requireContext().applicationContext, baseUrl, VerloopAPI::class.java
             )
@@ -145,9 +146,6 @@ class VerloopFragment : Fragment() {
     @SuppressLint("JavascriptInterface")
     fun initializeWebView() {
         Log.d(TAG, "initializeWebView")
-        if (BuildConfig.DEBUG) {
-            WebView.setWebContentsDebuggingEnabled(true)
-        }
         mWebView?.webViewClient = object : WebViewClient() {
 
             override fun onReceivedHttpError(
@@ -216,11 +214,6 @@ class VerloopFragment : Fragment() {
         }
 
         mWebView?.webChromeClient = object : WebChromeClient() {
-
-            override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                super.onProgressChanged(view, newProgress)
-                Log.d(TAG, newProgress.toString())
-            }
 
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
                 return super.onConsoleMessage(consoleMessage)

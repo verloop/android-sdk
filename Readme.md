@@ -45,6 +45,7 @@ var config = VerloopConfig.Builder()
     .userName("USER_NAME")              // If guest name variable is a part of the recipe, or the value is not required, skip this
     .userEmail("USER_EMAIL")            // If email variable is a part of the recipe, or the value is not required, skip this
     .userPhone("USER_PHONE")            // If phone variable is a part of the recipe, or the value is not required, skip this
+    .isStaging(false)                   // Keep this as true if you want to access <client_id>.stage.verloop.io account. If the account doesn't exist, keep it as false or skip it
     .closeExistingChat(false)           // Close the existing chat if exist and start a new conversation
     .fields(customFields)               // These are predefined variables added on room level or user level
     .build()                            // this would build the final config object which is later used by Verloop object to star the chat

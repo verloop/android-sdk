@@ -60,7 +60,9 @@ class VerloopActivity : AppCompatActivity() {
         this.config = config
 
         if (config != null) {
-            val baseUrl = "https://${config.clientId}.verloop.io"
+            val baseUrl =
+                if (config.isStaging) "https://${config.clientId}.stage.verloop.io"
+                else "https://${config.clientId}.verloop.io"
 
             val retrofit =
                 buildService(
