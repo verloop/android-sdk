@@ -1,15 +1,13 @@
 package io.verloop
 
 import android.content.Intent
-import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.*
-import com.google.firebase.messaging.FirebaseMessaging
-import android.widget.EditText
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.messaging.FirebaseMessaging
 import io.verloop.sdk.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -28,7 +26,7 @@ class TestActivity : AppCompatActivity() {
 
         var verloopConfig: VerloopConfig? = null
 
-        var verloopConfig2: VerloopConfig? = null
+        var verloopConfig2: VerloopConfig?
 
         var fcmToken: String? = null
 
@@ -59,7 +57,6 @@ class TestActivity : AppCompatActivity() {
         val department1 = findViewById<EditText>(R.id.editDepartment1)
         val department2 = findViewById<EditText>(R.id.editDepartment2)
 
-        val checkBoxIsStaging = findViewById<CheckBox>(R.id.checkBoxStaging)
         val checkBoxRegisterFCMToken = findViewById<CheckBox>(R.id.checkBoxFCM)
         val checkOverrideUrlClick = findViewById<CheckBox>(R.id.checkOverrideUrlClick)
         val checkCloseExistingChat = findViewById<CheckBox>(R.id.checkCloseExistingChat)
@@ -116,25 +113,24 @@ class TestActivity : AppCompatActivity() {
 
                 verloopConfig =
                     VerloopConfig.Builder()
-                        .clientId(clientId1.text?.toString())
+                        .clientId(clientId1.text?.trim().toString())
                         .userId(userId1.text?.toString())
                         .recipeId(recipeId1.text?.toString())
                         .userName(name1.text?.toString())
                         .userEmail(email1.text?.toString())
                         .userPhone(phone1.text?.toString())
                         .department(department1.text?.toString())
-                        .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken else null)
+                        .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken?.trim() else null)
                         .closeExistingChat(checkCloseExistingChat.isChecked)
-                        .fields(customFields)
-                        .isStaging(checkBoxIsStaging.isChecked).build()
+                        .fields(customFields).build()
 
                 verloopConfig?.setUrlClickListener(object : LiveChatUrlClickListener {
                     override fun urlClicked(url: String?) {
                         Toast.makeText(applicationContext, "Chat 1: $url", Toast.LENGTH_SHORT)
                             .show()
-                        val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
-                        i.putExtra("config", verloopConfig)
-                        startActivity(i)
+//                        val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
+//                        i.putExtra("config", verloopConfig)
+//                        startActivity(i)
                     }
                 }, checkOverrideUrlClick.isChecked)
                 verloop = Verloop(this, verloopConfig!!)
@@ -159,18 +155,17 @@ class TestActivity : AppCompatActivity() {
 
                 verloopConfig2 =
                     VerloopConfig.Builder()
-                        .clientId(clientId2.text?.toString())
+                        .clientId(clientId2.text.trim()?.toString())
                         .userId(userId2.text?.toString())
-                        .fields(customFields)
-                        .isStaging(false).build()
+                        .fields(customFields).build()
 
                 verloopConfig2?.setUrlClickListener(object : LiveChatUrlClickListener {
                     override fun urlClicked(url: String?) {
                         Toast.makeText(applicationContext, "Chat 2: $url", Toast.LENGTH_SHORT)
                             .show()
-                        val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
-                        i.putExtra("config", verloopConfig)
-                        startActivity(i)
+//                        val i = Intent(this@TestActivity, ProductDetailsActivity::class.java)
+//                        i.putExtra("config", verloopConfig)
+//                        startActivity(i)
                     }
                 }, checkOverrideUrlClick.isChecked)
 

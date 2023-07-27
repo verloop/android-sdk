@@ -39,15 +39,6 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         val eventListeners = HashMap<String?, VerloopEventListener>()
     }
 
-    // Preload WebView with template URL to cache the contents and improve performance on next reload
-    init {
-        val webView = WebView(context)
-        webView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
-        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
-        webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-        webView.loadUrl("https://hello.verloop.io/livechat?mode=popout")
-    }
-
     @Deprecated("Not in use anymore")
     fun login(userId: String) {
     }

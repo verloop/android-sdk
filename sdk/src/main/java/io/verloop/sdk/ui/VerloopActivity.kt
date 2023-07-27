@@ -40,6 +40,7 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verloop)
 
@@ -81,17 +82,20 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
+        Log.d(TAG, "onResume")
         super.onResume()
         setActivityActive(true)
         VerloopNotification.cancelNotification(this)
     }
 
     override fun onPause() {
+        Log.d(TAG, "onPause")
         super.onPause()
         setActivityActive(false)
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
         super.onDestroy()
         eventListeners.remove(configKey)
     }
@@ -106,12 +110,14 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     private fun addFragment() {
+        Log.d(TAG, "addFragment")
         verloopFragment = VerloopFragment.newInstance(configKey, config)
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit()
     }
 
     private fun updateClientInfo(clientInfo: ClientInfo) {
+        Log.d(TAG, "updateClientInfo")
         toolbar?.title = clientInfo.title
         toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor ?: "#FFFFFF"))
         toolbar?.setTitleTextColor(Color.parseColor(CommonUtils.getExpandedColorHex(clientInfo.textColor)))

@@ -31,7 +31,6 @@ class VerloopConfigTest {
         assertNull(verloopConfig.userName)
         assertNull(verloopConfig.userPhone)
         assertNotNull(verloopConfig.userId)
-        assertFalse(verloopConfig.isStaging)
         assertFalse(verloopConfig.overrideUrlClick)
         assertEquals(0, verloopConfig.fields.size)
     }

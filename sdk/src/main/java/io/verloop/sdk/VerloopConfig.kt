@@ -175,7 +175,10 @@ data class VerloopConfig private constructor(
         fun userPhone(userPhone: String?) = apply { this.userPhone = userPhone }
         fun recipeId(recipeId: String?) = apply { this.recipeId = recipeId }
         fun department(department: String?) = apply { this.department = department }
+
+        @Deprecated("Not required anymore", ReplaceWith(""))
         fun isStaging(isStaging: Boolean) = apply { this.isStaging = isStaging }
+        
         fun closeExistingChat(closeExistingChat: Boolean) = apply { this.closeExistingChat = closeExistingChat }
         fun overrideUrlClick(overrideUrlClick: Boolean) =
             apply { this.overrideUrlClick = overrideUrlClick }
