@@ -5,20 +5,45 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".ui.VerloopActivity">
+
     <ProgressBar
         android:id="@+id/progressBar"
-        android:max="3"
-        android:indeterminateTint="@android:color/holo_blue_light"
-        android:background="@color/white"
-        android:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:background="@color/white"
+        android:indeterminateTint="@android:color/holo_blue_light"
+        android:max="3"
+        android:visibility="gone" />
+
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/progressBar"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:id="@+id/layoutReload"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="Failed to load the chat. Please try again."/>
+
+        <Button
+            android:id="@+id/buttonReload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Reload" />
+    </LinearLayout>
 </RelativeLayout>

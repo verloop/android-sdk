@@ -9,6 +9,8 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.messaging.FirebaseMessaging
 import io.verloop.sdk.*
+import io.verloop.sdk.model.LogEvent
+import io.verloop.sdk.model.LogLevel
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -124,6 +126,12 @@ class TestActivity : AppCompatActivity() {
                         .closeExistingChat(checkCloseExistingChat.isChecked)
                         .fields(customFields).build()
 
+                verloopConfig?.setLogEventListener(object : LiveLogEventListener {
+                    override fun logEvent(event: LogEvent) {
+                        Log.i("Log Event", event.toString() )
+                    }
+                }, LogLevel.DEBUG)
+
                 verloopConfig?.setUrlClickListener(object : LiveChatUrlClickListener {
                     override fun urlClicked(url: String?) {
                         Toast.makeText(applicationContext, "Chat 1: $url", Toast.LENGTH_SHORT)
@@ -133,6 +141,7 @@ class TestActivity : AppCompatActivity() {
 //                        startActivity(i)
                     }
                 }, checkOverrideUrlClick.isChecked)
+
                 verloop = Verloop(this, verloopConfig!!)
                 verloop?.showChat()
             } catch (e: VerloopException) {

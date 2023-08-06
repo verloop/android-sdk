@@ -2,6 +2,7 @@ package io.verloop.sdk
 
 import android.os.Parcel
 import android.os.Parcelable
+import io.verloop.sdk.model.LogLevel
 import java.util.*
 
 data class VerloopConfig private constructor(
@@ -18,6 +19,14 @@ data class VerloopConfig private constructor(
     var overrideUrlClick: Boolean = false,
     var fields: ArrayList<CustomField> = ArrayList()
 ) : Parcelable {
+
+    var logLevel: LogLevel = LogLevel.WARNING
+
+    var buttonOnClickListener: LiveChatButtonClickListener? = null
+    var chatUrlClickListener: LiveChatUrlClickListener? = null
+
+    var logEventListener: LiveLogEventListener? = null
+        private set
 
     @Deprecated("Use builder instead")
     constructor(clientId: String) : this(
@@ -48,15 +57,13 @@ data class VerloopConfig private constructor(
         this.userPhone = source.readString()
         this.recipeId = source.readString()
         this.department = source.readString()
+        this.logLevel = LogLevel.values()[source.readInt()]
         this.isStaging = source.readInt() == 1
         this.closeExistingChat = source.readInt() == 1
         this.overrideUrlClick = source.readInt() == 1
         this.fields =
             source.readArrayList(CustomField::class.java.classLoader) as ArrayList<CustomField>
     }
-
-    var buttonOnClickListener: LiveChatButtonClickListener? = null
-    var chatUrlClickListener: LiveChatUrlClickListener? = null
 
     fun putCustomField(key: String, value: String, scope: Scope) {
         fields.add(CustomField(key, value, scope))
@@ -86,6 +93,18 @@ data class VerloopConfig private constructor(
         this.overrideUrlClick = overrideUrlClick
     }
 
+    /**
+     * Callback for log events from within the chat
+     * @param logEventListener
+     */
+    fun setLogEventListener(
+        logEventListener: LiveLogEventListener,
+        logLevel: LogLevel
+    ) {
+        this.logEventListener = logEventListener
+        this.logLevel = logLevel
+    }
+
     override fun describeContents(): Int {
         return 0
     }
@@ -99,6 +118,7 @@ data class VerloopConfig private constructor(
         dest.writeString(this.userPhone)
         dest.writeString(this.recipeId)
         dest.writeString(this.department)
+        dest.writeInt(this.logLevel.ordinal)
         dest.writeByte((if (this.isStaging) 1 else 0).toByte())
         dest.writeByte((if (this.closeExistingChat) 1 else 0).toByte())
         dest.writeByte((if (this.overrideUrlClick) 1 else 0).toByte())
@@ -178,8 +198,10 @@ data class VerloopConfig private constructor(
 
         @Deprecated("Not required anymore", ReplaceWith(""))
         fun isStaging(isStaging: Boolean) = apply { this.isStaging = isStaging }
-        
-        fun closeExistingChat(closeExistingChat: Boolean) = apply { this.closeExistingChat = closeExistingChat }
+
+        fun closeExistingChat(closeExistingChat: Boolean) =
+            apply { this.closeExistingChat = closeExistingChat }
+
         fun overrideUrlClick(overrideUrlClick: Boolean) =
             apply { this.overrideUrlClick = overrideUrlClick }
 

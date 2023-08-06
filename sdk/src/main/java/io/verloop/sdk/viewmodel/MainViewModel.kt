@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import io.verloop.sdk.Verloop
 import io.verloop.sdk.model.ClientInfo
+import io.verloop.sdk.model.LogEvent
 import io.verloop.sdk.repository.VerloopRepository
 
 class MainViewModel(var configKey: String?, var repository: VerloopRepository) : ViewModel() {
@@ -24,6 +25,12 @@ class MainViewModel(var configKey: String?, var repository: VerloopRepository) :
     fun urlClicked(json: String) {
         configKey.let {
             Verloop.eventListeners[configKey]?.onURLClick(json)
+        }
+    }
+
+    fun logEvent(event: LogEvent) {
+        configKey.let {
+            Verloop.eventListeners[configKey]?.onLogEvent(event)
         }
     }
 }

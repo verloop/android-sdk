@@ -82,14 +82,12 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        Log.d(TAG, "onResume")
         super.onResume()
         setActivityActive(true)
         VerloopNotification.cancelNotification(this)
     }
 
     override fun onPause() {
-        Log.d(TAG, "onPause")
         super.onPause()
         setActivityActive(false)
     }
