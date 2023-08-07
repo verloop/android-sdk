@@ -58,6 +58,14 @@ class VerloopFragment : Fragment() {
         private const val ICE_CREAM = 12421
         private const val LOLLIPOP = 12422
 
+        private const val JS_CALL_SET_USER_PARAMS = "SetUserParams"
+        private const val JS_CALL_SET_USER_ID = "SetUserId"
+        private const val JS_CALL_SET_DEPARTMENT = "SetDepartment"
+        private const val JS_CALL_SET_RECIPE = "SetRecipe"
+        private const val JS_CALL_SET_CUSTOM_FIELD = "SetCustomField"
+        private const val JS_CALL_SET_WIDGIT_OPENED = "WidgetOpened"
+        private const val JS_CALL_SET_CLOSE = "CLOSE"
+
         fun newInstance(configKey: String?, config: VerloopConfig?): VerloopFragment {
             val fragment = VerloopFragment()
             val args = Bundle()
@@ -174,7 +182,12 @@ class VerloopFragment : Fragment() {
                 view: WebView?, errorCode: Int, description: String?, failingUrl: String?
             ) {
                 @Suppress("DEPRECATION")
-                super.onReceivedError(view, errorCode, description, failingUrl)
+                super.onReceivedError(
+                    view,
+                    errorCode,
+                    description,
+                    failingUrl
+                )
                 description?.let {
                     logEvent(LogLevel.ERROR, it)
                 }
@@ -192,12 +205,12 @@ class VerloopFragment : Fragment() {
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
-                logEvent(LogLevel.INFO, "Chat Loading. Url: $url")
+                logEvent(LogLevel.INFO, "Page Started. Url: $url")
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                logEvent(LogLevel.INFO, "Chat Loaded")
+                logEvent(LogLevel.INFO, "Page Finished")
             }
 
             @Deprecated("Deprecated in Java")
@@ -252,17 +265,14 @@ class VerloopFragment : Fragment() {
         mWebView.addJavascriptInterface(this, "VerloopMobile")
         mWebView.addJavascriptInterface(this, "VerloopMobileV2")
         settings.domStorageEnabled = true
-        @Suppress("DEPRECATION")
-        settings.allowFileAccessFromFileURLs = true
-        @Suppress("DEPRECATION")
-        settings.allowUniversalAccessFromFileURLs = true
+        @Suppress("DEPRECATION") settings.allowFileAccessFromFileURLs = true
+        @Suppress("DEPRECATION") settings.allowUniversalAccessFromFileURLs = true
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
         settings.mediaPlaybackRequiresUserGesture = false
     }
 
     private fun loadChat() {
         // Make sure the URL is built using a library.
-        logEvent(LogLevel.INFO, "Initializing Chat")
         val uriBuilder = Uri.Builder()
         uriBuilder.scheme("https")
         uriBuilder.authority(config?.clientId + ".verloop.io")
@@ -280,6 +290,7 @@ class VerloopFragment : Fragment() {
     }
 
     private fun onLoadStart() {
+        logEvent(LogLevel.INFO, "Load Chat Started")
         loading = true
         progressBar.visibility = View.VISIBLE
         mWebView.visibility = View.INVISIBLE
@@ -288,6 +299,7 @@ class VerloopFragment : Fragment() {
     }
 
     private fun onLoadSuccess() {
+        logEvent(LogLevel.INFO, "Load Chat Successful")
         loading = false
         progressBar.visibility = View.GONE
         mWebView.visibility = View.VISIBLE
@@ -295,6 +307,7 @@ class VerloopFragment : Fragment() {
     }
 
     private fun onLoadError() {
+        logEvent(LogLevel.ERROR, "Load Chat Failed")
         loading = false
         progressBar.visibility = View.GONE
         mWebView.visibility = View.INVISIBLE
@@ -319,15 +332,19 @@ class VerloopFragment : Fragment() {
             if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
 
             if (userParamsObject.length() > 0) {
+                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_USER_PARAMS: $userParamsObject")
                 callJavaScript("VerloopLivechat.setUserParams(${userParamsObject});")
             }
             if (!it.userId.isNullOrEmpty()) {
+                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_USER_ID: ${it.userId}")
                 callJavaScript("VerloopLivechat.setUserId(\"${it.userId}\");")
             }
             if (!it.department.isNullOrEmpty()) {
+                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_DEPARTMENT: ${it.department}")
                 callJavaScript("VerloopLivechat.setDepartment(\"${it.department}\");")
             }
             if (!it.recipeId.isNullOrEmpty()) {
+                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_RECIPE: ${it.recipeId}")
                 callJavaScript("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
             }
 
@@ -338,15 +355,19 @@ class VerloopFragment : Fragment() {
                     if (field.scope !== null) {
                         scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
                     }
+                    logEvent(
+                        LogLevel.DEBUG,
+                        "JS_CALL: $JS_CALL_SET_RECIPE: key->${field.key} value->${field.value} scope->${scopeObject}"
+                    )
                     callJavaScript("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
                 }
             }
         }
+        logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_WIDGIT_OPENED")
         callJavaScript("VerloopLivechat.widgetOpened();")
     }
 
     private fun callJavaScript(script: String) {
-        logEvent(LogLevel.DEBUG, "Calling javascript: $script")
         mWebView.evaluateJavascript(script, null)
     }
 
@@ -385,14 +406,14 @@ class VerloopFragment : Fragment() {
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onButtonClick(json: String) {
-        logEvent(LogLevel.INFO, " onButtonClick $json")
+        logEvent(LogLevel.DEBUG, " onButtonClick $json")
         viewModel?.buttonClicked(json)
     }
 
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onURLClick(json: String) {
-        logEvent(LogLevel.INFO, "onURLClick: $json")
+        logEvent(LogLevel.DEBUG, "onURLClick: $json")
         viewModel?.urlClicked(json)
     }
 
@@ -420,6 +441,7 @@ class VerloopFragment : Fragment() {
         Handler(Looper.getMainLooper()).post {
             onLoadSuccess()
             if (config?.closeExistingChat == true) {
+                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_CLOSE")
                 callJavaScript("VerloopLivechat.close();")
             }
         }
