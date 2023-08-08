@@ -155,7 +155,7 @@ class VerloopFragment : Fragment() {
 
     @SuppressLint("JavascriptInterface", "SetJavaScriptEnabled")
     fun initializeWebView() {
-        logEvent(LogLevel.INFO, "Configuring Chat")
+        logEvent(LogLevel.INFO, "Configuring Chat", null)
         mWebView.webViewClient = object : WebViewClient() {
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -164,7 +164,7 @@ class VerloopFragment : Fragment() {
             ) {
                 super.onReceivedHttpError(view, request, errorResponse)
                 errorResponse?.reasonPhrase?.let {
-                    logEvent(LogLevel.WARNING, it)
+                    logEvent(LogLevel.WARNING, it, null)
                 }
             }
 
@@ -173,7 +173,7 @@ class VerloopFragment : Fragment() {
             ) {
                 super.onReceivedSslError(view, handler, error)
                 error?.let {
-                    logEvent(LogLevel.ERROR, it.toString())
+                    logEvent(LogLevel.ERROR, it.toString(), null)
                 }
             }
 
@@ -189,7 +189,7 @@ class VerloopFragment : Fragment() {
                     failingUrl
                 )
                 description?.let {
-                    logEvent(LogLevel.ERROR, it)
+                    logEvent(LogLevel.ERROR, it, null)
                 }
             }
 
@@ -199,18 +199,19 @@ class VerloopFragment : Fragment() {
             ) {
                 super.onReceivedError(view, request, error)
                 error?.description?.let {
-                    logEvent(LogLevel.WARNING, it.toString())
+                    logEvent(LogLevel.WARNING, it.toString(), null)
                 }
             }
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
-                logEvent(LogLevel.INFO, "Page Started. Url: $url")
+                val params = JSONObject().put("url", url)
+                logEvent(LogLevel.INFO, "Page Started", params)
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                logEvent(LogLevel.INFO, "Page Finished")
+                logEvent(LogLevel.INFO, "Page Finished", null)
             }
 
             @Deprecated("Deprecated in Java")
@@ -240,7 +241,7 @@ class VerloopFragment : Fragment() {
         mWebView.webChromeClient = object : WebChromeClient() {
 
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                logEvent(LogLevel.DEBUG, consoleMessage?.message().toString())
+                logEvent(LogLevel.DEBUG, consoleMessage?.message().toString(), null)
                 return super.onConsoleMessage(consoleMessage)
             }
 
@@ -290,7 +291,7 @@ class VerloopFragment : Fragment() {
     }
 
     private fun onLoadStart() {
-        logEvent(LogLevel.INFO, "Load Chat Started")
+        logEvent(LogLevel.INFO, "Load Chat Started", null)
         loading = true
         progressBar.visibility = View.VISIBLE
         mWebView.visibility = View.INVISIBLE
@@ -299,7 +300,7 @@ class VerloopFragment : Fragment() {
     }
 
     private fun onLoadSuccess() {
-        logEvent(LogLevel.INFO, "Load Chat Successful")
+        logEvent(LogLevel.INFO, "Load Chat Successful", null)
         loading = false
         progressBar.visibility = View.GONE
         mWebView.visibility = View.VISIBLE
@@ -307,7 +308,7 @@ class VerloopFragment : Fragment() {
     }
 
     private fun onLoadError() {
-        logEvent(LogLevel.ERROR, "Load Chat Failed")
+        logEvent(LogLevel.ERROR, "Load Chat Failed", null)
         loading = false
         progressBar.visibility = View.GONE
         mWebView.visibility = View.INVISIBLE
@@ -318,13 +319,13 @@ class VerloopFragment : Fragment() {
         Handler(Looper.getMainLooper()).postDelayed({
             if (loading) {
                 onLoadError()
-                logEvent(LogLevel.ERROR, "Timeout. Failed to load chat. Please try again")
+                logEvent(LogLevel.ERROR, "Timeout. Failed to load chat. Please try again", null)
             }
         }, 10000)
     }
 
     private fun startRoom() {
-        logEvent(LogLevel.INFO, "Starting room")
+        logEvent(LogLevel.INFO, "Starting room", null)
         config?.let { it ->
             val userParamsObject = JSONObject()
             if (!it.userEmail.isNullOrEmpty()) userParamsObject.put("email", it.userEmail)
@@ -332,19 +333,29 @@ class VerloopFragment : Fragment() {
             if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
 
             if (userParamsObject.length() > 0) {
-                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_USER_PARAMS: $userParamsObject")
+                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_USER_PARAMS", userParamsObject)
                 callJavaScript("VerloopLivechat.setUserParams(${userParamsObject});")
             }
             if (!it.userId.isNullOrEmpty()) {
-                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_USER_ID: ${it.userId}")
+                logEvent(
+                    LogLevel.DEBUG,
+                    "JS_CALL: $JS_CALL_SET_USER_ID",
+                    JSONObject().put("userId", it.userId)
+                )
                 callJavaScript("VerloopLivechat.setUserId(\"${it.userId}\");")
             }
             if (!it.department.isNullOrEmpty()) {
-                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_DEPARTMENT: ${it.department}")
+                logEvent(
+                    LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_DEPARTMENT",
+                    JSONObject().put("department", it.department)
+                )
                 callJavaScript("VerloopLivechat.setDepartment(\"${it.department}\");")
             }
             if (!it.recipeId.isNullOrEmpty()) {
-                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_RECIPE: ${it.recipeId}")
+                logEvent(
+                    LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_RECIPE",
+                    JSONObject().put("recipeId", it.recipeId)
+                )
                 callJavaScript("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
             }
 
@@ -355,15 +366,20 @@ class VerloopFragment : Fragment() {
                     if (field.scope !== null) {
                         scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
                     }
+                    val params = JSONObject()
+                    params.put("key", field.key)
+                    params.put("value", field.value)
+                    params.put("scope", field.scope)
                     logEvent(
                         LogLevel.DEBUG,
-                        "JS_CALL: $JS_CALL_SET_RECIPE: key->${field.key} value->${field.value} scope->${scopeObject}"
+                        "JS_CALL: $JS_CALL_SET_RECIPE",
+                        params
                     )
                     callJavaScript("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
                 }
             }
         }
-        logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_WIDGIT_OPENED")
+        logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_WIDGIT_OPENED", null)
         callJavaScript("VerloopLivechat.widgetOpened();")
     }
 
@@ -406,21 +422,21 @@ class VerloopFragment : Fragment() {
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onButtonClick(json: String) {
-        logEvent(LogLevel.DEBUG, " onButtonClick $json")
+        logEvent(LogLevel.DEBUG, "onButtonClick", JSONObject(json))
         viewModel?.buttonClicked(json)
     }
 
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onURLClick(json: String) {
-        logEvent(LogLevel.DEBUG, "onURLClick: $json")
+        logEvent(LogLevel.DEBUG, "onURLClick", JSONObject(json))
         viewModel?.urlClicked(json)
     }
 
     @JavascriptInterface
     @Throws(JSONException::class)
     fun livechatEvent(json: String) {
-        logEvent(LogLevel.DEBUG, "livechatEvent: $json")
+        logEvent(LogLevel.DEBUG, "livechatEvent", JSONObject(json))
         val params = JSONObject(json)
         if (params.getString("fn").equals("ready")) {
             ready()
@@ -430,27 +446,27 @@ class VerloopFragment : Fragment() {
     }
 
     private fun ready() {
-        logEvent(LogLevel.INFO, "Ready")
+        logEvent(LogLevel.INFO, "Ready", null)
         Handler(Looper.getMainLooper()).post {
             startRoom()
         }
     }
 
     private fun roomReady() {
-        logEvent(LogLevel.INFO, "Room Ready")
+        logEvent(LogLevel.INFO, "Room Ready", null)
         Handler(Looper.getMainLooper()).post {
             onLoadSuccess()
             if (config?.closeExistingChat == true) {
-                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_CLOSE")
+                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_CLOSE", null)
                 callJavaScript("VerloopLivechat.close();")
             }
         }
     }
 
 
-    private fun logEvent(level: LogLevel, message: String) {
+    private fun logEvent(level: LogLevel, message: String, params: JSONObject?) {
         if (config?.logLevel?.ordinal!! >= level.ordinal) {
-            viewModel?.logEvent(LogEvent(level.name, message))
+            viewModel?.logEvent(LogEvent(level.name, message, params))
         }
     }
 }
