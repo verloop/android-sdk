@@ -22,10 +22,13 @@ import io.verloop.sdk.VerloopNotification
 import io.verloop.sdk.api.VerloopAPI
 import io.verloop.sdk.api.VerloopServiceBuilder.buildService
 import io.verloop.sdk.model.ClientInfo
+import io.verloop.sdk.model.LogEvent
+import io.verloop.sdk.model.LogLevel
 import io.verloop.sdk.repository.VerloopRepository
 import io.verloop.sdk.utils.CommonUtils
 import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
+import org.json.JSONObject
 
 class VerloopActivity : AppCompatActivity() {
 
@@ -60,6 +63,7 @@ class VerloopActivity : AppCompatActivity() {
         this.config = config
 
         if (config != null) {
+            logEvent(LogLevel.DEBUG, "$TAG:onCreate", null)
             val baseUrl =
                 if (config.isStaging) "https://${config.clientId}.stage.verloop.io"
                 else "https://${config.clientId}.verloop.io"
@@ -94,6 +98,7 @@ class VerloopActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         Log.d(TAG, "onDestroy")
+        logEvent(LogLevel.DEBUG, "$TAG:onDestroy", null)
         super.onDestroy()
         eventListeners.remove(configKey)
     }
@@ -109,6 +114,7 @@ class VerloopActivity : AppCompatActivity() {
 
     private fun addFragment() {
         Log.d(TAG, "addFragment")
+        logEvent(LogLevel.DEBUG, "$TAG:addFragment", null)
         verloopFragment = VerloopFragment.newInstance(configKey, config)
         val ft = supportFragmentManager.beginTransaction()
         ft.add(R.id.verloop_layout, verloopFragment, "VerloopActivity#Fragment").commit()
@@ -116,6 +122,7 @@ class VerloopActivity : AppCompatActivity() {
 
     private fun updateClientInfo(clientInfo: ClientInfo) {
         Log.d(TAG, "updateClientInfo")
+        logEvent(LogLevel.DEBUG, "$TAG:updateClientInfo", null)
         toolbar?.title = clientInfo.title
         toolbar?.setBackgroundColor(Color.parseColor(clientInfo.bgColor ?: "#FFFFFF"))
         toolbar?.setTitleTextColor(Color.parseColor(CommonUtils.getExpandedColorHex(clientInfo.textColor)))
@@ -128,6 +135,7 @@ class VerloopActivity : AppCompatActivity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult")
+        logEvent(LogLevel.DEBUG, "$TAG:onActivityResult", null)
         verloopFragment.fileUploadResult(requestCode, resultCode, data)
     }
 
@@ -138,6 +146,12 @@ class VerloopActivity : AppCompatActivity() {
             // Permission is granted. Continue the action or workflow in your app.
         } else {
             // Permission not granted. Notifications will be disabled.
+        }
+    }
+
+    private fun logEvent(level: LogLevel, message: String, params: JSONObject?) {
+        if (config?.logLevel?.ordinal!! >= level.ordinal) {
+            viewModel?.logEvent(LogEvent(level.name, message, params))
         }
     }
 }

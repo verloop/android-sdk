@@ -24,6 +24,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import io.verloop.sdk.Constants
 import io.verloop.sdk.R
 import io.verloop.sdk.VerloopConfig
 import io.verloop.sdk.api.VerloopAPI
@@ -57,14 +58,6 @@ class VerloopFragment : Fragment() {
         private const val TAG = "VerloopFragment"
         private const val ICE_CREAM = 12421
         private const val LOLLIPOP = 12422
-
-        private const val JS_CALL_SET_USER_PARAMS = "SetUserParams"
-        private const val JS_CALL_SET_USER_ID = "SetUserId"
-        private const val JS_CALL_SET_DEPARTMENT = "SetDepartment"
-        private const val JS_CALL_SET_RECIPE = "SetRecipe"
-        private const val JS_CALL_SET_CUSTOM_FIELD = "SetCustomField"
-        private const val JS_CALL_SET_WIDGIT_OPENED = "WidgetOpened"
-        private const val JS_CALL_SET_CLOSE = "CLOSE"
 
         fun newInstance(configKey: String?, config: VerloopConfig?): VerloopFragment {
             val fragment = VerloopFragment()
@@ -333,27 +326,27 @@ class VerloopFragment : Fragment() {
             if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
 
             if (userParamsObject.length() > 0) {
-                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_USER_PARAMS", userParamsObject)
+                logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_USER_PARAMS, userParamsObject)
                 callJavaScript("VerloopLivechat.setUserParams(${userParamsObject});")
             }
             if (!it.userId.isNullOrEmpty()) {
                 logEvent(
                     LogLevel.DEBUG,
-                    "JS_CALL: $JS_CALL_SET_USER_ID",
+                    Constants.JS_CALL_SET_USER_ID,
                     JSONObject().put("userId", it.userId)
                 )
                 callJavaScript("VerloopLivechat.setUserId(\"${it.userId}\");")
             }
             if (!it.department.isNullOrEmpty()) {
                 logEvent(
-                    LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_DEPARTMENT",
+                    LogLevel.DEBUG, Constants.JS_CALL_SET_DEPARTMENT,
                     JSONObject().put("department", it.department)
                 )
                 callJavaScript("VerloopLivechat.setDepartment(\"${it.department}\");")
             }
             if (!it.recipeId.isNullOrEmpty()) {
                 logEvent(
-                    LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_RECIPE",
+                    LogLevel.DEBUG, Constants.JS_CALL_SET_RECIPE,
                     JSONObject().put("recipeId", it.recipeId)
                 )
                 callJavaScript("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
@@ -372,14 +365,14 @@ class VerloopFragment : Fragment() {
                     params.put("scope", field.scope)
                     logEvent(
                         LogLevel.DEBUG,
-                        "JS_CALL: $JS_CALL_SET_RECIPE",
+                        Constants.JS_CALL_SET_CUSTOM_FIELD,
                         params
                     )
                     callJavaScript("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
                 }
             }
         }
-        logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_WIDGIT_OPENED", null)
+        logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_WIDGET_OPENED, null)
         callJavaScript("VerloopLivechat.widgetOpened();")
     }
 
@@ -457,12 +450,11 @@ class VerloopFragment : Fragment() {
         Handler(Looper.getMainLooper()).post {
             onLoadSuccess()
             if (config?.closeExistingChat == true) {
-                logEvent(LogLevel.DEBUG, "JS_CALL: $JS_CALL_SET_CLOSE", null)
+                logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_CLOSE, null)
                 callJavaScript("VerloopLivechat.close();")
             }
         }
     }
-
 
     private fun logEvent(level: LogLevel, message: String, params: JSONObject?) {
         if (config?.logLevel?.ordinal!! >= level.ordinal) {
