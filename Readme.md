@@ -1,6 +1,3 @@
-# Verloop Android SDK
-
----
 
 ## How to install
 
