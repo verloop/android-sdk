@@ -40,6 +40,7 @@ import java.util.*
 
 class VerloopFragment : Fragment() {
 
+    private lateinit var baseUri: String
     private lateinit var mWebView: WebView
     private lateinit var progressBar: ProgressBar
     private lateinit var layoutReload: LinearLayout
@@ -209,11 +210,9 @@ class VerloopFragment : Fragment() {
 
             @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (config?.overrideUrlClick == true) {
-                    return true
+                if (url.startsWith(baseUri)) {
+                    return false
                 }
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                startActivity(intent)
                 return true
             }
 
@@ -221,12 +220,10 @@ class VerloopFragment : Fragment() {
             override fun shouldOverrideUrlLoading(
                 view: WebView?, request: WebResourceRequest
             ): Boolean {
-                val uri = request.url
-                if (config?.overrideUrlClick == true) {
-                    return true
+                var url: String = request.url.toString()
+                if (url.startsWith(baseUri)) {
+                    return false
                 }
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(intent)
                 return true
             }
         }
@@ -278,6 +275,7 @@ class VerloopFragment : Fragment() {
             uriBuilder.appendQueryParameter("device_type", "android")
         }
         val uri = uriBuilder.build()
+        baseUri = "${uri.scheme}://${uri.authority}${uri.path}"
         Log.d(TAG, uri.toString())
         onLoadStart()
         mWebView.loadUrl(uri.toString())
@@ -422,6 +420,14 @@ class VerloopFragment : Fragment() {
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onURLClick(json: String) {
+        if (config?.overrideUrlClick == false) {
+            val jsonObject = JSONObject(json)
+            val url = jsonObject.getString("url");
+            if (!url.isNullOrEmpty()) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(intent)
+            }
+        }
         logEvent(LogLevel.DEBUG, "onURLClick", JSONObject(json))
         viewModel?.urlClicked(json)
     }
