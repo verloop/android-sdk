@@ -58,7 +58,11 @@ class VerloopActivity : AppCompatActivity() {
                 BlendModeCompat.SRC_ATOP
             )
 
-        val config: VerloopConfig? = intent.getParcelableExtra("config")
+        val config = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("config", VerloopConfig::class.java)
+        } else {
+            @Suppress("DEPRECATION")  intent.getParcelableExtra("config")
+        }
         configKey = intent.getStringExtra("configKey")
         this.config = config
 
