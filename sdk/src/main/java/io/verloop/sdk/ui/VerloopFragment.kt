@@ -3,7 +3,6 @@ package io.verloop.sdk.ui
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -17,15 +16,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import io.verloop.sdk.Constants
 import io.verloop.sdk.R
 import io.verloop.sdk.VerloopConfig
 import io.verloop.sdk.api.VerloopAPI
 import io.verloop.sdk.api.VerloopServiceBuilder
+import io.verloop.sdk.model.LogEvent
+import io.verloop.sdk.model.LogLevel
 import io.verloop.sdk.repository.VerloopRepository
 import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
@@ -35,14 +40,20 @@ import java.util.*
 
 class VerloopFragment : Fragment() {
 
-    private var mWebView: WebView? = null
-    private var progressBar: ProgressBar? = null
-    private var config: VerloopConfig? = null
-    private var configKey: String? = null
+    private lateinit var baseUri: String
+    private lateinit var mWebView: WebView
+    private lateinit var progressBar: ProgressBar
+    private lateinit var layoutReload: LinearLayout
+    private lateinit var buttonReload: Button
+
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
     private var uploadMsg: ValueCallback<Uri?>? = null
     private var resultLauncher: ActivityResultLauncher<Intent>? = null
+
     private var viewModel: MainViewModel? = null
+    private var configKey: String? = null
+    private var config: VerloopConfig? = null
+    private var loading: Boolean = false
 
     companion object {
         private const val TAG = "VerloopFragment"
@@ -106,96 +117,102 @@ class VerloopFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_verloop, container, false);
+        return inflater.inflate(R.layout.fragment_verloop, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        progressBar = view?.findViewById(R.id.progressBar)
-        mWebView = view?.findViewById(R.id.webView)
+        progressBar = view.findViewById(R.id.progressBar)
+        mWebView = view.findViewById(R.id.webView)
+        layoutReload = view.findViewById(R.id.layoutReload)
+        buttonReload = view.findViewById(R.id.buttonReload)
+
+        buttonReload.setOnClickListener {
+            this.mWebView.removeAllViews()
+            initializeWebView()
+            loadChat()
+        }
+
         initializeWebView()
         loadChat()
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.d(TAG, "onAttach")
-        if (mWebView != null) {
-            mWebView?.settings?.mediaPlaybackRequiresUserGesture = false
-        }
-    }
-
-    override fun onDetach() {
-        Log.d(TAG, "onDetach")
-        mWebView?.settings?.mediaPlaybackRequiresUserGesture = true
-        super.onDetach()
-    }
-
-
     override fun onDestroyView() {
-        mWebView?.removeAllViews()
+        this.mWebView.removeAllViews()
         super.onDestroyView()
     }
 
     override fun onDestroy() {
-        mWebView?.destroy()
-        mWebView = null
+        this.mWebView.destroy()
         super.onDestroy()
     }
 
-    @SuppressLint("JavascriptInterface")
+    @SuppressLint("JavascriptInterface", "SetJavaScriptEnabled")
     fun initializeWebView() {
-        Log.d(TAG, "initializeWebView")
-        mWebView?.webViewClient = object : WebViewClient() {
+        logEvent(LogLevel.INFO, "Configuring Chat", null)
+        mWebView.webViewClient = object : WebViewClient() {
 
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onReceivedHttpError(
                 view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?
             ) {
                 super.onReceivedHttpError(view, request, errorResponse)
-                Log.d(TAG, errorResponse.toString())
+                errorResponse?.reasonPhrase?.let {
+                    logEvent(LogLevel.WARNING, it, null)
+                }
             }
 
             override fun onReceivedSslError(
                 view: WebView?, handler: SslErrorHandler?, error: SslError?
             ) {
                 super.onReceivedSslError(view, handler, error)
-                Log.d(TAG, error.toString())
+                error?.let {
+                    logEvent(LogLevel.ERROR, it.toString(), null)
+                }
             }
 
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                Log.d(TAG, "onPageStarted")
-                progressBar?.visibility = View.VISIBLE
-                super.onPageStarted(view, url, favicon)
-            }
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                Log.d(TAG, "onPageFinished")
-                progressBar?.visibility = View.GONE
-                super.onPageFinished(view, url)
-            }
-
+            @Deprecated("Deprecated in Java")
             override fun onReceivedError(
                 view: WebView?, errorCode: Int, description: String?, failingUrl: String?
             ) {
-                super.onReceivedError(view, errorCode, description, failingUrl)
-                Log.e(TAG, description.toString())
+                @Suppress("DEPRECATION")
+                super.onReceivedError(
+                    view,
+                    errorCode,
+                    description,
+                    failingUrl
+                )
+                description?.let {
+                    logEvent(LogLevel.ERROR, it, null)
+                }
             }
 
+            @RequiresApi(Build.VERSION_CODES.M)
             override fun onReceivedError(
                 view: WebView?, request: WebResourceRequest?, error: WebResourceError?
             ) {
                 super.onReceivedError(view, request, error)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    Log.e(TAG, error?.description.toString())
+                error?.description?.let {
+                    logEvent(LogLevel.WARNING, it.toString(), null)
                 }
             }
 
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                val params = JSONObject().put("url", url)
+                logEvent(LogLevel.INFO, "Page Started", params)
+            }
+
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                logEvent(LogLevel.INFO, "Page Finished", null)
+            }
+
+            @Deprecated("Deprecated in Java")
             override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                if (config?.overrideUrlClick == true) {
-                    return true
+                if (url.startsWith(baseUri)) {
+                    return false
                 }
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                startActivity(intent)
                 return true
             }
 
@@ -203,35 +220,19 @@ class VerloopFragment : Fragment() {
             override fun shouldOverrideUrlLoading(
                 view: WebView?, request: WebResourceRequest
             ): Boolean {
-                val uri = request.url
-                if (config?.overrideUrlClick == true) {
-                    return true
+                var url: String = request.url.toString()
+                if (url.startsWith(baseUri)) {
+                    return false
                 }
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                startActivity(intent)
                 return true
             }
         }
 
-        mWebView?.webChromeClient = object : WebChromeClient() {
+        mWebView.webChromeClient = object : WebChromeClient() {
 
             override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                logEvent(LogLevel.DEBUG, consoleMessage?.message().toString(), null)
                 return super.onConsoleMessage(consoleMessage)
-                Log.d(TAG, consoleMessage.toString())
-            }
-
-            //Handling input[type="file"] requests for android API 16+
-            fun openFileChooser(
-                uploadMsg: ValueCallback<Uri?>, acceptType: String?, capture: String?
-            ) {
-                Log.d(TAG, "openFileChooser")
-                this@VerloopFragment.uploadMsg = uploadMsg
-                val i = Intent(Intent.ACTION_GET_CONTENT)
-                i.addCategory(Intent.CATEGORY_OPENABLE)
-                i.type = "video/*"
-                activity?.startActivityForResult(
-                    Intent.createChooser(i, "Choose a file"), ICE_CREAM
-                )
             }
 
             //Handling input[type="file"] requests for android API 21+
@@ -246,23 +247,23 @@ class VerloopFragment : Fragment() {
                 return true
             }
         }
-        val settings = mWebView?.settings
+
+        val settings: WebSettings = mWebView.settings
         if (activity?.applicationContext?.cacheDir != null) {
-            settings?.allowFileAccess = true
+            settings.allowFileAccess = true
         }
-        settings?.javaScriptEnabled = true
-        Log.d(TAG, "Adding JavascriptInterface")
-        mWebView!!.addJavascriptInterface(this, "VerloopMobile")
-        mWebView!!.addJavascriptInterface(this, "VerloopMobileV2")
-        settings?.domStorageEnabled = true
-        settings?.allowFileAccessFromFileURLs = true
-        settings?.allowUniversalAccessFromFileURLs = true
-        settings?.cacheMode = WebSettings.LOAD_NO_CACHE
+        settings.javaScriptEnabled = true
+        mWebView.addJavascriptInterface(this, "VerloopMobile")
+        mWebView.addJavascriptInterface(this, "VerloopMobileV2")
+        settings.domStorageEnabled = true
+        @Suppress("DEPRECATION") settings.allowFileAccessFromFileURLs = true
+        @Suppress("DEPRECATION") settings.allowUniversalAccessFromFileURLs = true
+        settings.cacheMode = WebSettings.LOAD_NO_CACHE
+        settings.mediaPlaybackRequiresUserGesture = false
     }
 
     private fun loadChat() {
         // Make sure the URL is built using a library.
-        Log.d(TAG, "loadChat")
         val uriBuilder = Uri.Builder()
         uriBuilder.scheme("https")
         uriBuilder.authority(config?.clientId + ".verloop.io")
@@ -274,12 +275,48 @@ class VerloopFragment : Fragment() {
             uriBuilder.appendQueryParameter("device_type", "android")
         }
         val uri = uriBuilder.build()
+        baseUri = "${uri.scheme}://${uri.authority}${uri.path}"
         Log.d(TAG, uri.toString())
-        mWebView?.loadUrl(uri.toString())
+        onLoadStart()
+        mWebView.loadUrl(uri.toString())
+    }
+
+    private fun onLoadStart() {
+        logEvent(LogLevel.INFO, "Load Chat Started", null)
+        loading = true
+        progressBar.visibility = View.VISIBLE
+        mWebView.visibility = View.INVISIBLE
+        layoutReload.visibility = View.GONE
+        setTimeoutListener()
+    }
+
+    private fun onLoadSuccess() {
+        logEvent(LogLevel.INFO, "Load Chat Successful", null)
+        loading = false
+        progressBar.visibility = View.GONE
+        mWebView.visibility = View.VISIBLE
+        layoutReload.visibility = View.GONE
+    }
+
+    private fun onLoadError() {
+        logEvent(LogLevel.ERROR, "Load Chat Failed", null)
+        loading = false
+        progressBar.visibility = View.GONE
+        mWebView.visibility = View.INVISIBLE
+        layoutReload.visibility = View.VISIBLE
+    }
+
+    private fun setTimeoutListener() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            if (loading) {
+                onLoadError()
+                logEvent(LogLevel.ERROR, "Timeout. Failed to load chat. Please try again", null)
+            }
+        }, 10000)
     }
 
     private fun startRoom() {
-        Log.d(TAG, "startRoom")
+        logEvent(LogLevel.INFO, "Starting room", null)
         config?.let { it ->
             val userParamsObject = JSONObject()
             if (!it.userEmail.isNullOrEmpty()) userParamsObject.put("email", it.userEmail)
@@ -287,15 +324,29 @@ class VerloopFragment : Fragment() {
             if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
 
             if (userParamsObject.length() > 0) {
+                logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_USER_PARAMS, userParamsObject)
                 callJavaScript("VerloopLivechat.setUserParams(${userParamsObject});")
             }
             if (!it.userId.isNullOrEmpty()) {
+                logEvent(
+                    LogLevel.DEBUG,
+                    Constants.JS_CALL_SET_USER_ID,
+                    JSONObject().put("userId", it.userId)
+                )
                 callJavaScript("VerloopLivechat.setUserId(\"${it.userId}\");")
             }
             if (!it.department.isNullOrEmpty()) {
+                logEvent(
+                    LogLevel.DEBUG, Constants.JS_CALL_SET_DEPARTMENT,
+                    JSONObject().put("department", it.department)
+                )
                 callJavaScript("VerloopLivechat.setDepartment(\"${it.department}\");")
             }
             if (!it.recipeId.isNullOrEmpty()) {
+                logEvent(
+                    LogLevel.DEBUG, Constants.JS_CALL_SET_RECIPE,
+                    JSONObject().put("recipeId", it.recipeId)
+                )
                 callJavaScript("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
             }
 
@@ -306,16 +357,25 @@ class VerloopFragment : Fragment() {
                     if (field.scope !== null) {
                         scopeObject.put("scope", field.scope!!.name.lowercase(Locale.getDefault()))
                     }
+                    val params = JSONObject()
+                    params.put("key", field.key)
+                    params.put("value", field.value)
+                    params.put("scope", field.scope)
+                    logEvent(
+                        LogLevel.DEBUG,
+                        Constants.JS_CALL_SET_CUSTOM_FIELD,
+                        params
+                    )
                     callJavaScript("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
                 }
             }
         }
+        logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_WIDGET_OPENED, null)
         callJavaScript("VerloopLivechat.widgetOpened();")
     }
 
     private fun callJavaScript(script: String) {
-        Log.d(TAG, "javascript: $script")
-        mWebView?.evaluateJavascript(script, null)
+        mWebView.evaluateJavascript(script, null)
     }
 
     fun openFileSelector() {
@@ -326,8 +386,6 @@ class VerloopFragment : Fragment() {
     }
 
     fun fileUploadResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.d(TAG, "Request Code: $requestCode")
-        Log.d(TAG, "Result Code:  $resultCode")
         when (requestCode) {
             ICE_CREAM -> {
                 var uri: Uri? = null
@@ -355,21 +413,29 @@ class VerloopFragment : Fragment() {
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onButtonClick(json: String) {
-        Log.d(TAG, " onButtonClick $json")
+        logEvent(LogLevel.DEBUG, "onButtonClick", JSONObject(json))
         viewModel?.buttonClicked(json)
     }
 
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onURLClick(json: String) {
-        Log.d(TAG, "onURLClick: $json")
+        if (config?.overrideUrlClick == false) {
+            val jsonObject = JSONObject(json)
+            val url = jsonObject.getString("url");
+            if (!url.isNullOrEmpty()) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                startActivity(intent)
+            }
+        }
+        logEvent(LogLevel.DEBUG, "onURLClick", JSONObject(json))
         viewModel?.urlClicked(json)
     }
 
     @JavascriptInterface
     @Throws(JSONException::class)
     fun livechatEvent(json: String) {
-        Log.d(TAG, "livechatEvent: $json")
+        logEvent(LogLevel.DEBUG, "livechatEvent", JSONObject(json))
         val params = JSONObject(json)
         if (params.getString("fn").equals("ready")) {
             ready()
@@ -379,16 +445,26 @@ class VerloopFragment : Fragment() {
     }
 
     private fun ready() {
+        logEvent(LogLevel.INFO, "Ready", null)
         Handler(Looper.getMainLooper()).post {
             startRoom()
         }
     }
 
     private fun roomReady() {
+        logEvent(LogLevel.INFO, "Room Ready", null)
         Handler(Looper.getMainLooper()).post {
+            onLoadSuccess()
             if (config?.closeExistingChat == true) {
+                logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_CLOSE, null)
                 callJavaScript("VerloopLivechat.close();")
             }
+        }
+    }
+
+    private fun logEvent(level: LogLevel, message: String, params: JSONObject?) {
+        if (config?.logLevel?.ordinal!! >= level.ordinal) {
+            viewModel?.logEvent(LogEvent(level.name, message, params))
         }
     }
 }

@@ -4,21 +4,15 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.util.Log
-import android.view.View
-import android.webkit.JavascriptInterface
-import android.webkit.WebSettings
-import android.webkit.WebView
 import androidx.work.*
+import io.verloop.sdk.model.LogEvent
 import io.verloop.sdk.model.LogoutRequestBody
 import io.verloop.sdk.service.LogoutWorker
 import io.verloop.sdk.ui.VerloopActivity
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
@@ -118,7 +112,6 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             private const val TAG = "VerloopInterface"
         }
 
-        @JavascriptInterface
         @Throws(JSONException::class)
         fun onButtonClick(json: String) {
             Log.d(TAG, " onButtonClick $json")
@@ -129,13 +122,16 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             config.buttonOnClickListener?.buttonClicked(title, type, payload);
         }
 
-        @JavascriptInterface
         @Throws(JSONException::class)
         fun onURLClick(json: String) {
             Log.d(TAG, " onURLClick $json")
             val jsonObject = JSONObject(json)
             val url = jsonObject.getString("url")
             config.chatUrlClickListener?.urlClicked(url)
+        }
+
+        fun onLogEvent(logEvent: LogEvent) {
+            config.logEventListener?.logEvent(logEvent)
         }
     }
 }
