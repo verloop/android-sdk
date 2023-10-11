@@ -313,36 +313,38 @@
                     android:textSize="14sp"
                     tools:ignore="RtlCompat" />
 
-                <TableRow android:layout_marginTop="8dp">
-
-                    <CheckBox
-                        android:id="@+id/checkBoxFCM"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3"
-                        android:text="FCM Token" />
-
-                    <CheckBox
-                        android:id="@+id/checkOverrideUrlClick"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="4"
-                        android:text="Override Url Click" />
-
-                </TableRow>
-
-                <TableRow android:layout_marginTop="8dp">
-
-                    <CheckBox
-                        android:id="@+id/checkCloseExistingChat"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="4"
-                        android:text="Close Existing Chat" />
-                </TableRow>
-
-                <TableRow android:layout_marginTop="8dp"></TableRow>
             </TableLayout>
+
+            <LinearLayout android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="8dp">
+
+                <CheckBox
+                    android:id="@+id/checkBoxFCM"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="FCM token" />
+
+                <CheckBox
+                    android:id="@+id/checkOverrideUrlClick"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Override url click" />
+
+                <CheckBox
+                    android:id="@+id/checkCloseExistingChat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Close existing chat" />
+
+                <CheckBox
+                    android:id="@+id/openMenuWidgetOnStart"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Open menu widget on start" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
