@@ -17,7 +17,8 @@ data class VerloopConfig private constructor(
     var isStaging: Boolean = false,
     var closeExistingChat: Boolean = false,
     var overrideUrlClick: Boolean = false,
-    var fields: ArrayList<CustomField> = ArrayList()
+    var openMenuWidgetOnStart: Boolean = false,
+var fields: ArrayList<CustomField> = ArrayList()
 ) : Parcelable {
 
     var logLevel: LogLevel = LogLevel.WARNING
@@ -41,6 +42,7 @@ data class VerloopConfig private constructor(
         false,
         false,
         false,
+        false,
         ArrayList()
     )
 
@@ -61,6 +63,7 @@ data class VerloopConfig private constructor(
         this.isStaging = source.readInt() == 1
         this.closeExistingChat = source.readInt() == 1
         this.overrideUrlClick = source.readInt() == 1
+        this.openMenuWidgetOnStart = source.readInt() == 1
         this.fields =
             source.readArrayList(CustomField::class.java.classLoader) as ArrayList<CustomField>
     }
@@ -122,6 +125,7 @@ data class VerloopConfig private constructor(
         dest.writeByte((if (this.isStaging) 1 else 0).toByte())
         dest.writeByte((if (this.closeExistingChat) 1 else 0).toByte())
         dest.writeByte((if (this.overrideUrlClick) 1 else 0).toByte())
+        dest.writeByte((if (this.openMenuWidgetOnStart) 1 else 0).toByte())
         dest.writeList(this.fields)
     }
 
@@ -181,6 +185,7 @@ data class VerloopConfig private constructor(
         var isStaging: Boolean = false,
         var closeExistingChat: Boolean = false,
         var overrideUrlClick: Boolean = false,
+        var openMenuWidgetOnStart: Boolean = false,
         var fields: ArrayList<CustomField> = ArrayList()
     ) {
         fun clientId(clientId: String?) = apply { this.clientId = clientId }
@@ -205,6 +210,9 @@ data class VerloopConfig private constructor(
         fun overrideUrlClick(overrideUrlClick: Boolean) =
             apply { this.overrideUrlClick = overrideUrlClick }
 
+        fun openMenuWidgetOnStart(openMenuWidgetOnStart: Boolean) =
+            apply { this.openMenuWidgetOnStart = openMenuWidgetOnStart }
+
         fun fields(fields: ArrayList<CustomField>) = apply { this.fields = fields }
 
         @Throws(VerloopException::class)
@@ -222,6 +230,7 @@ data class VerloopConfig private constructor(
                 isStaging,
                 closeExistingChat,
                 overrideUrlClick,
+                openMenuWidgetOnStart,
                 fields
             )
         }

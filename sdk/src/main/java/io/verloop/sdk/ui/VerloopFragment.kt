@@ -370,7 +370,7 @@ class VerloopFragment : Fragment() {
                 }
             }
         }
-        logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_WIDGET_OPENED, null)
+        logEvent(LogLevel.DEBUG, Constants.JS_CALL_WIDGET_OPENED, null)
         callJavaScript("VerloopLivechat.widgetOpened();")
     }
 
@@ -456,8 +456,13 @@ class VerloopFragment : Fragment() {
         Handler(Looper.getMainLooper()).post {
             onLoadSuccess()
             if (config?.closeExistingChat == true) {
-                logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_CLOSE, null)
+                logEvent(LogLevel.DEBUG, Constants.JS_CALL_CLOSE, null)
                 callJavaScript("VerloopLivechat.close();")
+            }
+
+            if (config?.openMenuWidgetOnStart == true) {
+                logEvent(LogLevel.DEBUG, Constants.JS_CALL_OPEN_MENU_WIDGET, null)
+                callJavaScript("VerloopLivechat.openMenuWidget();")
             }
         }
     }

@@ -62,6 +62,7 @@ class TestActivity : AppCompatActivity() {
         val checkBoxRegisterFCMToken = findViewById<CheckBox>(R.id.checkBoxFCM)
         val checkOverrideUrlClick = findViewById<CheckBox>(R.id.checkOverrideUrlClick)
         val checkCloseExistingChat = findViewById<CheckBox>(R.id.checkCloseExistingChat)
+        val openMenuWidgetOnStart = findViewById<CheckBox>(R.id.openMenuWidgetOnStart)
 
         val btnAdd = findViewById<Button>(R.id.buttonAdd)
         val containerCustomFields = findViewById<LinearLayout>(R.id.containerCustomFields)
@@ -124,6 +125,7 @@ class TestActivity : AppCompatActivity() {
                         .department(department1.text?.toString())
                         .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken?.trim() else null)
                         .closeExistingChat(checkCloseExistingChat.isChecked)
+                        .openMenuWidgetOnStart(openMenuWidgetOnStart.isChecked)
                         .fields(customFields).build()
 
                 verloopConfig?.setLogEventListener(object : LiveLogEventListener {
