@@ -11,13 +11,13 @@ import io.verloop.sdk.repository.VerloopRepository
 
 class MainViewModel(var configKey: String?, var repository: VerloopRepository) : ViewModel() {
 
-    private var details: MutableLiveData<ClientInfo>? = null
+    private var details: MutableLiveData<ClientInfo?>? = null
 
     companion object {
         const val TAG = "MainViewModel"
     }
 
-    fun getClientInfo(): LiveData<ClientInfo>? {
+    fun getClientInfo(): LiveData<ClientInfo?>? {
         details = repository.getClientInfo()
         return details
     }

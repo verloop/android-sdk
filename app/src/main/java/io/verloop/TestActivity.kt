@@ -9,8 +9,11 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.messaging.FirebaseMessaging
 import io.verloop.sdk.*
+import io.verloop.sdk.enum.Position
+import io.verloop.sdk.model.HeaderConfig
 import io.verloop.sdk.model.LogEvent
 import io.verloop.sdk.model.LogLevel
+import io.verloop.sdk.utils.NetworkUtils
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -90,10 +93,12 @@ class TestActivity : AppCompatActivity() {
             allCustomScopes.add(field.findViewById(R.id.checkBoxRoom))
         }
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener {
-            if (it.isComplete) {
-                fcmToken = it.result.toString()
-                fcmToken?.let { it1 -> Log.i("FCM Token", it1) }
+        if (NetworkUtils.isNetworkAvailable(applicationContext)) {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener {
+                if (it.isComplete) {
+                    fcmToken = it.result.toString()
+                    fcmToken?.let { it1 -> Log.i("FCM Token", it1) }
+                }
             }
         }
 
@@ -114,6 +119,20 @@ class TestActivity : AppCompatActivity() {
                     )
                 }
 
+                // Use either header config or overrideHeaderLayout
+                val headerConfig: HeaderConfig = HeaderConfig.Builder()
+                    .brandLogo("https://cdn.dev.verloop.io/hello/ecb5f2cf-c04a-4fbe-8139-42ddf2be625a/4i5Fgko3LwhSyC75Q/face-with-symbols-on-mouth-png")
+                    .title("Verloop Local")
+                    .titleColor("#FFFFFF")
+                    .titlePosition(Position.LEFT)
+                    .titleFontSize(18.0f)
+                    .subtitle("India's Best Chatbot Platform Local")
+                    .subtitleColor("#FFFFFF")
+                    .subtitlePosition(Position.LEFT)
+                    .subtitleFontSize(12.0f)
+                    .backgroundColor("#d451db")
+                    .build()
+
                 verloopConfig =
                     VerloopConfig.Builder()
                         .clientId(clientId1.text?.trim().toString())
@@ -126,11 +145,13 @@ class TestActivity : AppCompatActivity() {
                         .fcmToken(if (checkBoxRegisterFCMToken.isChecked) fcmToken?.trim() else null)
                         .closeExistingChat(checkCloseExistingChat.isChecked)
                         .openMenuWidgetOnStart(openMenuWidgetOnStart.isChecked)
+                        .overrideHeaderLayout(false)
+                        .headerConfig(headerConfig)
                         .fields(customFields).build()
 
                 verloopConfig?.setLogEventListener(object : LiveLogEventListener {
                     override fun logEvent(event: LogEvent) {
-                        Log.i("Log Event", event.toString() )
+                        Log.i("Log Event", event.toString())
                     }
                 }, LogLevel.DEBUG)
 

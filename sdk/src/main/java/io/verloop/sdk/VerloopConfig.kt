@@ -1,7 +1,9 @@
 package io.verloop.sdk
 
+import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
+import io.verloop.sdk.model.HeaderConfig
 import io.verloop.sdk.model.LogLevel
 import java.util.*
 
@@ -17,8 +19,10 @@ data class VerloopConfig private constructor(
     var isStaging: Boolean = false,
     var closeExistingChat: Boolean = false,
     var overrideUrlClick: Boolean = false,
+    var overrideHeaderLayout: Boolean = false,
     var openMenuWidgetOnStart: Boolean = false,
-var fields: ArrayList<CustomField> = ArrayList()
+    var headerConfig: HeaderConfig? = null,
+    var fields: ArrayList<CustomField> = ArrayList()
 ) : Parcelable {
 
     var logLevel: LogLevel = LogLevel.WARNING
@@ -43,6 +47,8 @@ var fields: ArrayList<CustomField> = ArrayList()
         false,
         false,
         false,
+        false,
+        null,
         ArrayList()
     )
 
@@ -51,6 +57,7 @@ var fields: ArrayList<CustomField> = ArrayList()
         this.userId = userId
     }
 
+    @Suppress("DEPRECATION")
     constructor(source: Parcel) : this(source.readString().toString()) {
         this.userId = source.readString()
         this.fcmToken = source.readString()
@@ -63,9 +70,23 @@ var fields: ArrayList<CustomField> = ArrayList()
         this.isStaging = source.readInt() == 1
         this.closeExistingChat = source.readInt() == 1
         this.overrideUrlClick = source.readInt() == 1
+        this.overrideHeaderLayout = source.readInt() == 1
         this.openMenuWidgetOnStart = source.readInt() == 1
-        this.fields =
-            source.readArrayList(CustomField::class.java.classLoader) as ArrayList<CustomField>
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            this.headerConfig = source.readParcelable(
+                HeaderConfig::class.java.classLoader,
+                HeaderConfig::class.java
+            )
+            this.fields =
+                source.readArrayList(
+                    CustomField::class.java.classLoader,
+                    CustomField::class.java
+                ) as ArrayList<CustomField>
+        } else {
+            this.headerConfig = source.readParcelable(HeaderConfig::class.java.classLoader)
+            this.fields =
+                source.readArrayList(CustomField::class.java.classLoader) as ArrayList<CustomField>
+        }
     }
 
     fun putCustomField(key: String, value: String, scope: Scope) {
@@ -125,7 +146,9 @@ var fields: ArrayList<CustomField> = ArrayList()
         dest.writeByte((if (this.isStaging) 1 else 0).toByte())
         dest.writeByte((if (this.closeExistingChat) 1 else 0).toByte())
         dest.writeByte((if (this.overrideUrlClick) 1 else 0).toByte())
+        dest.writeByte((if (this.overrideHeaderLayout) 1 else 0).toByte())
         dest.writeByte((if (this.openMenuWidgetOnStart) 1 else 0).toByte())
+        dest.writeParcelable(this.headerConfig, flags)
         dest.writeList(this.fields)
     }
 
@@ -185,7 +208,9 @@ var fields: ArrayList<CustomField> = ArrayList()
         var isStaging: Boolean = false,
         var closeExistingChat: Boolean = false,
         var overrideUrlClick: Boolean = false,
+        var overrideHeaderLayout: Boolean = false,
         var openMenuWidgetOnStart: Boolean = false,
+        var headerConfig: HeaderConfig? = null,
         var fields: ArrayList<CustomField> = ArrayList()
     ) {
         fun clientId(clientId: String?) = apply { this.clientId = clientId }
@@ -210,8 +235,23 @@ var fields: ArrayList<CustomField> = ArrayList()
         fun overrideUrlClick(overrideUrlClick: Boolean) =
             apply { this.overrideUrlClick = overrideUrlClick }
 
+        /**
+         * Override the toolbar configuration received from server with toolbar_verloop.xml defined in main app.
+         * Can't use along with headerConfig. Either use headerConfig or overrideHeaderLayout
+         * @param overrideHeaderLayout
+         */
+        fun overrideHeaderLayout(overrideHeaderLayout: Boolean) =
+            apply { this.overrideHeaderLayout = overrideHeaderLayout }
+
         fun openMenuWidgetOnStart(openMenuWidgetOnStart: Boolean) =
             apply { this.openMenuWidgetOnStart = openMenuWidgetOnStart }
+
+        /**
+         * Override the toolbar configuration received from server with provided header configuration.
+         * Can't use along with overrideHeaderLayout. Either use overrideHeaderLayout or headerConfig
+         * @param headerConfig
+         */
+        fun headerConfig(headerConfig: HeaderConfig?) = apply { this.headerConfig = headerConfig }
 
         fun fields(fields: ArrayList<CustomField>) = apply { this.fields = fields }
 
@@ -230,7 +270,9 @@ var fields: ArrayList<CustomField> = ArrayList()
                 isStaging,
                 closeExistingChat,
                 overrideUrlClick,
+                overrideHeaderLayout,
                 openMenuWidgetOnStart,
+                headerConfig,
                 fields
             )
         }

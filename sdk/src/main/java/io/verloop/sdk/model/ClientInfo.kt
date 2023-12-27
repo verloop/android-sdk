@@ -6,5 +6,6 @@ import androidx.annotation.Keep
 data class ClientInfo(
     var title: String?,
     var textColor: String?,
-    var bgColor: String?
+    var bgColor: String?,
+    var livechatSettings: LivechatSettings?
 )
