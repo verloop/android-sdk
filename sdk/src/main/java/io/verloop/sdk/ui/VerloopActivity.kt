@@ -152,9 +152,8 @@ class VerloopActivity : AppCompatActivity() {
     private fun updateClientInfo(clientInfo: ClientInfo) {
         Log.d(TAG, "updateClientInfo:  + ${clientInfo?.toString()}")
         logEvent(LogLevel.DEBUG, "$TAG:updateClientInfo", null)
-        if (clientInfo.livechatSettings != null) {
-            val settings = clientInfo.livechatSettings;
-
+        if (clientInfo?.livechatSettings?.Header != null) {
+            val settings = clientInfo.livechatSettings
             val headerConfig: HeaderConfig = HeaderConfig.Builder()
                 .brandLogo(settings?.Header?.BrandLogo?.URL.toString())
                 .title(settings?.Header?.Title?.Heading.toString())
@@ -284,20 +283,19 @@ class VerloopActivity : AppCompatActivity() {
 
             headerConfig.titlePosition?.let {
                 tvTitle?.gravity = getGravity(it)
-                if (it == Position.CENTER) {
-                    tvTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig)
-                }
+                tvTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
             }
             headerConfig.subtitlePosition?.let {
                 tvSubTitle?.gravity = getGravity(it)
-                if (it == Position.CENTER) {
-                    tvSubTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig)
-                }
+                tvSubTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
             }
         }
     }
 
-    private fun getLayoutParamsForCenterAlignment(headerConfig: HeaderConfig): LinearLayout.LayoutParams {
+    private fun getLayoutParamsForCenterAlignment(
+        brandLogo: String?,
+        position: Position
+    ): LinearLayout.LayoutParams {
         val layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -305,10 +303,14 @@ class VerloopActivity : AppCompatActivity() {
         layoutParams.setMargins(
             0,
             0,
-            CommonUtils.pxFromDp(
-                applicationContext,
-                if (!headerConfig.brandLogo.isNullOrEmpty()) 72 else 36
-            ).toInt(),
+            if (position == Position.CENTER) {
+                CommonUtils.pxFromDp(
+                    applicationContext,
+                    if (!brandLogo.isNullOrEmpty()) 72 else 36
+                ).toInt()
+            } else {
+                0
+            },
             0
         )
         return layoutParams

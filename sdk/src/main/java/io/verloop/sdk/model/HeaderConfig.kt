@@ -1,19 +1,21 @@
 package io.verloop.sdk.model
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import io.verloop.sdk.enum.Position
 import kotlinx.android.parcel.Parcelize
 
+@Keep
 @Parcelize
 class HeaderConfig(
     var brandLogo: String? = null,
     var title: String? = null,
     var titleColor: String? = null,
-    var titlePosition: Position? = null,
+    var titlePosition: Position? = Position.UNDEFINED,
     var titleFontSize: Float? = 12.0f,
     var subtitle: String? = null,
     var subtitleColor: String? = null,
-    var subtitlePosition: Position? = null,
+    var subtitlePosition: Position? = Position.UNDEFINED,
     var subtitleFontSize: Float? = 10.0f,
     var backgroundColor: String? = null,
 ) : Parcelable {
@@ -21,11 +23,11 @@ class HeaderConfig(
         var brandLogo: String? = null,
         var title: String? = null,
         var titleColor: String? = null,
-        var titlePosition: Position? = null,
+        var titlePosition: Position? = Position.UNDEFINED,
         var titleFontSize: Float? = null,
         var subtitle: String? = null,
         var subtitleColor: String? = null,
-        var subtitlePosition: Position? = null,
+        var subtitlePosition: Position? = Position.UNDEFINED,
         var subtitleFontSize: Float? = null,
         var backgroundColor: String? = null,
     ) {
@@ -60,11 +62,11 @@ class HeaderConfig(
             if (this.brandLogo.isNullOrEmpty()) this.brandLogo = headerConfig.brandLogo
             if (this.title.isNullOrEmpty()) this.title = headerConfig.title
             if (this.titleColor.isNullOrEmpty()) this.titleColor = headerConfig.titleColor
-            if (this.titlePosition == null) this.titlePosition = headerConfig.titlePosition
+            if (this.titlePosition == Position.UNDEFINED) this.titlePosition = headerConfig.titlePosition
             if (this.titleFontSize == null) this.titleFontSize = headerConfig.titleFontSize
             if (this.subtitle.isNullOrEmpty()) this.subtitle = headerConfig.subtitle
             if (this.subtitleColor.isNullOrEmpty()) this.subtitleColor = headerConfig.subtitleColor
-            if (this.subtitlePosition == null) this.subtitlePosition = headerConfig.subtitlePosition
+            if (this.subtitlePosition == Position.UNDEFINED) this.subtitlePosition = headerConfig.subtitlePosition
             if (this.subtitleFontSize == null) this.subtitleFontSize = headerConfig.subtitleFontSize
             if (this.backgroundColor.isNullOrEmpty()) this.backgroundColor =
                 headerConfig.backgroundColor
