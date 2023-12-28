@@ -1,39 +1,124 @@
 {
   "project_info": {
-    "project_number": "375186201110",
-    "firebase_url": "https://verloop-sdk.firebaseio.com",
-    "project_id": "verloop-sdk",
-    "storage_bucket": "verloop-sdk.appspot.com"
+    "project_number": "664631556871",
+    "firebase_url": "https://fcmtest-c6b1c.firebaseio.com",
+    "project_id": "fcmtest-c6b1c",
+    "storage_bucket": "fcmtest-c6b1c.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:375186201110:android:30ad788fb5565fdc",
+        "mobilesdk_app_id": "1:664631556871:android:989a111862a67c8b9ca3a2",
+        "android_client_info": {
+          "package_name": "com.example.fcm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxjr4mShNp1lpyV1LLviSn90RdMz9YqlA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664631556871:android:3c4682e896404bbc9ca3a2",
+        "android_client_info": {
+          "package_name": "com.example.fcmtest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxjr4mShNp1lpyV1LLviSn90RdMz9YqlA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664631556871:android:2186a35b70e9d0d19ca3a2",
         "android_client_info": {
           "package_name": "io.verloop.demo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "375186201110-u9g1c3hsgnrf27pm7af61vo1ar089tb1.apps.googleusercontent.com",
+          "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAnVB2rHeybVYm8YQboWJb86g0z5oAVfB4"
+          "current_key": "AIzaSyBxjr4mShNp1lpyV1LLviSn90RdMz9YqlA"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664631556871:android:a3c01f81e862e8f79ca3a2",
+        "android_client_info": {
+          "package_name": "io.verloop.verloop_flutter_sdk_example"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxjr4mShNp1lpyV1LLviSn90RdMz9YqlA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664631556871-qtjhm337lv6nu8iore3l66pgs57bqvvc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
