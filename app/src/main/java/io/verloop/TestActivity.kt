@@ -23,26 +23,10 @@ class TestActivity : AppCompatActivity() {
 
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
-    var headerConfig: HeaderConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
-
-        // Use either header config or overrideHeaderLayout
-        headerConfig = HeaderConfig.Builder()
-            .brandLogo("https://cdn.dev.verloop.io/hello/ecb5f2cf-c04a-4fbe-8139-42ddf2be625a/4i5Fgko3LwhSyC75Q/face-with-symbols-on-mouth-png")
-            .title("Verloop Local")
-            .titleColor("#FFFFFF")
-            .titlePosition(Position.LEFT)
-            .titleFontSize(18.0f)
-            .subtitle("India's Best Chatbot Platform Local")
-            .subtitleColor("#FFFFFF")
-            .subtitlePosition(Position.LEFT)
-            .subtitleFontSize(12.0f)
-            .backgroundColor("#d451db")
-            .build()
-
         if (intent != null) onNewIntent(intent)
 
         var verloopConfig: VerloopConfig? = null
@@ -134,6 +118,20 @@ class TestActivity : AppCompatActivity() {
                         )
                     )
                 }
+
+                // Use either header config or overrideHeaderLayout
+                val headerConfig: HeaderConfig = HeaderConfig.Builder()
+                    .brandLogo("https://cdn.dev.verloop.io/hello/ecb5f2cf-c04a-4fbe-8139-42ddf2be625a/4i5Fgko3LwhSyC75Q/face-with-symbols-on-mouth-png")
+                    .title("Verloop Local")
+                    .titleColor("#FFFFFF")
+                    .titlePosition(Position.LEFT)
+                    .titleFontSize(18.0f)
+                    .subtitle("India's Best Chatbot Platform Local")
+                    .subtitleColor("#FFFFFF")
+                    .subtitlePosition(Position.LEFT)
+                    .subtitleFontSize(12.0f)
+                    .backgroundColor("#d451db")
+                    .build()
 
                 verloopConfig =
                     VerloopConfig.Builder()
@@ -234,14 +232,8 @@ class TestActivity : AppCompatActivity() {
                 val jsonObject = JSONObject(json)
                 if (jsonObject.has("client_id")) {
                     var clientId = jsonObject.getString("client_id")
-                    var userId = jsonObject.getString("user_id")
                     if (clientId != null) {
-                        var config = VerloopConfig.Builder()
-                            .clientId(clientId)
-                            .userId(userId)
-                            .headerConfig(headerConfig)
-                            .build()
-
+                        var config = VerloopConfig.Builder().clientId(clientId).build()
                         Verloop(this, config).showChat()
                     }
                 }
