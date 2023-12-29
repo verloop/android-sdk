@@ -19,8 +19,8 @@ class VerloopRepository(val context: Context, private val retrofit: Retrofit) {
     var sharedPreferences: SharedPreferences =
         context.getSharedPreferences("MySharedPref", MODE_PRIVATE)
 
-    fun getClientInfo(): MutableLiveData<ClientInfo> {
-        val details = MutableLiveData<ClientInfo>()
+    fun getClientInfo(): MutableLiveData<ClientInfo?> {
+        val details = MutableLiveData<ClientInfo?>()
 
         // If available return data stored in sharedPreferences first and then hit the API in background
         val clientInfoJson = sharedPreferences.getString("clientInfo", null)
@@ -36,13 +36,9 @@ class VerloopRepository(val context: Context, private val retrofit: Retrofit) {
         call.enqueue(object : Callback<ClientInfo> {
             override fun onResponse(call: Call<ClientInfo>, response: Response<ClientInfo>) {
                 val data = response.body()
-                if (data?.title != null && data.bgColor != null && data.textColor != null && data.bgColor != "") {
-                    val clientInfo = ClientInfo(data.title, data.textColor, data.bgColor);
-                    details.value = clientInfo
-
-                    val myEdit = sharedPreferences.edit()
-                    myEdit.putString("clientInfo", Gson().toJson(clientInfo))
-                    myEdit.apply()
+                if (data != null) {
+                    details.value = data
+                    sharedPreferences.edit().putString("clientInfo", Gson().toJson(data)).apply()
                 }
             }
 

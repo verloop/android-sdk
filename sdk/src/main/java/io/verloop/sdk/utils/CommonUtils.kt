@@ -1,5 +1,7 @@
 package io.verloop.sdk.utils
 
+import android.content.Context
+
 class CommonUtils {
 
     companion object {
@@ -18,6 +20,10 @@ class CommonUtils {
                 )
             }
             return mColor
+        }
+
+        fun pxFromDp(context: Context, dp: Int): Float {
+            return dp * context.resources.displayMetrics.density
         }
     }
 }
