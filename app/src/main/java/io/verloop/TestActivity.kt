@@ -16,7 +16,7 @@ import io.verloop.sdk.model.LogLevel
 import io.verloop.sdk.utils.NetworkUtils
 import org.json.JSONException
 import org.json.JSONObject
-
+import android.net.Uri
 class TestActivity : AppCompatActivity() {
 
     private val TAG: String = "TestActivity"
@@ -166,7 +166,28 @@ class TestActivity : AppCompatActivity() {
 //                        startActivity(i)
                     }
                 }, checkOverrideUrlClick.isChecked)
+                verloopConfig?.setButtonClickListener(object : LiveChatButtonClickListener {
+                    override fun buttonClicked(title: String?, type: String?, payload: String?) {
+                        if (type == "web_url"){
+                            try {
+                                val jsonPayload = JSONObject(payload)
+                                val url = jsonPayload.optString("url")
 
+                                if (!url.isNullOrEmpty()) {
+                                    val uri = Uri.parse(url)
+                                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                                    startActivity(intent)
+                                } else {
+                                    Log.e(TAG, "URL is empty or null")
+                                }
+                            } catch (e: JSONException) {
+                                Log.e(TAG, "Error parsing JSON payload", e)
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Error opening browser", e)
+                            }
+                        }
+                    }
+                })
                 verloop = Verloop(this, verloopConfig!!)
                 verloop?.showChat()
             } catch (e: VerloopException) {
