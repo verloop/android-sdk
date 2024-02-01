@@ -274,10 +274,12 @@ class VerloopActivity : AppCompatActivity() {
             }
 
             headerConfig.subtitle?.let { ito ->
-                tvSubTitle?.visibility = View.VISIBLE
-                tvSubTitle?.text = ito
-                headerConfig.subtitleColor?.let { tvSubTitle?.setTextColor(Color.parseColor(it)) }
-                headerConfig.subtitleFontSize?.let { tvSubTitle?.textSize = it }
+                if(ito.isNotEmpty()) {
+                    tvSubTitle?.visibility = View.VISIBLE
+                    tvSubTitle?.text = ito
+                    headerConfig.subtitleColor?.let { tvSubTitle?.setTextColor(Color.parseColor(it)) }
+                    headerConfig.subtitleFontSize?.let { tvSubTitle?.textSize = it }
+                }
             }
 
 
