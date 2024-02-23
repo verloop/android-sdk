@@ -160,11 +160,13 @@ class VerloopActivity : AppCompatActivity() {
                 .titleColor(CommonUtils.getExpandedColorHex(clientInfo.textColor))
                 .titlePosition(Position.valueOf(settings?.Header?.Title?.Position.toString()))
                 .titleFontSize(18.0f)
-                .subtitle(settings?.Header?.Subtitle?.Heading.toString())
-                .subtitlePosition(Position.valueOf(settings?.Header?.Subtitle?.Position.toString()))
-                .subtitleColor(CommonUtils.getExpandedColorHex(clientInfo.textColor))
-                .subtitleFontSize(12.0f)
                 .backgroundColor(settings?.Theme?.ColorPalette?.Primary.toString())
+                .apply { if (!settings?.Header?.Subtitle?.Heading.toString().isNullOrEmpty()) {
+                    subtitle(settings?.Header?.Subtitle?.Heading.toString())
+                    subtitlePosition(Position.valueOf(settings?.Header?.Subtitle?.Position.toString()))
+                    subtitleColor(CommonUtils.getExpandedColorHex(clientInfo.textColor))
+                    subtitleFontSize(12.0f)
+                }}
                 .build()
 
             if (config?.headerConfig != null) {
