@@ -107,11 +107,8 @@ class VerloopActivity : AppCompatActivity() {
 
     @Suppress("DEPRECATION")
     private fun getConfig(): VerloopConfig? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("config", VerloopConfig::class.java)
-        } else {
-            intent.getParcelableExtra("config")
-        }
+        // Needs to replaced with IntentCompat.getParcelableExtra(intent, "config", VerloopConfig::class.java) after upgrading API 34
+        return intent.getParcelableExtra("config")
     }
 
     override fun onResume() {
