@@ -2,7 +2,11 @@ package io.verloop.sdk.ui
 
 import android.Manifest
 import android.content.Intent
-import android.graphics.*
+import android.graphics.BitmapFactory
+import android.graphics.BlendMode
+import android.graphics.BlendModeColorFilter
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.lifecycle.ViewModelProvider
@@ -105,13 +110,8 @@ class VerloopActivity : AppCompatActivity() {
         else "https://${this.config!!.clientId}.verloop.io"
     }
 
-    @Suppress("DEPRECATION")
     private fun getConfig(): VerloopConfig? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("config", VerloopConfig::class.java)
-        } else {
-            intent.getParcelableExtra("config")
-        }
+        return IntentCompat.getParcelableExtra(intent, "config", VerloopConfig::class.java)
     }
 
     override fun onResume() {
