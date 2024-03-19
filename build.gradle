@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.6.21'
+    ext.kotlin_version = '1.8.0'
     ext.mockito_version = '3.6.28'
 
     repositories {
@@ -12,8 +12,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'com.google.gms:google-services:4.4.1'
 //        classpath 'com.kezong:fat-aar:1.2.15'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 

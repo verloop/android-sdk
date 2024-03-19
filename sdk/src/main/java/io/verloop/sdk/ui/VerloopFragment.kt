@@ -22,6 +22,7 @@ import android.widget.ProgressBar
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.Constants
@@ -72,12 +73,7 @@ class VerloopFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        config = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arguments?.getParcelable("config", VerloopConfig::class.java)
-        } else {
-            @Suppress("DEPRECATION") arguments?.getParcelable("config")
-        }
-
+        config = arguments?.let { BundleCompat.getParcelable(it, "config",  VerloopConfig::class.java) }
         configKey = arguments?.getString("configKey")
 
         if (config != null) {
