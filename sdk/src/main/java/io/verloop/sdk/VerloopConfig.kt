@@ -1,12 +1,12 @@
 package io.verloop.sdk
 
-import android.os.Build
-import android.os.Parcel
 import android.os.Parcelable
 import io.verloop.sdk.model.HeaderConfig
 import io.verloop.sdk.model.LogLevel
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
+@Parcelize
 data class VerloopConfig private constructor(
     var clientId: String?,
     var userId: String?,
@@ -57,38 +57,6 @@ data class VerloopConfig private constructor(
         this.userId = userId
     }
 
-    @Suppress("DEPRECATION")
-    constructor(source: Parcel) : this(source.readString().toString()) {
-        this.userId = source.readString()
-        this.fcmToken = source.readString()
-        this.userName = source.readString()
-        this.userEmail = source.readString()
-        this.userPhone = source.readString()
-        this.recipeId = source.readString()
-        this.department = source.readString()
-        this.logLevel = LogLevel.values()[source.readInt()]
-        this.isStaging = source.readInt() == 1
-        this.closeExistingChat = source.readInt() == 1
-        this.overrideUrlClick = source.readInt() == 1
-        this.overrideHeaderLayout = source.readInt() == 1
-        this.openMenuWidgetOnStart = source.readInt() == 1
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            this.headerConfig = source.readParcelable(
-                HeaderConfig::class.java.classLoader,
-                HeaderConfig::class.java
-            )
-            this.fields =
-                source.readArrayList(
-                    CustomField::class.java.classLoader,
-                    CustomField::class.java
-                ) as ArrayList<CustomField>
-        } else {
-            this.headerConfig = source.readParcelable(HeaderConfig::class.java.classLoader)
-            this.fields =
-                source.readArrayList(CustomField::class.java.classLoader) as ArrayList<CustomField>
-        }
-    }
-
     fun putCustomField(key: String, value: String, scope: Scope) {
         fields.add(CustomField(key, value, scope))
     }
@@ -129,70 +97,16 @@ data class VerloopConfig private constructor(
         this.logLevel = logLevel
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeString(this.clientId)
-        dest.writeString(this.userId)
-        dest.writeString(this.fcmToken)
-        dest.writeString(this.userName)
-        dest.writeString(this.userEmail)
-        dest.writeString(this.userPhone)
-        dest.writeString(this.recipeId)
-        dest.writeString(this.department)
-        dest.writeInt(this.logLevel.ordinal)
-        dest.writeByte((if (this.isStaging) 1 else 0).toByte())
-        dest.writeByte((if (this.closeExistingChat) 1 else 0).toByte())
-        dest.writeByte((if (this.overrideUrlClick) 1 else 0).toByte())
-        dest.writeByte((if (this.overrideHeaderLayout) 1 else 0).toByte())
-        dest.writeByte((if (this.openMenuWidgetOnStart) 1 else 0).toByte())
-        dest.writeParcelable(this.headerConfig, flags)
-        dest.writeList(this.fields)
-    }
-
-    companion object {
-        @JvmField
-        val CREATOR = object : Parcelable.Creator<VerloopConfig> {
-            override fun createFromParcel(parcel: Parcel) = VerloopConfig(parcel)
-            override fun newArray(size: Int) = arrayOfNulls<VerloopConfig>(size)
-        }
-    }
-
     enum class Scope {
         USER, ROOM
     }
 
+    @Parcelize
     class CustomField(var key: String?, var value: String?, var scope: Scope?) : Parcelable {
-
-        override fun describeContents(): Int {
-            return 0
-        }
 
         constructor() : this(
             null, null, Scope.USER
         )
-
-        constructor(source: Parcel) : this() {
-            this.key = source.readString()
-            this.value = source.readString()
-            this.scope = Scope.values()[source.readInt()]
-        }
-
-        override fun writeToParcel(dest: Parcel, flags: Int) {
-            dest.writeString(this.key)
-            dest.writeString(this.value)
-            this.scope?.ordinal?.let { dest.writeInt(it) }
-        }
-
-        companion object {
-            @JvmField
-            val CREATOR = object : Parcelable.Creator<CustomField> {
-                override fun createFromParcel(parcel: Parcel) = CustomField(parcel)
-                override fun newArray(size: Int) = arrayOfNulls<CustomField>(size)
-            }
-        }
 
     }
 
