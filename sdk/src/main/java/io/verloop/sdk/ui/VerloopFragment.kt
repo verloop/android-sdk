@@ -1,14 +1,19 @@
 package io.verloop.sdk.ui
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.DownloadManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -19,9 +24,12 @@ import android.webkit.*
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -365,6 +373,14 @@ class VerloopFragment : Fragment() {
                     callJavaScript("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
                 }
             }
+
+            if (it.allowFileDownload) {
+                logEvent(
+                    LogLevel.DEBUG, Constants.JS_CALL_SHOW_DOWNLOAD_BUTTON,
+                    JSONObject().put("showDownloadButton", it.allowFileDownload)
+                )
+                callJavaScript("VerloopLivechat.showDownloadButton(\"${it.allowFileDownload}\");")
+            }
         }
         logEvent(LogLevel.DEBUG, Constants.JS_CALL_WIDGET_OPENED, null)
         callJavaScript("VerloopLivechat.widgetOpened();")
@@ -379,6 +395,8 @@ class VerloopFragment : Fragment() {
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "*/*"
         resultLauncher?.launch(intent)
+
+//        downloadFile("https://files.testfile.org/PDF/50MB-TESTFILE.ORG.pdf")
     }
 
     fun fileUploadResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -467,5 +485,38 @@ class VerloopFragment : Fragment() {
         if (config?.logLevel?.ordinal!! >= level.ordinal) {
             viewModel?.logEvent(LogEvent(level.name, message, params))
         }
+    }
+
+    private fun downloadFile(url: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && // 1.
+            ContextCompat.checkSelfPermission( // 2.
+                requireActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions( // 3.
+                requireActivity(),
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1
+            )
+            Toast.makeText( // 4,
+                requireContext(),
+                "Permission denied. Grant permissions and try again.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
+        Toast.makeText(requireContext(), "Download started", Toast.LENGTH_SHORT).show()
+
+        val downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val request = DownloadManager.Request(Uri.parse(url))
+            .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "document.pdf") // Replace with desired filename
+            .setTitle("Document Download")
+            .setDescription("Downloading document from $url")
+
+        downloadManager.enqueue(request)
     }
 }

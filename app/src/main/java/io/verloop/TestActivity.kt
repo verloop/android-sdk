@@ -148,6 +148,7 @@ class TestActivity : AppCompatActivity() {
                         .closeExistingChat(checkCloseExistingChat.isChecked)
                         .openMenuWidgetOnStart(openMenuWidgetOnStart.isChecked)
                         .overrideHeaderLayout(false)
+                        .allowFileDownload(true)
                         .headerConfig(headerConfig)
                         .fields(customFields).build()
 

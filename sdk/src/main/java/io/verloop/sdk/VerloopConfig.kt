@@ -22,7 +22,8 @@ data class VerloopConfig private constructor(
     var overrideHeaderLayout: Boolean = false,
     var openMenuWidgetOnStart: Boolean = false,
     var headerConfig: HeaderConfig? = null,
-    var fields: ArrayList<CustomField> = ArrayList()
+    var fields: ArrayList<CustomField> = ArrayList(),
+    var allowFileDownload: Boolean = false
 ) : Parcelable {
 
     var logLevel: LogLevel = LogLevel.WARNING
@@ -49,7 +50,8 @@ data class VerloopConfig private constructor(
         false,
         false,
         null,
-        ArrayList()
+        ArrayList(),
+        false
     )
 
     @Deprecated("Use builder instead")
@@ -125,7 +127,8 @@ data class VerloopConfig private constructor(
         var overrideHeaderLayout: Boolean = false,
         var openMenuWidgetOnStart: Boolean = false,
         var headerConfig: HeaderConfig? = null,
-        var fields: ArrayList<CustomField> = ArrayList()
+        var fields: ArrayList<CustomField> = ArrayList(),
+        var allowFileDownload: Boolean = false,
     ) {
         fun clientId(clientId: String?) = apply { this.clientId = clientId }
         fun userId(userId: String?) = apply {
@@ -157,6 +160,9 @@ data class VerloopConfig private constructor(
         fun overrideHeaderLayout(overrideHeaderLayout: Boolean) =
             apply { this.overrideHeaderLayout = overrideHeaderLayout }
 
+        fun allowFileDownload(allowFileDownload: Boolean) =
+            apply { this.allowFileDownload = allowFileDownload }
+
         fun openMenuWidgetOnStart(openMenuWidgetOnStart: Boolean) =
             apply { this.openMenuWidgetOnStart = openMenuWidgetOnStart }
 
@@ -187,7 +193,8 @@ data class VerloopConfig private constructor(
                 overrideHeaderLayout,
                 openMenuWidgetOnStart,
                 headerConfig,
-                fields
+                fields,
+                allowFileDownload
             )
         }
     }

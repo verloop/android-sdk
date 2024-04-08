@@ -36,7 +36,7 @@ dependencies {
     implementation 'androidx.media:media:1.6.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
-//    implementation 'com.github.verloop:android-sdk:1.1.0'
+//    implementation 'com.github.verloop:android-sdk:1.1.14'
     implementation project(':sdk')
     implementation 'com.google.android.material:material:1.7.0-alpha02'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'// for local testing
