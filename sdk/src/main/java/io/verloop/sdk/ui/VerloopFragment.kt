@@ -447,7 +447,6 @@ class VerloopFragment : Fragment() {
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onDownloadClick(jsonString: String?) {
-        println("onDownloadClick ${jsonString.toString()}")
         if (!jsonString.isNullOrEmpty()) {
             val jsonObject = JSONObject(jsonString)
             val url = jsonObject.getString("url")
