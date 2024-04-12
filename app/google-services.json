@@ -1,116 +1,39 @@
 {
   "project_info": {
-    "project_number": "988356977057",
-    "firebase_url": "https://deeplink-test-ac269.firebaseio.com",
-    "project_id": "deeplink-test-ac269",
-    "storage_bucket": "deeplink-test-ac269.appspot.com"
+    "project_number": "375186201110",
+    "firebase_url": "https://verloop-sdk.firebaseio.com",
+    "project_id": "verloop-sdk",
+    "storage_bucket": "verloop-sdk.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:988356977057:android:8613f9ee3aae93a36e6be0",
-        "android_client_info": {
-          "package_name": "io.verloop"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "988356977057-v879kvtv741190jkqqljpr066i16drre.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCs8gAXczoAgaWpeFpXYO_IKQcLLy97Nyo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "988356977057-v879kvtv741190jkqqljpr066i16drre.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "988356977057-nfrsr7i48j0lk276gve2a9psqom48lgn.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "io.verloop.verloopFlutterSdkExample"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:988356977057:android:46fab4d7b13a7b746e6be0",
+        "mobilesdk_app_id": "1:375186201110:android:30ad788fb5565fdc",
         "android_client_info": {
           "package_name": "io.verloop.demo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "988356977057-v879kvtv741190jkqqljpr066i16drre.apps.googleusercontent.com",
+          "client_id": "375186201110-u9g1c3hsgnrf27pm7af61vo1ar089tb1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCs8gAXczoAgaWpeFpXYO_IKQcLLy97Nyo"
+          "current_key": "AIzaSyAnVB2rHeybVYm8YQboWJb86g0z5oAVfB4"
         }
       ],
       "services": {
+        "analytics_service": {
+          "status": 1
+        },
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "988356977057-v879kvtv741190jkqqljpr066i16drre.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "988356977057-nfrsr7i48j0lk276gve2a9psqom48lgn.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "io.verloop.verloopFlutterSdkExample"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:988356977057:android:a7c210f0a7a120096e6be0",
-        "android_client_info": {
-          "package_name": "io.verloop.verloop_flutter_sdk_example"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "988356977057-v879kvtv741190jkqqljpr066i16drre.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCs8gAXczoAgaWpeFpXYO_IKQcLLy97Nyo"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "988356977057-v879kvtv741190jkqqljpr066i16drre.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "988356977057-nfrsr7i48j0lk276gve2a9psqom48lgn.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "io.verloop.verloopFlutterSdkExample"
-              }
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
         }
       }
     }
