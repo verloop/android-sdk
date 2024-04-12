@@ -28,7 +28,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.os.BundleCompat
 import androidx.fragment.app.Fragment
@@ -41,6 +40,7 @@ import io.verloop.sdk.api.VerloopServiceBuilder
 import io.verloop.sdk.model.LogEvent
 import io.verloop.sdk.model.LogLevel
 import io.verloop.sdk.repository.VerloopRepository
+import io.verloop.sdk.utils.CommonUtils
 import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
@@ -395,8 +395,6 @@ class VerloopFragment : Fragment() {
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "*/*"
         resultLauncher?.launch(intent)
-
-//        downloadFile("https://files.testfile.org/PDF/50MB-TESTFILE.ORG.pdf")
     }
 
     fun fileUploadResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -448,6 +446,17 @@ class VerloopFragment : Fragment() {
 
     @JavascriptInterface
     @Throws(JSONException::class)
+    fun onDownloadClick(jsonString: String?) {
+        println("onDownloadClick ${jsonString.toString()}")
+        if (!jsonString.isNullOrEmpty()) {
+            val jsonObject = JSONObject(jsonString)
+            val url = jsonObject.getString("url")
+            downloadFile(url)
+        }
+    }
+
+    @JavascriptInterface
+    @Throws(JSONException::class)
     fun livechatEvent(json: String) {
         logEvent(LogLevel.DEBUG, "livechatEvent", JSONObject(json))
         val params = JSONObject(json)
@@ -487,36 +496,54 @@ class VerloopFragment : Fragment() {
         }
     }
 
-    private fun downloadFile(url: String) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && // 1.
-            ContextCompat.checkSelfPermission( // 2.
+    private fun downloadFile(url: String?) {
+        if (url.isNullOrEmpty())
+            return
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+            ContextCompat.checkSelfPermission(
                 requireActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
             != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions( // 3.
-                requireActivity(),
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                1
-            )
-            Toast.makeText( // 4,
-                requireContext(),
-                "Permission denied. Grant permissions and try again.",
-                Toast.LENGTH_LONG
-            ).show()
+            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             return
         }
 
-        Toast.makeText(requireContext(), "Download started", Toast.LENGTH_SHORT).show()
+        startDownloadRequest(url)
+    }
 
-        val downloadManager = requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+    private fun startDownloadRequest(url: String){
+        showToast(getString(R.string.download_started))
+        val (fileNameFull, extension) = CommonUtils.getFileNameAndExtension(url)
+
+        val downloadManager =
+            requireContext().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val request = DownloadManager.Request(Uri.parse(url))
             .setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
-            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "document.pdf") // Replace with desired filename
-            .setTitle("Document Download")
-            .setDescription("Downloading document from $url")
+            .setDestinationInExternalPublicDir(
+                Environment.DIRECTORY_DOWNLOADS,
+                fileNameFull
+            )
+            .setTitle("Downloading $extension File")
+            .setDescription("Downloading $fileNameFull")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
 
         downloadManager.enqueue(request)
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showToast("Permission Granted, Try Again!")
+        } else {
+            showToast("Need to grant Permission to continue download!")
+        }
+    }
+
+    private fun showToast(msg: String){
+        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
 }
