@@ -15,7 +15,7 @@ Then add the Verloop's dependency in your app's gradle file
 
 ```
   dependencies {
-          implementation 'com.github.verloop:android-sdk:1.1.14'
+          implementation 'com.github.verloop:android-sdk:1.1.15'
   }
 ```
 
@@ -45,6 +45,7 @@ var config = VerloopConfig.Builder()
     .fields(customFields)               // These are predefined variables added on room level or user level
     .overrideHeaderLayout(false)        // Use toolbar_verloop.xml from parent project to set custom header. Can't use along with headerConfig
     .headerConfig(headerConfig)         // Configuration to customize toolbar. Can't use along with overrideHeaderLayout
+    .allowFileDownload(true)            // This will allow visitors to download the attachments. If this is false, download button will not be visible on the attachment
     .build()                            // this would build the final config object which is later used by Verloop object to star the chat
 
 val verloop = Verloop(this, config)     // `this` here refers to an activity context.
