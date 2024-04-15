@@ -1,6 +1,7 @@
 package io.verloop.sdk.utils
 
 import android.content.Context
+import java.net.URL
 
 class CommonUtils {
 
@@ -24,6 +25,12 @@ class CommonUtils {
 
         fun pxFromDp(context: Context, dp: Int): Float {
             return dp * context.resources.displayMetrics.density
+        }
+
+        fun getFileNameAndExtension(url: String): Pair<String, String> {
+            val fileNameFull = URL(url).path.substringAfterLast("/")
+            val extension = fileNameFull.substringAfterLast(".")
+            return Pair(fileNameFull, extension)
         }
     }
 }

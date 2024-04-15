@@ -9,4 +9,5 @@ object Constants {
     internal const val JS_CALL_WIDGET_OPENED = "JS_CALL: WidgetOpened"
     internal const val JS_CALL_CLOSE = "JS_CALL: Close"
     internal const val JS_CALL_OPEN_MENU_WIDGET = "JS_CALL: OpenMenuWidget"
+    internal const val JS_CALL_SHOW_DOWNLOAD_BUTTON = "JS_CALL: ShowDownloadButton"
 }
