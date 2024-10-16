@@ -224,10 +224,11 @@ class VerloopFragment : Fragment() {
             override fun shouldOverrideUrlLoading(
                 view: WebView?, request: WebResourceRequest
             ): Boolean {
-                var url: String = request.url.toString()
+                val url: String = request.url.toString()
                 if (url.startsWith(baseUri)) {
                     return false
                 }
+                view?.loadUrl(url)
                 return true
             }
         }
@@ -251,6 +252,8 @@ class VerloopFragment : Fragment() {
                 return true
             }
         }
+
+
 
         val settings: WebSettings = mWebView.settings
         if (activity?.applicationContext?.cacheDir != null) {
