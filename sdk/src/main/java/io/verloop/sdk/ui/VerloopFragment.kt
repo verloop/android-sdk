@@ -228,7 +228,8 @@ class VerloopFragment : Fragment() {
                 if (url.startsWith(baseUri)) {
                     return false
                 }
-                view?.loadUrl(url)
+                val newWebView = WebView(requireContext())
+                newWebView.loadUrl(url)
                 return true
             }
         }
