@@ -120,6 +120,7 @@ class VerloopActivity : AppCompatActivity() {
         // Register broadcast receiver
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // For Android 13 (API 33) and above
+            logEvent(LogLevel.DEBUG, "$TAG:onClosingEvent", null)
             registerReceiver(
                 closeActivityReceiver,
                 IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
@@ -127,6 +128,7 @@ class VerloopActivity : AppCompatActivity() {
             )
         } else {
             // For older Android versions
+            logEvent(LogLevel.DEBUG, "$TAG:onClosingEvent", null)
             registerReceiver(
                 closeActivityReceiver,
                 IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET)
