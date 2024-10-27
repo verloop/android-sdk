@@ -55,7 +55,9 @@ import java.net.URL
 
 object Constants {
     const val ACTION_CLOSE_VERLOOP_WIDGET = "io.verloop.CLOSE_VERLOOP_WIDGET"
+    const val ACTION_VERLOOP_WIDGET_TO_BACKGROUND = "io.verloop.PUSH_VERLOOP_WIDGET_TO_BACKGROUND"
 }
+
 class VerloopActivity : AppCompatActivity() {
 
     private lateinit var verloopFragment: VerloopFragment
@@ -71,7 +73,16 @@ class VerloopActivity : AppCompatActivity() {
     private val closeActivityReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Constants.ACTION_CLOSE_VERLOOP_WIDGET) {
+                logEvent(LogLevel.DEBUG, "$TAG:onClosingEvent", null)
                 finish()
+            }
+        }
+    }
+    private val putActivityInBackgroundReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Constants.ACTION_CLOSE_VERLOOP_WIDGET) {
+                logEvent(LogLevel.DEBUG, "$TAG:onPushingToBackground", null)
+                moveTaskToBack(true)
             }
         }
     }
@@ -120,18 +131,25 @@ class VerloopActivity : AppCompatActivity() {
         // Register broadcast receiver
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // For Android 13 (API 33) and above
-            logEvent(LogLevel.DEBUG, "$TAG:onClosingEvent", null)
             registerReceiver(
                 closeActivityReceiver,
                 IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
                 Context.RECEIVER_NOT_EXPORTED
             )
+            registerReceiver(
+                putActivityInBackgroundReceiver,
+                IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND),
+                Context.RECEIVER_NOT_EXPORTED
+            )
         } else {
             // For older Android versions
-            logEvent(LogLevel.DEBUG, "$TAG:onClosingEvent", null)
             registerReceiver(
                 closeActivityReceiver,
                 IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET)
+            )
+            registerReceiver(
+                putActivityInBackgroundReceiver,
+                IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND)
             )
         }
 
@@ -307,7 +325,7 @@ class VerloopActivity : AppCompatActivity() {
             }
 
             headerConfig.subtitle?.let { ito ->
-                if(ito.isNotEmpty()) {
+                if (ito.isNotEmpty()) {
                     tvSubTitle?.visibility = View.VISIBLE
                     tvSubTitle?.text = ito
                     headerConfig.subtitleColor?.let { tvSubTitle?.setTextColor(Color.parseColor(it)) }
@@ -318,11 +336,13 @@ class VerloopActivity : AppCompatActivity() {
 
             headerConfig.titlePosition?.let {
                 tvTitle?.gravity = getGravity(it)
-                tvTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
+                tvTitle?.layoutParams =
+                    getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
             }
             headerConfig.subtitlePosition?.let {
                 tvSubTitle?.gravity = getGravity(it)
-                tvSubTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
+                tvSubTitle?.layoutParams =
+                    getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
             }
         }
     }
