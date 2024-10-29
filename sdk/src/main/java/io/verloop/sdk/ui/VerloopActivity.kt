@@ -1,7 +1,10 @@
 package io.verloop.sdk.ui
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.BitmapFactory
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
@@ -50,6 +53,11 @@ import java.net.MalformedURLException
 import java.net.URL
 
 
+object Constants {
+    const val ACTION_CLOSE_VERLOOP_WIDGET = "io.verloop.CLOSE_VERLOOP_WIDGET"
+    const val ACTION_VERLOOP_WIDGET_TO_BACKGROUND = "io.verloop.PUSH_VERLOOP_WIDGET_TO_BACKGROUND"
+}
+
 class VerloopActivity : AppCompatActivity() {
 
     private lateinit var verloopFragment: VerloopFragment
@@ -61,6 +69,23 @@ class VerloopActivity : AppCompatActivity() {
     private var brandLogo: ImageView? = null
     private var tvTitle: TextView? = null
     private var tvSubTitle: TextView? = null
+
+    private val closeActivityReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Constants.ACTION_CLOSE_VERLOOP_WIDGET) {
+                logEvent(LogLevel.DEBUG, "$TAG:onClosingEvent", null)
+                finish()
+            }
+        }
+    }
+    private val putActivityInBackgroundReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Constants.ACTION_CLOSE_VERLOOP_WIDGET) {
+                logEvent(LogLevel.DEBUG, "$TAG:onPushingToBackground", null)
+                moveTaskToBack(true)
+            }
+        }
+    }
 
     companion object {
         const val TAG = "VerloopActivity"
@@ -103,6 +128,31 @@ class VerloopActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) requestPermissionLauncher.launch(
             Manifest.permission.POST_NOTIFICATIONS
         )
+        // Register broadcast receiver
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13 (API 33) and above
+            registerReceiver(
+                closeActivityReceiver,
+                IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
+                Context.RECEIVER_NOT_EXPORTED
+            )
+            registerReceiver(
+                putActivityInBackgroundReceiver,
+                IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND),
+                Context.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            // For older Android versions
+            registerReceiver(
+                closeActivityReceiver,
+                IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET)
+            )
+            registerReceiver(
+                putActivityInBackgroundReceiver,
+                IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND)
+            )
+        }
+
     }
 
     private fun getBaseUrl(): String {
@@ -130,6 +180,7 @@ class VerloopActivity : AppCompatActivity() {
         logEvent(LogLevel.DEBUG, "$TAG:onDestroy", null)
         super.onDestroy()
         eventListeners.remove(configKey)
+        unregisterReceiver(closeActivityReceiver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -274,7 +325,7 @@ class VerloopActivity : AppCompatActivity() {
             }
 
             headerConfig.subtitle?.let { ito ->
-                if(ito.isNotEmpty()) {
+                if (ito.isNotEmpty()) {
                     tvSubTitle?.visibility = View.VISIBLE
                     tvSubTitle?.text = ito
                     headerConfig.subtitleColor?.let { tvSubTitle?.setTextColor(Color.parseColor(it)) }
@@ -285,11 +336,13 @@ class VerloopActivity : AppCompatActivity() {
 
             headerConfig.titlePosition?.let {
                 tvTitle?.gravity = getGravity(it)
-                tvTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
+                tvTitle?.layoutParams =
+                    getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
             }
             headerConfig.subtitlePosition?.let {
                 tvSubTitle?.gravity = getGravity(it)
-                tvSubTitle?.layoutParams = getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
+                tvSubTitle?.layoutParams =
+                    getLayoutParamsForCenterAlignment(headerConfig.brandLogo, it)
             }
         }
     }
