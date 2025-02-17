@@ -129,8 +129,20 @@ class VerloopActivity : AppCompatActivity() {
             Manifest.permission.POST_NOTIFICATIONS
         )
         // Register broadcast receiver
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // For Android 13 (API 33) and above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // For Android 14 (API 34) and above
+            registerReceiver(
+                closeActivityReceiver,
+                IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
+                Context.RECEIVER_NOT_EXPORTED or Context.RECEIVER_VISIBLE_TO_INSTANT_APPS
+            )
+            registerReceiver(
+                putActivityInBackgroundReceiver,
+                IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND),
+                Context.RECEIVER_NOT_EXPORTED or Context.RECEIVER_VISIBLE_TO_INSTANT_APPS
+            )
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13 (API 33)
             registerReceiver(
                 closeActivityReceiver,
                 IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
