@@ -1,6 +1,7 @@
 package io.verloop.sdk.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -91,6 +92,7 @@ class VerloopActivity : AppCompatActivity() {
         const val TAG = "VerloopActivity"
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
@@ -125,21 +127,22 @@ class VerloopActivity : AppCompatActivity() {
             addFragment()
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) requestPermissionLauncher.launch(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) requestPermissionLauncher.launch(
             Manifest.permission.POST_NOTIFICATIONS
         )
         // Register broadcast receiver
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val flags = Context.RECEIVER_NOT_EXPORTED
             // For Android 13 (API 33) and above
             registerReceiver(
                 closeActivityReceiver,
                 IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
-                Context.RECEIVER_NOT_EXPORTED
+                flags
             )
             registerReceiver(
                 putActivityInBackgroundReceiver,
                 IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND),
-                Context.RECEIVER_NOT_EXPORTED
+                flags
             )
         } else {
             // For older Android versions
@@ -181,6 +184,7 @@ class VerloopActivity : AppCompatActivity() {
         super.onDestroy()
         eventListeners.remove(configKey)
         unregisterReceiver(closeActivityReceiver)
+        unregisterReceiver(putActivityInBackgroundReceiver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
