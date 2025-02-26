@@ -196,7 +196,6 @@ class VerloopActivity : AppCompatActivity() {
         super.onDestroy()
         eventListeners.remove(configKey)
         unregisterReceiver(closeActivityReceiver)
-        unregisterReceiver(putActivityInBackgroundReceiver)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
