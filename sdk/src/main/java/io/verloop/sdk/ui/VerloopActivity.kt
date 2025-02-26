@@ -132,7 +132,11 @@ class VerloopActivity : AppCompatActivity() {
         )
         // Register broadcast receiver
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            val flags = Context.RECEIVER_NOT_EXPORTED
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                Context.RECEIVER_EXPORTED
+            } else {
+                Context.RECEIVER_NOT_EXPORTED
+            }
             // For Android 13 (API 33) and above
             registerReceiver(
                 closeActivityReceiver,
@@ -144,7 +148,15 @@ class VerloopActivity : AppCompatActivity() {
                 IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND),
                 flags
             )
-        } else {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13 (API 33)
+            registerReceiver(
+                closeActivityReceiver,
+                IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
+                Context.RECEIVER_EXPORTED
+            )
+        }
+        else {
             // For older Android versions
             registerReceiver(
                 closeActivityReceiver,
