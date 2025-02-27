@@ -92,7 +92,6 @@ class VerloopActivity : AppCompatActivity() {
         const val TAG = "VerloopActivity"
     }
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
