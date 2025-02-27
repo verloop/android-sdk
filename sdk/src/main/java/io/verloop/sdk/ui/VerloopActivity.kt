@@ -1,6 +1,7 @@
 package io.verloop.sdk.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -125,23 +126,36 @@ class VerloopActivity : AppCompatActivity() {
             addFragment()
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) requestPermissionLauncher.launch(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) requestPermissionLauncher.launch(
             Manifest.permission.POST_NOTIFICATIONS
         )
         // Register broadcast receiver
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                Context.RECEIVER_EXPORTED
+            } else {
+                Context.RECEIVER_NOT_EXPORTED
+            }
             // For Android 13 (API 33) and above
             registerReceiver(
                 closeActivityReceiver,
                 IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
-                Context.RECEIVER_NOT_EXPORTED
+                flags
             )
             registerReceiver(
                 putActivityInBackgroundReceiver,
                 IntentFilter(Constants.ACTION_VERLOOP_WIDGET_TO_BACKGROUND),
-                Context.RECEIVER_NOT_EXPORTED
+                flags
             )
-        } else {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // For Android 13 (API 33)
+            registerReceiver(
+                closeActivityReceiver,
+                IntentFilter(Constants.ACTION_CLOSE_VERLOOP_WIDGET),
+                Context.RECEIVER_EXPORTED
+            )
+        }
+        else {
             // For older Android versions
             registerReceiver(
                 closeActivityReceiver,
