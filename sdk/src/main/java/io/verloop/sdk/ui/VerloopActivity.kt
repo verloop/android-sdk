@@ -29,6 +29,7 @@ import androidx.core.content.IntentCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.R
 import io.verloop.sdk.Verloop.Companion.eventListeners
