@@ -46,6 +46,7 @@ import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
 import org.json.JSONObject
+import androidx.annotation.RequiresApi
 import java.util.*
 
 class VerloopFragment : Fragment() {
