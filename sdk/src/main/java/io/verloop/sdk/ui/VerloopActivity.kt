@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.R
 import io.verloop.sdk.Verloop.Companion.eventListeners
@@ -100,6 +101,18 @@ class VerloopActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.verloop_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""
+
+        // Apply insets to toolbar so it doesn’t overlap status bar (android >=15)
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(
+                v.paddingLeft,
+                systemBars.top,   // push toolbar content below status bar
+                v.paddingRight,
+                v.paddingBottom
+            )
+            insets
+        }
 
         brandLogo = toolbar.findViewById(R.id.verloop_brand_logo)
         tvTitle = toolbar.findViewById(R.id.toolbar_title)
