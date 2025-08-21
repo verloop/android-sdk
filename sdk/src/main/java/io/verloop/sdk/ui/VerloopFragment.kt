@@ -27,9 +27,10 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.os.BundleCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.Constants
@@ -130,6 +131,13 @@ class VerloopFragment : Fragment() {
         mWebView = view.findViewById(R.id.webView)
         layoutReload = view.findViewById(R.id.layoutReload)
         buttonReload = view.findViewById(R.id.buttonReload)
+
+        // Enable edge-to-edge by handling window insets
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
 
         buttonReload.setOnClickListener {
             this.mWebView.removeAllViews()
