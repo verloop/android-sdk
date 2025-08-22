@@ -99,27 +99,16 @@ class VerloopActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verloop)
 
-        // this is to handle the keyboard appearance
         val rootView = findViewById<View>(R.id.verloop_layout)
-        ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, insets ->
-            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            v.setPadding(0, 0, 0, imeHeight)
-            insets
-        }
 
         toolbar = findViewById(R.id.verloop_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""
 
-        // Apply insets to toolbar so it doesn’t overlap status bar (android >=15)
+        // Apply top system bar inset to toolbar
         ViewCompat.setOnApplyWindowInsetsListener(toolbar) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(
-                v.paddingLeft,
-                systemBars.top,   // push toolbar content below status bar
-                v.paddingRight,
-                v.paddingBottom
-            )
+            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
             insets
         }
 

@@ -129,24 +129,20 @@ class VerloopFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // this is to handle the keyboard appearance
         ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            v.setPadding(0, 0, 0, imeHeight)
-            insets
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val isKeyboardVisible = ime.bottom > 0
+            // on opening of keyboard ime.bottom also includes systemBars.bottom, this creates extra padding beneath inputbox, so subtracting
+            val bottomInset = if (isKeyboardVisible) ime.bottom - systemBars.bottom else 0
+            v.setPadding(systemBars.left, 0, systemBars.right, bottomInset)
+            WindowInsetsCompat.CONSUMED
         }
 
         progressBar = view.findViewById(R.id.progressBar)
         mWebView = view.findViewById(R.id.webView)
         layoutReload = view.findViewById(R.id.layoutReload)
         buttonReload = view.findViewById(R.id.buttonReload)
-
-        // Enable edge-to-edge by handling window insets
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            WindowInsetsCompat.CONSUMED
-        }
 
         buttonReload.setOnClickListener {
             this.mWebView.removeAllViews()
