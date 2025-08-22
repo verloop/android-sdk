@@ -99,6 +99,14 @@ class VerloopActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verloop)
 
+        // this is to handle the keyboard appearance
+        val rootView = findViewById<View>(R.id.verloop_layout)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, insets ->
+            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            v.setPadding(0, 0, 0, imeHeight)
+            insets
+        }
+
         toolbar = findViewById(R.id.verloop_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""
@@ -181,6 +189,23 @@ class VerloopActivity : AppCompatActivity() {
             )
         }
 
+        // starting android 15 we have edge-to-edge screens
+        // this allows user to have complete control of the screen
+        // since for the older version safe view like status bar and navigation bar were auto calculated, for newer versions it needs to be handled via WindowInsets
+        rootView.setOnApplyWindowInsetsListener { view, insets ->
+            val systemInsets = insets.getInsets(android.view.WindowInsets.Type.systemBars())
+            view.setPadding(systemInsets.left, 0, systemInsets.right, systemInsets.bottom)
+
+            // Adjust toolbar height dynamically 
+            val lp = toolbar.layoutParams
+            val minToolbarHeight = resources.getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material)
+            lp.height = minToolbarHeight + systemInsets.top
+            toolbar.layoutParams = lp
+
+            toolbar.setPadding(toolbar.paddingLeft, systemInsets.top, toolbar.paddingRight, toolbar.paddingBottom)
+            insets
+        }
+        rootView.requestApplyInsets()
     }
 
     private fun getBaseUrl(): String {

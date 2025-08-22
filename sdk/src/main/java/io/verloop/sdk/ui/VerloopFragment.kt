@@ -128,6 +128,14 @@ class VerloopFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // this is to handle the keyboard appearance
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            v.setPadding(0, 0, 0, imeHeight)
+            insets
+        }
+
         progressBar = view.findViewById(R.id.progressBar)
         mWebView = view.findViewById(R.id.webView)
         layoutReload = view.findViewById(R.id.layoutReload)
