@@ -28,6 +28,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.R
 import io.verloop.sdk.Verloop.Companion.eventListeners
@@ -97,9 +99,18 @@ class VerloopActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verloop)
 
+        val rootView = findViewById<View>(R.id.verloop_layout)
+
         toolbar = findViewById(R.id.verloop_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.title = ""
+
+        // Apply top system bar inset to toolbar
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
+            insets
+        }
 
         brandLogo = toolbar.findViewById(R.id.verloop_brand_logo)
         tvTitle = toolbar.findViewById(R.id.toolbar_title)
@@ -167,6 +178,23 @@ class VerloopActivity : AppCompatActivity() {
             )
         }
 
+        // starting android 15 we have edge-to-edge screens
+        // this allows user to have complete control of the screen
+        // since for the older version safe view like status bar and navigation bar were auto calculated, for newer versions it needs to be handled via WindowInsets
+        rootView.setOnApplyWindowInsetsListener { view, insets ->
+            val systemInsets = insets.getInsets(android.view.WindowInsets.Type.systemBars())
+            view.setPadding(systemInsets.left, 0, systemInsets.right, systemInsets.bottom)
+
+            // Adjust toolbar height dynamically 
+            val lp = toolbar.layoutParams
+            val minToolbarHeight = resources.getDimensionPixelSize(R.dimen.abc_action_bar_default_height_material)
+            lp.height = minToolbarHeight + systemInsets.top
+            toolbar.layoutParams = lp
+
+            toolbar.setPadding(toolbar.paddingLeft, systemInsets.top, toolbar.paddingRight, toolbar.paddingBottom)
+            insets
+        }
+        rootView.requestApplyInsets()
     }
 
     private fun getBaseUrl(): String {

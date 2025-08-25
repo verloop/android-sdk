@@ -27,9 +27,10 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.os.BundleCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import io.verloop.sdk.Constants
@@ -45,6 +46,7 @@ import io.verloop.sdk.viewmodel.MainViewModel
 import io.verloop.sdk.viewmodel.MainViewModelFactory
 import org.json.JSONException
 import org.json.JSONObject
+import androidx.annotation.RequiresApi
 import java.util.*
 
 class VerloopFragment : Fragment() {
@@ -126,6 +128,17 @@ class VerloopFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val isKeyboardVisible = ime.bottom > 0
+            // on opening of keyboard ime.bottom also includes systemBars.bottom, this creates extra padding beneath inputbox, so subtracting
+            val bottomInset = if (isKeyboardVisible) ime.bottom - systemBars.bottom else 0
+            v.setPadding(systemBars.left, 0, systemBars.right, bottomInset)
+            WindowInsetsCompat.CONSUMED
+        }
+
         progressBar = view.findViewById(R.id.progressBar)
         mWebView = view.findViewById(R.id.webView)
         layoutReload = view.findViewById(R.id.layoutReload)
