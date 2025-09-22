@@ -56,16 +56,18 @@ class VerloopFragment : Fragment() {
      * Otherwise, it will store the request and call it after roomReady.
      */
     fun clearChat() {
-        Log.d(TAG, "clearChat() called in VerloopFragment")
-        val ready = isWidgetReady()
-        Log.d(TAG, "isWidgetReady() = $ready, loading = $loading, webViewVisible = ${if (::mWebView.isInitialized) mWebView.visibility == View.VISIBLE else "not initialized"}")
-        if (ready) {
-            Log.d(TAG, "Widget is ready, calling VerloopLivechat.close() via JS")
-            callJavaScript("VerloopLivechat.close();")
-            io.verloop.sdk.Verloop.pendingCloseChat = false
-        } else {
-            Log.d(TAG, "Widget not ready, setting pendingCloseChat = true")
-            io.verloop.sdk.Verloop.pendingCloseChat = true
+        Handler(Looper.getMainLooper()).post {
+            Log.d(TAG, "clearChat() called in VerloopFragment")
+            val ready = isWidgetReady()
+            Log.d(TAG, "isWidgetReady() = $ready, loading = $loading, webViewVisible = ${if (::mWebView.isInitialized) mWebView.visibility == View.VISIBLE else "not initialized"}")
+            if (ready) {
+                Log.d(TAG, "Widget is ready, calling VerloopLivechat.close() via JS")
+                callJavaScript("VerloopLivechat.close();")
+                io.verloop.sdk.Verloop.pendingCloseChat = false
+            } else {
+                Log.d(TAG, "Widget not ready, setting pendingCloseChat = true")
+                io.verloop.sdk.Verloop.pendingCloseChat = true
+            }
         }
     }
 
