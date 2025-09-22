@@ -25,7 +25,7 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             if (fragment != null) {
                 Log.d(TAG, "VerloopFragment found, calling clearChat() on fragment")
                 fragment.clearChat()
-                Companion.pendingCloseChat = false
+                // Do NOT reset pendingCloseChat here; let the fragment do it after close
             } else {
                 Log.w(TAG, "VerloopFragment not found in activity, setting pendingCloseChat = true")
                 Companion.pendingCloseChat = true
