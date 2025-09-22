@@ -16,6 +16,26 @@ import java.util.*
 
 class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
+    fun clearChat() {
+        Log.d(TAG, "clearChat() called from SDK")
+        val activity = io.verloop.sdk.ui.VerloopActivity.currentInstance
+        if (activity != null) {
+            Log.d(TAG, "VerloopActivity.currentInstance is not null")
+            val fragment = activity.supportFragmentManager.findFragmentByTag("VerloopActivity#Fragment") as? io.verloop.sdk.ui.VerloopFragment
+            if (fragment != null) {
+                Log.d(TAG, "VerloopFragment found, calling clearChat() on fragment")
+                fragment.clearChat()
+                Companion.pendingCloseChat = false
+            } else {
+                Log.w(TAG, "VerloopFragment not found in activity, setting pendingCloseChat = true")
+                Companion.pendingCloseChat = true
+            }
+        } else {
+            Log.w(TAG, "VerloopActivity.currentInstance is null, setting pendingCloseChat = true")
+            Companion.pendingCloseChat = true
+        }
+    }
+
     val TAG = "VerloopOBJECT"
     val PREF_USER_ID = "user_id"
     private val prefName = "VerloopPreference"
@@ -31,6 +51,10 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         // Centralized access to the event listeners for all Verloop objects.
         // Used for passing callback events triggered from the WebView back to the user via ViewModel
         val eventListeners = HashMap<String?, VerloopEventListener>()
+
+    // Global flag to track if closeChat was requested before widget was ready
+    @JvmStatic
+    var pendingCloseChat: Boolean = false
     }
 
     @Deprecated("Not in use anymore")

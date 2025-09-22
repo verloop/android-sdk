@@ -62,6 +62,10 @@ object Constants {
 }
 
 class VerloopActivity : AppCompatActivity() {
+    companion object {
+        var currentInstance: VerloopActivity? = null
+        const val TAG = "VerloopActivity"
+    }
 
     private lateinit var verloopFragment: VerloopFragment
     private lateinit var toolbar: Toolbar
@@ -90,11 +94,8 @@ class VerloopActivity : AppCompatActivity() {
         }
     }
 
-    companion object {
-        const val TAG = "VerloopActivity"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        currentInstance = this
         Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_verloop)
@@ -218,6 +219,7 @@ class VerloopActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        currentInstance = null
         Log.d(TAG, "onDestroy")
         logEvent(LogLevel.DEBUG, "$TAG:onDestroy", null)
         super.onDestroy()

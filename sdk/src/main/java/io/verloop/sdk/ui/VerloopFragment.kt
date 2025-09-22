@@ -50,6 +50,27 @@ import androidx.annotation.RequiresApi
 import java.util.*
 
 class VerloopFragment : Fragment() {
+    /**
+     * Call this method from outside to close the chat widget.
+     * If the widget is ready, it will call verloopLivechat.close() immediately.
+     * Otherwise, it will store the request and call it after roomReady.
+     */
+    fun clearChat() {
+        // If the widget is already ready, close immediately
+        if (isWidgetReady()) {
+            callJavaScript("VerloopLivechat.close();")
+            io.verloop.sdk.Verloop.pendingCloseChat = false
+        } else {
+            // Otherwise, set flag to close after roomReady
+            io.verloop.sdk.Verloop.pendingCloseChat = true
+        }
+    }
+
+    // Helper to check if widget is ready (after roomReady)
+    private fun isWidgetReady(): Boolean {
+        // You can improve this logic if you have a more robust ready state
+        return mWebView.visibility == View.VISIBLE && !loading
+    }
 
     private lateinit var baseUri: String
     private lateinit var mWebView: WebView
@@ -494,7 +515,12 @@ class VerloopFragment : Fragment() {
                 logEvent(LogLevel.DEBUG, Constants.JS_CALL_CLOSE, null)
                 callJavaScript("VerloopLivechat.close();")
             }
-
+            // New: If clearChat was requested before ready, call it now
+            if (io.verloop.sdk.Verloop.pendingCloseChat) {
+                logEvent(LogLevel.DEBUG, "External clearChat invoked after ready", null)
+                callJavaScript("VerloopLivechat.close();")
+                io.verloop.sdk.Verloop.pendingCloseChat = false
+            }
             if (config?.openMenuWidgetOnStart == true) {
                 logEvent(LogLevel.DEBUG, Constants.JS_CALL_OPEN_MENU_WIDGET, null)
                 callJavaScript("VerloopLivechat.openMenuWidget();")
