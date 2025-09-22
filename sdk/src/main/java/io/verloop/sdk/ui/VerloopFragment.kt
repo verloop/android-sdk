@@ -56,12 +56,15 @@ class VerloopFragment : Fragment() {
      * Otherwise, it will store the request and call it after roomReady.
      */
     fun clearChat() {
-        // If the widget is already ready, close immediately
-        if (isWidgetReady()) {
+        Log.d(TAG, "clearChat() called in VerloopFragment")
+        val ready = isWidgetReady()
+        Log.d(TAG, "isWidgetReady() = $ready, loading = $loading, webViewVisible = ${if (::mWebView.isInitialized) mWebView.visibility == View.VISIBLE else "not initialized"}")
+        if (ready) {
+            Log.d(TAG, "Widget is ready, calling VerloopLivechat.close() via JS")
             callJavaScript("VerloopLivechat.close();")
             io.verloop.sdk.Verloop.pendingCloseChat = false
         } else {
-            // Otherwise, set flag to close after roomReady
+            Log.d(TAG, "Widget not ready, setting pendingCloseChat = true")
             io.verloop.sdk.Verloop.pendingCloseChat = true
         }
     }
