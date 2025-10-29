@@ -16,15 +16,15 @@ import java.util.*
 
 class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
 
-    fun clearChat() {
-        Log.d(TAG, "clearChat() called from SDK")
+    fun closeChat() {
+        Log.d(TAG, "closeChat() called from SDK")
         val activity = io.verloop.sdk.ui.VerloopActivity.currentInstance
         if (activity != null) {
             Log.d(TAG, "VerloopActivity.currentInstance is not null")
             val fragment = activity.supportFragmentManager.findFragmentByTag("VerloopActivity#Fragment") as? io.verloop.sdk.ui.VerloopFragment
             if (fragment != null) {
-                Log.d(TAG, "VerloopFragment found, calling clearChat() on fragment")
-                fragment.clearChat()
+                Log.d(TAG, "VerloopFragment found, calling closeChat() on fragment")
+                fragment.closeChat()
                 // Do NOT reset pendingCloseChat here; let the fragment do it after close
             } else {
                 Log.w(TAG, "VerloopFragment not found in activity, setting pendingCloseChat = true")
@@ -90,6 +90,16 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
      * This will logout the user and unregister the device from notification subscription.
      */
     fun logout() {
+        Log.d(TAG, "logout() called on SDK -> attempting to close widget if fragment present")
+        val activity = io.verloop.sdk.ui.VerloopActivity.currentInstance
+        val fragment = activity?.supportFragmentManager?.findFragmentByTag("VerloopActivity#Fragment") as? io.verloop.sdk.ui.VerloopFragment
+        if (fragment != null) {
+            Log.d(TAG, "Fragment present: invoking fragment.logoutWidget() to call JS close with 'logout'")
+            fragment.logoutWidget()
+        } else {
+            Log.d(TAG, "Fragment not present: skipping fragment logout JS call")
+        }
+
         val data = Data.Builder()
             .putString(LogoutRequestBody.CLIENT_ID, verloopConfig.clientId)
             .putString(LogoutRequestBody.USER_ID, verloopConfig.userId)

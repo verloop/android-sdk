@@ -55,9 +55,9 @@ class VerloopFragment : Fragment() {
      * If the widget is ready, it will call verloopLivechat.close() immediately.
      * Otherwise, it will store the request and call it after roomReady.
      */
-    fun clearChat() {
+    fun closeChat() {
         Handler(Looper.getMainLooper()).post {
-            Log.d(TAG, "clearChat() called in VerloopFragment")
+            Log.d(TAG, "closeChat() called in VerloopFragment")
             val ready = isWidgetReady()
             Log.d(TAG, "isWidgetReady() = $ready, loading = $loading, webViewVisible = ${if (::mWebView.isInitialized) mWebView.visibility == View.VISIBLE else "not initialized"}")
             if (ready) {
@@ -461,6 +461,22 @@ class VerloopFragment : Fragment() {
         }
     }
 
+    /**
+     * Called by SDK when a logout is requested. This will instruct the webview to close the
+     * widget with a logout reason so the JS side can cleanup.
+     */
+    fun logoutWidget() {
+        Log.d(TAG, "logoutWidget() invoked on fragment")
+        Handler(Looper.getMainLooper()).post {
+            if (::mWebView.isInitialized) {
+                logEvent(LogLevel.DEBUG, "Invoking JS close for logout", null)
+                callJavaScript("VerloopLivechat.close('logout');")
+            } else {
+                Log.w(TAG, "WebView not initialized, cannot call logout JS")
+            }
+        }
+    }
+
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onButtonClick(json: String) {
@@ -520,9 +536,9 @@ class VerloopFragment : Fragment() {
                 logEvent(LogLevel.DEBUG, Constants.JS_CALL_CLOSE, null)
                 callJavaScript("VerloopLivechat.close();")
             }
-            // New: If clearChat was requested before ready, call it now
+            // New: If closeChat was requested before ready, call it now
             if (io.verloop.sdk.Verloop.pendingCloseChat) {
-                logEvent(LogLevel.DEBUG, "External clearChat invoked after ready", null)
+                logEvent(LogLevel.DEBUG, "External closeChat invoked after ready", null)
                 callJavaScript("VerloopLivechat.close();")
                 io.verloop.sdk.Verloop.pendingCloseChat = false
             }
