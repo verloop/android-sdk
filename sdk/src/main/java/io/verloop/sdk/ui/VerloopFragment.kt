@@ -50,6 +50,32 @@ import androidx.annotation.RequiresApi
 import java.util.*
 
 class VerloopFragment : Fragment() {
+    /**
+     * Call this method from outside to close the chat widget.
+     * If the widget is ready, it will call verloopLivechat.close() immediately.
+     * Otherwise, it will store the request and call it after roomReady.
+     */
+    fun closeChat() {
+        Handler(Looper.getMainLooper()).post {
+            Log.d(TAG, "closeChat() called in VerloopFragment")
+            val ready = isWidgetReady()
+            Log.d(TAG, "isWidgetReady() = $ready, loading = $loading, webViewVisible = ${if (::mWebView.isInitialized) mWebView.visibility == View.VISIBLE else "not initialized"}")
+            if (ready) {
+                Log.d(TAG, "Widget is ready, calling VerloopLivechat.close() via JS")
+                callJavaScript("VerloopLivechat.close();")
+                io.verloop.sdk.Verloop.pendingCloseChat = false
+            } else {
+                Log.d(TAG, "Widget not ready, setting pendingCloseChat = true")
+                io.verloop.sdk.Verloop.pendingCloseChat = true
+            }
+        }
+    }
+
+    // Helper to check if widget is ready (after roomReady)
+    private fun isWidgetReady(): Boolean {
+        // You can improve this logic if you have a more robust ready state
+        return mWebView.visibility == View.VISIBLE && !loading
+    }
 
     private lateinit var baseUri: String
     private lateinit var mWebView: WebView
@@ -435,6 +461,22 @@ class VerloopFragment : Fragment() {
         }
     }
 
+    /**
+     * Called by SDK when a logout is requested. This will instruct the webview to close the
+     * widget with a logout reason so the JS side can cleanup.
+     */
+    fun logoutWidget() {
+        Log.d(TAG, "logoutWidget() invoked on fragment")
+        Handler(Looper.getMainLooper()).post {
+            if (::mWebView.isInitialized) {
+                logEvent(LogLevel.DEBUG, "Invoking JS close for logout", null)
+                callJavaScript("VerloopLivechat.close('logout');")
+            } else {
+                Log.w(TAG, "WebView not initialized, cannot call logout JS")
+            }
+        }
+    }
+
     @JavascriptInterface
     @Throws(JSONException::class)
     fun onButtonClick(json: String) {
@@ -494,7 +536,12 @@ class VerloopFragment : Fragment() {
                 logEvent(LogLevel.DEBUG, Constants.JS_CALL_CLOSE, null)
                 callJavaScript("VerloopLivechat.close();")
             }
-
+            // New: If closeChat was requested before ready, call it now
+            if (io.verloop.sdk.Verloop.pendingCloseChat) {
+                logEvent(LogLevel.DEBUG, "External closeChat invoked after ready", null)
+                callJavaScript("VerloopLivechat.close();")
+                io.verloop.sdk.Verloop.pendingCloseChat = false
+            }
             if (config?.openMenuWidgetOnStart == true) {
                 logEvent(LogLevel.DEBUG, Constants.JS_CALL_OPEN_MENU_WIDGET, null)
                 callJavaScript("VerloopLivechat.openMenuWidget();")
