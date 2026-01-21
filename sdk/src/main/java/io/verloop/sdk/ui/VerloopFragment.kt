@@ -92,6 +92,8 @@ class VerloopFragment : Fragment() {
     private var config: VerloopConfig? = null
     private var loading: Boolean = false
 
+    private var pendingPermissionRequest: PermissionRequest? = null
+
     companion object {
         private const val TAG = "VerloopFragment"
         private const val ICE_CREAM = 12421
@@ -288,6 +290,30 @@ class VerloopFragment : Fragment() {
                 this@VerloopFragment.filePathCallback = filePathCallback
                 openFileSelector()
                 return true
+            }
+
+//          Handles microphone permission initiated by webView
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+            override fun onPermissionRequest(request: PermissionRequest) {
+                activity?.runOnUiThread {
+                    val resources = request.resources
+                    for (resource in resources) {
+                        if (resource == PermissionRequest.RESOURCE_AUDIO_CAPTURE) {
+                            if (ContextCompat.checkSelfPermission(
+                                    requireContext(),
+                                    Manifest.permission.RECORD_AUDIO
+                                ) == PackageManager.PERMISSION_GRANTED
+                            ) {
+                                request.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+                            } else {
+                                pendingPermissionRequest = request
+                                microphonePermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                            }
+                            return@runOnUiThread
+                        }
+                    }
+                    request.deny()
+                }
             }
         }
 
@@ -599,6 +625,22 @@ class VerloopFragment : Fragment() {
             showToast("Permission Granted, Try Again!")
         } else {
             showToast("Need to grant Permission to continue download!")
+        }
+    }
+
+    private val microphonePermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        pendingPermissionRequest?.let { request ->
+            activity?.runOnUiThread {
+                if (isGranted) {
+                    request.grant(arrayOf(PermissionRequest.RESOURCE_AUDIO_CAPTURE))
+                } else {
+                    showToast("Microphone permission is required to send voice messages")
+                    request.deny()
+                }
+            }
+            pendingPermissionRequest = null
         }
     }
 
