@@ -30,7 +30,6 @@ class TestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
-        WebView.setWebContentsDebuggingEnabled(true);
 
         // Use either header config or overrideHeaderLayout
         headerConfig = HeaderConfig.Builder()
