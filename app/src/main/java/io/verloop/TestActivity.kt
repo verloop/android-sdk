@@ -17,6 +17,8 @@ import io.verloop.sdk.utils.NetworkUtils
 import org.json.JSONException
 import org.json.JSONObject
 import android.net.Uri
+import android.webkit.WebView
+
 class TestActivity : AppCompatActivity() {
 
     private val TAG: String = "TestActivity"
@@ -28,6 +30,7 @@ class TestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test)
+        WebView.setWebContentsDebuggingEnabled(true);
 
         // Use either header config or overrideHeaderLayout
         headerConfig = HeaderConfig.Builder()
