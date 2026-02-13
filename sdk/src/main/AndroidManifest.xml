@@ -16,7 +16,7 @@
         <activity
             android:name=".ui.VerloopActivity"
             android:alwaysRetainTaskState="true"
-            android:exported="true"
+            android:exported="false"
             android:fitsSystemWindows="true"
             android:windowSoftInputMode="adjustResize"
             android:launchMode="singleTop"

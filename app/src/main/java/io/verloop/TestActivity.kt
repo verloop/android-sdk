@@ -17,6 +17,7 @@ import io.verloop.sdk.utils.NetworkUtils
 import org.json.JSONException
 import org.json.JSONObject
 import android.net.Uri
+
 class TestActivity : AppCompatActivity() {
 
     private val TAG: String = "TestActivity"

@@ -391,10 +391,9 @@ class VerloopFragment : Fragment() {
             if (!it.userEmail.isNullOrEmpty()) userParamsObject.put("email", it.userEmail)
             if (!it.userName.isNullOrEmpty()) userParamsObject.put("name", it.userName)
             if (!it.userPhone.isNullOrEmpty()) userParamsObject.put("phone", it.userPhone)
-
             if (userParamsObject.length() > 0) {
                 logEvent(LogLevel.DEBUG, Constants.JS_CALL_SET_USER_PARAMS, userParamsObject)
-                callJavaScript("VerloopLivechat.setUserParams(${userParamsObject});")
+                callJavaScript("VerloopLivechat.setUserParams(${userParamsObject.toString()});")
             }
             if (!it.userId.isNullOrEmpty()) {
                 logEvent(
@@ -402,21 +401,21 @@ class VerloopFragment : Fragment() {
                     Constants.JS_CALL_SET_USER_ID,
                     JSONObject().put("userId", it.userId)
                 )
-                callJavaScript("VerloopLivechat.setUserId(\"${it.userId}\");")
+                callJavaScript("VerloopLivechat.setUserId(${JSONObject.quote(it.userId)});")
             }
             if (!it.department.isNullOrEmpty()) {
                 logEvent(
                     LogLevel.DEBUG, Constants.JS_CALL_SET_DEPARTMENT,
                     JSONObject().put("department", it.department)
                 )
-                callJavaScript("VerloopLivechat.setDepartment(\"${it.department}\");")
+                callJavaScript("VerloopLivechat.setDepartment(${JSONObject.quote(it.department)});")
             }
             if (!it.recipeId.isNullOrEmpty()) {
                 logEvent(
                     LogLevel.DEBUG, Constants.JS_CALL_SET_RECIPE,
                     JSONObject().put("recipeId", it.recipeId)
                 )
-                callJavaScript("VerloopLivechat.setRecipe(\"${it.recipeId}\");")
+                callJavaScript("VerloopLivechat.setRecipe(${JSONObject.quote(it.recipeId)});")
             }
 
             // Custom Fields
@@ -435,7 +434,7 @@ class VerloopFragment : Fragment() {
                         Constants.JS_CALL_SET_CUSTOM_FIELD,
                         params
                     )
-                    callJavaScript("VerloopLivechat.setCustomField(\"${field.key}\", \"${field.value}\", ${scopeObject});")
+                    callJavaScript("VerloopLivechat.setCustomField(${JSONObject.quote(field.key)},${JSONObject.quote(field.value)}, ${scopeObject});")
                 }
             }
 
@@ -444,7 +443,7 @@ class VerloopFragment : Fragment() {
                     LogLevel.DEBUG, Constants.JS_CALL_SHOW_DOWNLOAD_BUTTON,
                     JSONObject().put("showDownloadButton", it.allowFileDownload)
                 )
-                callJavaScript("VerloopLivechat.showDownloadButton(\"${it.allowFileDownload}\");")
+                callJavaScript("VerloopLivechat.showDownloadButton(${it.allowFileDownload});")
             }
         }
         logEvent(LogLevel.DEBUG, Constants.JS_CALL_WIDGET_OPENED, null)
