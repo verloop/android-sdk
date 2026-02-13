@@ -17,7 +17,6 @@ import io.verloop.sdk.utils.NetworkUtils
 import org.json.JSONException
 import org.json.JSONObject
 import android.net.Uri
-import android.webkit.WebView
 
 class TestActivity : AppCompatActivity() {
 
