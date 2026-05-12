@@ -167,5 +167,13 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
         fun onLogEvent(logEvent: LogEvent) {
             config.logEventListener?.logEvent(logEvent)
         }
+
+        fun onChatStarted() {
+            config.chatStartedListenerImpl?.onChatStarted()
+        }
+
+        fun onRoomReady() {
+            config.roomReadyListenerImpl?.onRoomReady()
+        }
     }
 }

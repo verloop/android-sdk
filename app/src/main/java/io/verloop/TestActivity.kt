@@ -24,6 +24,16 @@ class TestActivity : AppCompatActivity() {
 
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
+
+    private val chatStarted: () -> Unit = {
+        Log.i(TAG, "Chat Started")
+        Toast.makeText(applicationContext, "Chat Started", Toast.LENGTH_SHORT).show()
+    }
+
+    private val roomReady: () -> Unit = {
+        Log.i(TAG, "Room Ready")
+        Toast.makeText(applicationContext, "Room Ready", Toast.LENGTH_SHORT).show()
+    }
     var headerConfig: HeaderConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,7 +159,7 @@ class TestActivity : AppCompatActivity() {
                         .closeExistingChat(checkCloseExistingChat.isChecked)
                         .openMenuWidgetOnStart(openMenuWidgetOnStart.isChecked)
                         .overrideHeaderLayout(false)
-                        .allowFileDownload(true)
+                        .allowFileDownload(false)
                         .headerConfig(headerConfig)
                         .fields(customFields).build()
 
@@ -171,6 +181,7 @@ class TestActivity : AppCompatActivity() {
                 verloopConfig?.setButtonClickListener(object : LiveChatButtonClickListener {
                     override fun buttonClicked(title: String?, type: String?, payload: String?) {
                         if (type == "web_url"){
+                            Log.d("URL",payload.toString())
                             try {
                                 val jsonPayload = JSONObject(payload)
                                 val url = jsonPayload.optString("url")
@@ -190,6 +201,8 @@ class TestActivity : AppCompatActivity() {
                         }
                     }
                 })
+                verloopConfig?.setChatStartedListener(chatStarted)
+                verloopConfig?.setRoomReadyListner(roomReady)
                 verloop = Verloop(this, verloopConfig!!)
                 verloop?.showChat()
             } catch (e: VerloopException) {
@@ -274,3 +287,4 @@ class TestActivity : AppCompatActivity() {
         }
     }
 }
+

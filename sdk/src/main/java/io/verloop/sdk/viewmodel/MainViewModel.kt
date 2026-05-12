@@ -28,6 +28,14 @@ class MainViewModel(var configKey: String?, var repository: VerloopRepository) :
         }
     }
 
+    fun chatStarted() {
+        Verloop.eventListeners[configKey]?.onChatStarted()
+    }
+
+    fun roomReady() {
+        Verloop.eventListeners[configKey]?.onRoomReady()
+    }
+
     fun urlClicked(json: String) {
         configKey.let {
             Verloop.eventListeners[configKey]?.onURLClick(json)
