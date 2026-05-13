@@ -168,12 +168,12 @@ class Verloop(val context: Context, var verloopConfig: VerloopConfig) {
             config.logEventListener?.logEvent(logEvent)
         }
 
-        fun onChatStarted() {
-            config.chatStartedListenerImpl?.onChatStarted()
+        fun onChatStarted(roomId: String?) {
+            config.chatStartedListenerImpl?.onChatStarted(roomId)
         }
 
-        fun onRoomReady() {
-            config.roomReadyListenerImpl?.onRoomReady()
+        fun onRoomReady(roomId: String?) {
+            config.roomReadyListenerImpl?.onRoomReady(roomId)
         }
     }
 }

@@ -578,24 +578,26 @@ class VerloopFragment : Fragment() {
 
     private fun handleCallback(args: org.json.JSONArray?) {
         val eventName = args?.optString(0) ?: return
+        val payload = args.optJSONObject(1)
+        val roomId = payload?.optString("roomId", null)
         when (eventName) {
-            "chat-started" -> callChatStarted()
-            "room-ready" -> callRoomReady()
+            "chat-started" -> callChatStarted(roomId)
+            "room-ready" -> callRoomReady(roomId)
             // room-ready, chat-ended, etc. — add later as needed
         }
     }
 
-    private fun callChatStarted(){
+    private fun callChatStarted(roomId: String?){
         logEvent(LogLevel.INFO, "ChatStarted", null)
         Handler(Looper.getMainLooper()).post {
-            viewModel?.chatStarted()
+            viewModel?.chatStarted(roomId)
         }
     }
 
-    private fun callRoomReady(){
+    private fun callRoomReady(roomId: String?){
         logEvent(LogLevel.INFO, "Room Ready", null)
         Handler(Looper.getMainLooper()).post {
-            viewModel?.roomReady()
+            viewModel?.roomReady(roomId)
         }
     }
 

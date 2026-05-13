@@ -28,12 +28,12 @@ class MainViewModel(var configKey: String?, var repository: VerloopRepository) :
         }
     }
 
-    fun chatStarted() {
-        Verloop.eventListeners[configKey]?.onChatStarted()
+    fun chatStarted(roomId: String?) {
+        Verloop.eventListeners[configKey]?.onChatStarted(roomId)
     }
 
-    fun roomReady() {
-        Verloop.eventListeners[configKey]?.onRoomReady()
+    fun roomReady(roomId: String?) {
+        Verloop.eventListeners[configKey]?.onRoomReady(roomId)
     }
 
     fun urlClicked(json: String) {

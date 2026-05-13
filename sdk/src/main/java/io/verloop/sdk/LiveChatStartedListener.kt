@@ -1,5 +1,5 @@
 package io.verloop.sdk
 
 fun interface LiveChatStartedListener {
-    fun onChatStarted()
+    fun onChatStarted(roomId: String?)
 }

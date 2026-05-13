@@ -25,13 +25,13 @@ class TestActivity : AppCompatActivity() {
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
 
-    private val chatStarted: () -> Unit = {
-        Log.i(TAG, "Chat Started")
+    private val chatStarted: (String?) -> Unit = { roomId ->
+        Log.i(TAG, "Chat Started - roomId $roomId")
         Toast.makeText(applicationContext, "Chat Started", Toast.LENGTH_SHORT).show()
     }
 
-    private val roomReady: () -> Unit = {
-        Log.i(TAG, "Room Ready")
+    private val roomReady: (String?) -> Unit = { roomId ->
+        Log.i(TAG, "Room Ready - roomId $roomId")
         Toast.makeText(applicationContext, "Room Ready", Toast.LENGTH_SHORT).show()
     }
     var headerConfig: HeaderConfig? = null

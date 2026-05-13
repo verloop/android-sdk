@@ -1,5 +1,6 @@
 package io.verloop.sdk
 
+
 fun interface LiveChatRoomReadyListner {
-    fun onRoomReady()
+    fun onRoomReady(roomId: String?)
 }
