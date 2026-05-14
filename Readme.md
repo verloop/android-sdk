@@ -247,12 +247,20 @@ click listeners can be added using:
 `overrideUrlClick`: keep it as true if you want to handle the url internally in your app. Else keep
 it false if you want to open a browser when url is clicked.
 
-```kotlin
-config?.setUrlClickListener(object : LiveChatUrlClickListener {
-    override fun buttonClicked(url: String?) {
-        // Add the app logic for url click
+### Chat Started Listener
+
+Receive a callback when a new chat conversation has been started for the user.
+This fires once the chat has been initiated and the backend has assigned a
+`roomId` for the conversation. Use it to log analytics, persist the room
+reference, or trigger any in-app behaviour that depends on a chat being live.
+
+  ```kotlin
+  config?.setChatStartedListener(object : LiveChatStartedListener {
+    override fun onChatStarted(roomId: String?) {
+        // A new chat has started — `roomId` identifies this conversation
+        // Log.d("Chat Started","roomId = $roomId")
     }
-}, overrideUrlClick)
+})
 ```
 
 # User session management

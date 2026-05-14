@@ -17,6 +17,7 @@ import io.verloop.sdk.utils.NetworkUtils
 import org.json.JSONException
 import org.json.JSONObject
 import android.net.Uri
+import kotlin.math.log
 
 class TestActivity : AppCompatActivity() {
 
@@ -25,15 +26,6 @@ class TestActivity : AppCompatActivity() {
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
 
-    private val chatStarted: (String?) -> Unit = { roomId ->
-        Log.i(TAG, "Chat Started - roomId $roomId")
-        Toast.makeText(applicationContext, "Chat Started", Toast.LENGTH_SHORT).show()
-    }
-
-    private val roomReady: (String?) -> Unit = { roomId ->
-        Log.i(TAG, "Room Ready - roomId $roomId")
-        Toast.makeText(applicationContext, "Room Ready", Toast.LENGTH_SHORT).show()
-    }
     var headerConfig: HeaderConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -201,8 +193,16 @@ class TestActivity : AppCompatActivity() {
                         }
                     }
                 })
-                verloopConfig?.setChatStartedListener(chatStarted)
-                verloopConfig?.setRoomReadyListner(roomReady)
+                verloopConfig?.setChatStartedListener(object : LiveChatStartedListener{
+                    override fun onChatStarted(roomId: String?) {
+                        Log.d("Chat Started"," roomId = $roomId")
+                    }
+                })
+                verloopConfig?.setRoomReadyListener(object : LiveChatRoomReadyListner{
+                    override fun onRoomReady(roomId: String?) {
+                        Log.d("Room Ready","roomId = $roomId")
+                    }
+                })
                 verloop = Verloop(this, verloopConfig!!)
                 verloop?.showChat()
             } catch (e: VerloopException) {

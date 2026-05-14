@@ -92,7 +92,7 @@ data class VerloopConfig private constructor(
      * Callback for chat started
      * @param roomReadyListenerImpl
      */
-    fun setRoomReadyListner(listener: LiveChatRoomReadyListner) {
+    fun setRoomReadyListener(listener: LiveChatRoomReadyListner) {
         this.roomReadyListenerImpl = listener   // ← uses new name
     }
 
