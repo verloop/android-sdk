@@ -29,6 +29,11 @@ data class VerloopConfig private constructor(
     var logLevel: LogLevel = LogLevel.WARNING
 
     var buttonOnClickListener: LiveChatButtonClickListener? = null
+
+    var chatStartedListenerImpl: LiveChatStartedListener? = null
+
+    var roomReadyListenerImpl: LiveChatRoomReadyListner? = null
+
     var chatUrlClickListener: LiveChatUrlClickListener? = null
 
     var logEventListener: LiveLogEventListener? = null
@@ -73,6 +78,22 @@ data class VerloopConfig private constructor(
      */
     fun setButtonClickListener(buttonOnClickListener: LiveChatButtonClickListener) {
         this.buttonOnClickListener = buttonOnClickListener
+    }
+
+    /**
+     * Callback for chat started
+     * @param chatStartedListener
+     */
+    fun setChatStartedListener(listener: LiveChatStartedListener) {
+        this.chatStartedListenerImpl = listener   // ← uses new name
+    }
+
+    /**
+     * Callback for chat started
+     * @param roomReadyListenerImpl
+     */
+    fun setRoomReadyListener(listener: LiveChatRoomReadyListner) {
+        this.roomReadyListenerImpl = listener   // ← uses new name
     }
 
     /**

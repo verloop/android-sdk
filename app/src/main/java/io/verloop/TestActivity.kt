@@ -17,6 +17,7 @@ import io.verloop.sdk.utils.NetworkUtils
 import org.json.JSONException
 import org.json.JSONObject
 import android.net.Uri
+import kotlin.math.log
 
 class TestActivity : AppCompatActivity() {
 
@@ -24,6 +25,7 @@ class TestActivity : AppCompatActivity() {
 
     var verloop: Verloop? = null
     var verloop2: Verloop? = null
+
     var headerConfig: HeaderConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -149,7 +151,7 @@ class TestActivity : AppCompatActivity() {
                         .closeExistingChat(checkCloseExistingChat.isChecked)
                         .openMenuWidgetOnStart(openMenuWidgetOnStart.isChecked)
                         .overrideHeaderLayout(false)
-                        .allowFileDownload(true)
+                        .allowFileDownload(false)
                         .headerConfig(headerConfig)
                         .fields(customFields).build()
 
@@ -171,6 +173,7 @@ class TestActivity : AppCompatActivity() {
                 verloopConfig?.setButtonClickListener(object : LiveChatButtonClickListener {
                     override fun buttonClicked(title: String?, type: String?, payload: String?) {
                         if (type == "web_url"){
+                            Log.d("URL",payload.toString())
                             try {
                                 val jsonPayload = JSONObject(payload)
                                 val url = jsonPayload.optString("url")
@@ -188,6 +191,16 @@ class TestActivity : AppCompatActivity() {
                                 Log.e(TAG, "Error opening browser", e)
                             }
                         }
+                    }
+                })
+                verloopConfig?.setChatStartedListener(object : LiveChatStartedListener{
+                    override fun onChatStarted(roomId: String?) {
+                        Log.d("Chat Started"," roomId = $roomId")
+                    }
+                })
+                verloopConfig?.setRoomReadyListener(object : LiveChatRoomReadyListner{
+                    override fun onRoomReady(roomId: String?) {
+                        Log.d("Room Ready","roomId = $roomId")
                     }
                 })
                 verloop = Verloop(this, verloopConfig!!)
@@ -274,3 +287,4 @@ class TestActivity : AppCompatActivity() {
         }
     }
 }
+

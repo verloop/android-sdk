@@ -543,6 +543,8 @@ class VerloopFragment : Fragment() {
             ready()
         } else if (params.getString("fn").equals("roomReady")) {
             roomReady()
+        }else if (params.getString("fn").equals("callback")) {
+            handleCallback(params.optJSONArray("args"))
         }
     }
 
@@ -571,6 +573,31 @@ class VerloopFragment : Fragment() {
                 logEvent(LogLevel.DEBUG, Constants.JS_CALL_OPEN_MENU_WIDGET, null)
                 callJavaScript("VerloopLivechat.openMenuWidget();")
             }
+        }
+    }
+
+    private fun handleCallback(args: org.json.JSONArray?) {
+        val eventName = args?.optString(0) ?: return
+        val payload = args.optJSONObject(1)
+        val roomId = payload?.optString("roomId", null)
+        when (eventName) {
+            "chat-started" -> callChatStarted(roomId)
+            "room-ready" -> callRoomReady(roomId)
+            // room-ready, chat-ended, etc. — add later as needed
+        }
+    }
+
+    private fun callChatStarted(roomId: String?){
+        logEvent(LogLevel.INFO, "ChatStarted", null)
+        Handler(Looper.getMainLooper()).post {
+            viewModel?.chatStarted(roomId)
+        }
+    }
+
+    private fun callRoomReady(roomId: String?){
+        logEvent(LogLevel.INFO, "Room Ready", null)
+        Handler(Looper.getMainLooper()).post {
+            viewModel?.roomReady(roomId)
         }
     }
 
